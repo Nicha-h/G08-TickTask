@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { addWeeks, subWeeks, format, startOfWeek, eachDayOfInterval } from 'date-fns';
+import ArrowLeft from '../assets/ArrowLeft.svg';
+import ArrowRight from '../assets/ArrowRight.svg';
 
 function Home() {
   const date = new Date();
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
   const calendarRef = useRef(null);
   const [selectedDate, setSelectedDate] = useState(format(date, 'yyyy-MM-dd')); // Default to today's date
   const [selectedDateElement, setSelectedDateElement] = useState(null);
@@ -32,37 +32,10 @@ function Home() {
     end: addWeeks(currentWeekStart, 1),
   });
 
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartX(e.clientX);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-
-    const currentX = e.clientX;
-    const deltaX = currentX - startX;
-
-    if (Math.abs(deltaX) > 100) {
-      if (deltaX > 0) {
-        setCurrentWeekStart(subWeeks(currentWeekStart, 1));
-      } else {
-        setCurrentWeekStart(addWeeks(currentWeekStart, 1));
-      }
-      setIsDragging(false);
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
   const handleDateClick = (date, element) => {
-    if (!isDragging) {
-      setSelectedDate(format(date, 'yyyy-MM-dd'));
-      setSelectedDateElement(element);
-      updateBoxPosition(element);
-    }
+    setSelectedDate(format(date, 'yyyy-MM-dd'));
+    setSelectedDateElement(element);
+    updateBoxPosition(element);
   };
 
   const updateBoxPosition = (element) => {
@@ -76,9 +49,16 @@ function Home() {
     }
   };
 
+  const handlePrevWeek = () => {
+    setCurrentWeekStart(subWeeks(currentWeekStart, 1));
+  };
+
+  const handleNextWeek = () => {
+    setCurrentWeekStart(addWeeks(currentWeekStart, 1));
+  };
+
   useEffect(() => {
     if (calendarRef.current) {
-      // Find today's date element and set the initial box position
       const todayElement = calendarRef.current.querySelector(
         `[data-date="${format(date, 'yyyy-MM-dd')}"]`
       );
@@ -87,7 +67,7 @@ function Home() {
         setSelectedDateElement(todayElement);
       }
     }
-  }, [calendarRef.current]);
+  }, [calendarRef.current, currentWeekStart]); 
 
   useEffect(() => {
     const handleResize = () => {
@@ -103,7 +83,7 @@ function Home() {
   return (
     <>
       <div className="flex grid-cols-2 justify-center gap-[249px] items-center w-full font-poppins">
-        <div className="font-bold">Welcome, Inwza0072545!</div>
+        <div className="font-bold text-2xl">Welcome, Inwza0072545!</div>
         <div className="flex flex-row">
           <div className="flex justify-center items-center w-[100px] h-[100px] border-2 rounded-xl font-fredoka">
             <div className="text-[60px]">{day}</div>
@@ -120,53 +100,69 @@ function Home() {
         <div className="w-[1078px] my-4 border-t border-1 border-gray"></div>
       </div>
       {/* Calendar Area */}
-      <div
-        ref={calendarRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        className="p-4 cursor-grab relative" 
-      >
-        {/* Blue Border Box */}
+      <div className="flex justify-center items-center">
+        <button
+          onClick={handlePrevWeek}
+          className="p-2 mb-7 hover:scale-105 transition-all duration-200 "
+        >
+          <img src={ArrowLeft} alt="Previous Week" className='w-[20px] h-[20px]'/>
+        </button>
         <div
-          className="absolute border-2 border-blue-500 rounded-lg transition-all duration-300"
-          style={{
-            left: `${boxPosition.left}px`,
-            width: `${boxPosition.width}px`,
-            height: '50%', 
-            top: '10%',
-          }}
-        ></div>
+          ref={calendarRef}
+          className="p-4 relative mx-4"
+        >
+          {/* Blue Border Box */}
+          <div
+            className="absolute border-2 border-blue-500 rounded-lg transition-all duration-300"
+            style={{
+              left: `${boxPosition.left}px`,
+              width: `${boxPosition.width}px`,
+              height: '50%',
+              top: '10%',
+            }}
+          ></div>
 
-        <div className="flex justify-center grid-cols-7 gap-3 text-center font-bold">
-          {weekDays.map((day, index) => {
-            const isSelected = format(day, 'yyyy-MM-dd') === selectedDate;
-            return (
-              <div
-                key={index}
-                data-date={format(day, 'yyyy-MM-dd')} // Add data attribute for today's date
-                ref={(el) => isSelected && setSelectedDateElement(el)}
-                className={`p-1 ${isSelected ? 'text-blue-500' : ''}`}
-                onClick={(e) => handleDateClick(day, e.currentTarget)}
-              >
-                <div className="text-[16px]">{format(day, 'EEE')}</div>
-                <div className="text-[16px]">{format(day, 'd')}</div>
-              </div>
-            );
-          })}
-        </div>
-        {selectedDate && (
-          <div className="mt-4">
-            <h3 className="font-bold">Tasks for {selectedDate}</h3>
-            {tasks[selectedDate]?.map((task) => (
-              <div key={task.id} className="mt-2">
-                <strong>{task.description}</strong> - {task.time}
-              </div>
-            ))}
+          <div className="flex justify-center grid-cols-7 gap-3 text-center font-bold">
+            {weekDays.map((day, index) => {
+              const isSelected = format(day, 'yyyy-MM-dd') === selectedDate;
+              return (
+                <div
+                  key={index}
+                  data-date={format(day, 'yyyy-MM-dd')} 
+                  ref={(el) => isSelected && setSelectedDateElement(el)}
+                  className={`p-1 ${isSelected ? 'text-blue-500' : ''}`}
+                  onClick={(e) => handleDateClick(day, e.currentTarget)}
+                >
+                  <div className="text-[16px]">{format(day, 'EEE')}</div>
+                  <div className="text-[16px]">{format(day, 'd')}</div>
+                </div>
+              );
+            })}
           </div>
-        )}
+          {selectedDate && (
+            <div className="mt-4">
+              <h3 className="font-bold">Tasks for {selectedDate}</h3>
+              {tasks[selectedDate]?.map((task) => (
+                <div key={task.id} className="mt-2">
+                  <strong>{task.description}</strong> - {task.time}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <button
+          onClick={handleNextWeek}
+          className="p-2 mb-7 hover:scale-105 transition-all duration-200"
+        >
+          <img src={ArrowRight} alt="Next Week" className='w-[20px] h-[20px]'/>
+        </button>
       </div>
+
+      {/*Category Area */}
+      <div className="flex justify-center">
+        <div className="w-[1078px] my-4 border-t border-1 border-gray"></div>
+      </div>
+      <div className='font-poppins font-bold text-2xl'>Category</div>
     </>
   );
 }

@@ -4,6 +4,7 @@
 
 @theme {
   --font-poppins: "Poppins", sans-serif;
+  
   --font-fredoka: "Fredoka One", sans-serif; 
   --color-primary: #95B1EE;
   --color-primary2: #6A8DD9;
@@ -16,10 +17,12 @@
   --color-darkgray: #3c4045;
   --color-azureblue: #4078F3;
   --color-royalblue: #004cfe;
+  --color-bluegray: #6A8DD9
 }
 .calendar-week {
   transition: transform 0.3s ease;
 }
+
 /* 
 @tailwind utilities;
 @tailwind components;
