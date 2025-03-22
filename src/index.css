@@ -17,6 +17,9 @@
   --color-azureblue: #4078F3;
   --color-royalblue: #004cfe;
 }
+.calendar-week {
+  transition: transform 0.3s ease;
+}
 /* 
 @tailwind utilities;
 @tailwind components;

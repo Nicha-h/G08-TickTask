@@ -15,9 +15,12 @@ const router = createBrowserRouter([
     path: "/", 
     element: <App />,
     children: [
+      {path: "/",
+        element: <Home/>
+      },
       {path: "/home",
         element: <Home/>
-        },
+      },
       {path: "/pomodoro",
       element: <Pomodoro/>
       },
@@ -27,14 +30,14 @@ const router = createBrowserRouter([
       {path: "/overview",
           element: <Overview/>
         },
-    ]
+    ],
+    
   },
-  
 
 ]);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} /> {/* Provide the router to the app */}
+    <RouterProvider router={router} /> 
   </StrictMode>
 );
