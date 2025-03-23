@@ -94,7 +94,7 @@ function LoginPage() {
           transition-all duration-200 ease-in-out transform">
             <span>Forgot password? </span>
             <NavLink
-              to="/login"
+              to="/FindYourAccount"
               className="text-royalblue hover:underline">
               Click here
             </NavLink>

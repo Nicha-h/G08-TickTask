@@ -10,6 +10,8 @@ import Overview from "./pages/Overview.jsx";
 import Home from "./pages/Home.jsx";
 import Signup from "./pages/Authentication/Signup.jsx";
 import Login from "./pages/Authentication/LoginPage.jsx";
+import FindYourAccount from "./pages/Authentication/FindYourAccount.jsx";
+import ResetPassword from "./pages/Authentication/ResetPassword.jsx";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +43,14 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login/>
+  },
+  {
+    path: "/findYourAccount",
+    element: <FindYourAccount/>
+  },
+  {
+    path: "/resetPassword",
+    element: <ResetPassword/>
   }
 
 ]);
