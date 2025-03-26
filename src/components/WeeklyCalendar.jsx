@@ -10,6 +10,7 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
   const [selectedDateElement, setSelectedDateElement] = useState(null);
   const [boxPosition, setBoxPosition] = useState({ left: 0, width: 0 });
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(date, { weekStartsOn: 0 }));
+  const currentMonth = format(new Date(currentWeekStart.getTime() + 3 * 24 * 60 * 60 * 1000), 'MMMM');
 
   const weekDays = eachDayOfInterval({
     start: currentWeekStart,
@@ -70,56 +71,66 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
   }, [selectedDateElement]);
 
   return (
-    <div className="flex justify-center items-center">
-      <button onClick={handlePrevWeek} className="p-2 mb-7 cursor-pointer hover:scale-105 transition-all duration-200">
-        <img src={ArrowLeft} alt="Previous Week" className='w-[20px] h-[20px]'/>
-      </button>
-      <div ref={calendarRef} className="p-4 relative mx-4">
-        {isSelectedDateInView && selectedDateElement && (
-          <div
-            className="absolute border-2 border-blue-500 rounded-lg transition-all duration-300"
-            style={{
-              left: `${boxPosition.left}px`,
-              width: `${boxPosition.width}px`,
-              height: '50%',
-              top: '10%',
-            }}
-          ></div>
-        )}
-
-        <div className="flex justify-center grid-cols-7 gap-3 text-center font-bold">
-          {weekDays.map((day, index) => {
-            const dateStr = format(day, 'yyyy-MM-dd');
-            const isSelected = isSelectedDateInView && dateStr === selectedDate;
-            
-            return (
-              <div
-                key={index}
-                data-date={dateStr}
-                ref={(el) => isSelected && setSelectedDateElement(el)}
-                className={`p-1 ${isSelected ? 'text-blue-500' : ''}`}
-                onClick={(e) => handleDateClick(day, e.currentTarget)}
-              >
-                <div className="text-[16px]">{format(day, 'EEE')}</div>
-                <div className="text-[16px]">{format(day, 'd')}</div>
-              </div>
-            );
-          })}
-        </div>
-        {selectedDate && (
-          <div className="mt-4">
-            <h3 className="font-bold">Tasks for {selectedDate}</h3>
-            {tasks[selectedDate]?.map((task) => (
-              <div key={task.id} className="mt-2">
-                <strong>{task.description}</strong> - {task.time}
-              </div>
-            ))}
-          </div>
-        )}
+    <div className="flex justify-center items-center flex-col font-poppins">
+      <div className="text-center font-bold text-xl mb-2">
+        {currentMonth.toUpperCase()}
       </div>
-      <button onClick={handleNextWeek} className="p-2 mb-7 hover:scale-105 transition-all duration-200">
-        <img src={ArrowRight} alt="Next Week" className='w-[20px] h-[20px]'/>
-      </button>
+      <div className="flex items-center">
+        <button onClick={handlePrevWeek} className="p-2 cursor-pointer hover:scale-105 hover:translate-x-[-5px] transition-all duration-200">
+          <img src={ArrowLeft} alt="Previous Week" className='w-[20px] h-[20px]'/>
+        </button>
+        
+        <div ref={calendarRef} className="p-4 relative mx-4 min-w-[420px]">
+        {isSelectedDateInView && selectedDateElement && (
+            <div
+                className="absolute rounded-lg bg-primary blur-[4px] transition-all duration-300 "
+                style={{
+                left: `${boxPosition.left}px`,
+                width: '48px',
+                height: '60px',
+                top: '15%',
+                zIndex: -1,
+                }}
+            ></div>
+            )}
+  
+          <div className="flex justify-center gap-3 text-center font-bold">
+            {weekDays.map((day, index) => {
+              const dateStr = format(day, 'yyyy-MM-dd');
+              const isSelected = isSelectedDateInView && dateStr === selectedDate;
+              
+              return (
+                <div
+                  key={index}
+                  data-date={dateStr}
+                  ref={(el) => isSelected && setSelectedDateElement(el)}
+                  className={`cursor-pointer flex flex-col items-center p-1 w-12 ${isSelected ? 'text-black' : ''}`}
+                  onClick={(e) => handleDateClick(day, e.currentTarget)}
+                >
+                  <div className="text-[16px]">{format(day, 'EEE')}</div>
+                  <div className="text-[16px]">{format(day, 'd')}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+  
+        <button onClick={handleNextWeek} className="p-2 cursor-pointer hover:scale-105 hover:translate-x-[5px] transition-all duration-200">
+          <img src={ArrowRight} alt="Next Week" className='w-[20px] h-[20px]'/>
+        </button>
+      </div>
+
+      {/* Tasks display below calendar */}
+      {selectedDate && (
+        <div className="mt-4 w-full">
+          <h3 className="font-bold text-center">Tasks for {selectedDate}</h3>
+          {tasks[selectedDate]?.map((task) => (
+            <div key={task.id} className="mt-2 text-center">
+              <strong>{task.description}</strong> - {task.time}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
