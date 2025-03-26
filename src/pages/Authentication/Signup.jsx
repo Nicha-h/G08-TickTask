@@ -63,7 +63,7 @@ function Signup() {
             <input
               {...register('email')}
               placeholder="example@mail.com"
-              className="w-full h-[40px] border-2 rounded-[8px] text-[14px] pl-3"
+              className="w-full h-[35px] sm:h-[35px] md:h-[37px] lg:h-[40px] border-2 rounded-[8px] text-[12px] sm:text-[12px] md:text-[12px] lg:text-[14px] pl-3"
             />
             {errors.email && <p className="text-red-500 text-xs sm:text-xs md:text-xs lg:text-sm mt-1">{errors.email.message}</p>}
           </div>
@@ -73,10 +73,10 @@ function Signup() {
               {...register('password')}
               type={showPassword ? 'text' : 'password'} 
               placeholder="Password"
-              className="w-full h-[40px] border-2 rounded-[8px] text-[14px] pl-3 pr-10" 
+              className="w-full h-[35px] sm:h-[35px] md:h-[37px] lg:h-[40px] border-2 rounded-[8px] text-[12px] sm:text-[12px] md:text-[12px] lg:text-[14px] pl-3" 
             />
             {/* encrypt */}
-            <button type="button" onClick={togglePasswordVisibility} className="absolute right-3 top-[42px] md:top-[43px] lg:top-[45px] transform -translate-y-1/2 hover:scale-105">
+            <button type="button" onClick={togglePasswordVisibility} className="absolute right-3 cursor-pointer top-[41px] sm:top-[41px] md:top-[43px] lg:top-[45px] transform -translate-y-1/2 hover:scale-105">
               {showPassword ? (
                 <img src={Reveal} alt="Hide Password" className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-all duration-200 ease-in-out transform"/>
               ) : (
@@ -93,14 +93,14 @@ function Signup() {
               <button
                 type="submit"
                 className="w-[140px] h-[35px] text-xs md:w-[150px] md:h-[40px] md:text-sm lg:w-[180px] lg:h-[40px]  lg:text-base rounded-[4px] bg-bluegray font-poppins font-semibold text-white 
-                transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg">
+                transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg cursor-pointer">
                 Sign Up
               </button>
           </div>
 
           {/* Login Link */}
           <div className="mt-2 text-center font-poppins text-[13px] sm:text-[13px] md:text-[14px] lg:text-[15px]
-          transition-all duration-200 ease-in-out transform
+          transition-all duration-200 ease-in-out transform cursor-pointer
           ">
             <span>Already have an account? </span>
             <NavLink

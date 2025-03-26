@@ -51,7 +51,7 @@ function ResetPassword() {
     setShowConfirmPassword((prev) => !prev);
   };
 
-  return (
+  return (  
     <div>
       {/* Back */}
       <div className="m-12">
@@ -62,8 +62,8 @@ function ResetPassword() {
 
       {/* Form */}
       <div className="flex flex-col justify-center items-center h-screen font-poppins -mt-28">
-        <div className="text-5xl font-bold">Reset your Password     
-            <div className="text-2xl font-normal py-3.5">Enter your new password</div>
+        <div className="sm:text-3xl md:text-4xl lg:text-5xl font-bold">Reset your Password     
+            <div className="sm:text-lg md:text-xl lg:text-2xl font-normal py-3.5">Enter your new password</div>
         </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
