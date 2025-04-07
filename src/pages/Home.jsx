@@ -1,15 +1,23 @@
 import React, { useState } from 'react';
 import WeeklyCalendar from '../components/WeeklyCalendar';
 import {format} from 'date-fns';
+import AddTask from '../components/AddTask';
+import CategoryBox from '../components/CategoryBox';
+import { NavLink } from 'react-router-dom';
 
 function Home() {
   const date = new Date();
   const [selectedDate, setSelectedDate] = useState(format(date, 'yyyy-MM-dd'));
+  const [setTasks] = useState([]);
 
   const tasks = {
-    '2023-10-23': [
-      { id: 1, description: 'Task 1', time: '00:00 - 00:00' },
-      { id: 2, description: 'Task 2', time: '00:00 - 00:00' },
+    '2025-03-23': [
+      { id: 1, taskname: 'Code Home Page', description: 'I have to finish this shite', time: '01:00 - 12:00' },
+      { id: 2, taskname: 'Code Pomo Page', description: 'i also have to do this one ffs', time: '12:00 - 23:00' },
+      { id: 3, taskname: 'bruh2', description: 'i also have to do this one ffs', time: '13:00 - 20:00' },
+      { id: 4, taskname: 'brush3', description: 'i also have to do this one ffs', time: '10:00 - 11:00' },
+      { id: 5, taskname: 'ksoadwaw', description: 'i also have to do this one ffs', time: '02:00 - 05:00' },
+
     ],
   };
 
@@ -21,6 +29,15 @@ function Home() {
     minute: 'numeric',
     hour12: false,
   }).format(date);
+
+  
+
+  const handleAddTask = (newTask) => {
+    setTasks([...tasks, { 
+      id: Date.now(), 
+      ...newTask 
+    }]);
+  };
 
   return (
     <>
@@ -53,10 +70,27 @@ function Home() {
       <div className="flex justify-center">
         <div className="w-[1078px] my-4 border-t border-1 border-gray"></div>
       </div>
-      
+
       {/*Category*/}
-      <div className='font-poppins font-bold text-2xl'>Category</div>
+      <div className='flex flex-col justify-start items-center'>
+        <div className='ml-50 mt-8 flex flex-col font-poppins font-bold text-2xl w-full'>Category
+        <div className="w-[1008px] flex justify-end mb-2">
+        <NavLink to="/taskList" className="flex justify-end text-xs underline cursor-pointer hover:text-blue-600">
+            view all
+        </NavLink>
+        </div>
+      </div>
+      
+        <CategoryBox/>
+
+        
+
+      </div>
+      
+      
+      <AddTask onAddTask={handleAddTask} />
     </>
+
   );
 }
 

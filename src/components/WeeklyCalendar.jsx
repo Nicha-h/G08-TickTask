@@ -1,8 +1,9 @@
-// src/components/WeeklyCalendar.js
 import React, { useState, useRef, useEffect } from 'react';
 import { addWeeks, subWeeks, format, startOfWeek, eachDayOfInterval, isSameWeek } from 'date-fns';
 import ArrowLeft from '../assets/ArrowLeft.svg';
 import ArrowRight from '../assets/ArrowRight.svg';
+import TaskList from '../components/Tasklist';
+import { NavLink, useLocation } from 'react-router-dom';
 
 const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
   const date = new Date();
@@ -11,6 +12,7 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
   const [boxPosition, setBoxPosition] = useState({ left: 0, width: 0 });
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(date, { weekStartsOn: 0 }));
   const currentMonth = format(new Date(currentWeekStart.getTime() + 3 * 24 * 60 * 60 * 1000), 'MMMM');
+  
 
   const weekDays = eachDayOfInterval({
     start: currentWeekStart,
@@ -120,17 +122,36 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
         </button>
       </div>
 
-      {/* Tasks display below calendar */}
+      {/* placeholder*/}
       {selectedDate && (
-        <div className="mt-4 w-full">
-          <h3 className="font-bold text-center">Tasks for {selectedDate}</h3>
-          {tasks[selectedDate]?.map((task) => (
-            <div key={task.id} className="mt-2 text-center">
-              <strong>{task.description}</strong> - {task.time}
-            </div>
-          ))}
-        </div>
-      )}
+        <div className="mt-3 w-full">
+            {/*<h3 className="font-bold text-center mb-4">Tasks for {selectedDate} -this is placeholder-</h3> */}
+    {/* Tasklist*/}   
+    <TaskList 
+      tasks={tasks[selectedDate] || []}
+      onTaskUpdate={(taskId, updates) => {
+        // Handle task update logic
+        const updatedTasks = {
+          ...tasks,
+          [selectedDate]: tasks[selectedDate].map(task => 
+            task.id === taskId ? { ...task, ...updates } : task
+          )
+        };
+        // Save to state/backend
+      }}
+      onTaskDelete={(taskId) => {
+        // Handle task deletion
+        {/* */}
+        const updatedTasks = {
+          ...tasks,
+          [selectedDate]: tasks[selectedDate].filter(task => task.id !== taskId)
+        };
+        // Save to state/backend
+      }}
+    />
+    
+  </div>
+)}
     </div>
   );
 };

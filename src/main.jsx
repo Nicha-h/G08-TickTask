@@ -12,6 +12,7 @@ import Signup from "./pages/Authentication/Signup.jsx";
 import Login from "./pages/Authentication/LoginPage.jsx";
 import FindYourAccount from "./pages/Authentication/FindYourAccount.jsx";
 import ResetPassword from "./pages/Authentication/ResetPassword.jsx";
+import AllTaskList from "./pages/AllTaskList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {path: "/overview",
           element: <Overview/>
         },
+      {
+        path: "/taskList",
+        element: <AllTaskList/>
+      },
     ],
     
   },
@@ -51,7 +56,8 @@ const router = createBrowserRouter([
   {
     path: "/resetPassword",
     element: <ResetPassword/>
-  }
+  },
+  
 
 ]);
 
