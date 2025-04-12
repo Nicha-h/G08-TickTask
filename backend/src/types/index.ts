@@ -1,3 +1,5 @@
+import type { Context } from "hono";
+
 export interface Task {
     id: number;
     title: string;
@@ -12,4 +14,8 @@ export type User = {
     password: string;
   };
   
-  
+export type TaskStatus = 'Incomplete' | 'Complete'; 
+
+export interface CustomContext extends Context {
+  user: { id: number, email: string }; 
+}

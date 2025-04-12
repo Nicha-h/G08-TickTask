@@ -3,9 +3,8 @@ import { addWeeks, subWeeks, format, startOfWeek, eachDayOfInterval, isSameWeek 
 import ArrowLeft from '../assets/ArrowLeft.svg';
 import ArrowRight from '../assets/ArrowRight.svg';
 import TaskList from '../components/Tasklist';
-import { NavLink, useLocation } from 'react-router-dom';
 
-const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
+const WeeklyCalendar = ({ selectedDate, onDateSelect }) => {
   const date = new Date();
   const calendarRef = useRef(null);
   const [selectedDateElement, setSelectedDateElement] = useState(null);
@@ -13,10 +12,13 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(date, { weekStartsOn: 0 }));
   const currentMonth = format(new Date(currentWeekStart.getTime() + 3 * 24 * 60 * 60 * 1000), 'MMMM');
   
+  const [tasks, setTasks] = useState({}); 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const weekDays = eachDayOfInterval({
     start: currentWeekStart,
-    end: new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000) // Sunday to Saturday
+    end: new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000) 
   });
 
   const handleDateClick = (date, element) => {
@@ -44,8 +46,31 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
     setCurrentWeekStart(addWeeks(currentWeekStart, 1));
   };
 
-  const isSelectedDateInView = selectedDate && 
-    isSameWeek(new Date(selectedDate), currentWeekStart);
+  const isSelectedDateInView = selectedDate && isSameWeek(new Date(selectedDate), currentWeekStart);
+
+  const fetchTasksForDate = async (date) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/tasks?date=${date}`);
+      const data = await response.json();
+      if (response.ok) {
+        setTasks((prevTasks) => ({ ...prevTasks, [date]: data }));
+      } else {
+        setError('Error fetching tasks.');
+      }
+    // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      setError('Error fetching tasks.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedDate) {
+      fetchTasksForDate(selectedDate);
+    }
+  }, [selectedDate]);
 
   useEffect(() => {
     if (calendarRef.current && isSelectedDateInView) {
@@ -83,24 +108,24 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
         </button>
         
         <div ref={calendarRef} className="p-4 relative mx-4 min-w-[420px]">
-        {isSelectedDateInView && selectedDateElement && (
+          {isSelectedDateInView && selectedDateElement && (
             <div
-                className="absolute rounded-lg bg-primary blur-[4px] transition-all duration-300 "
-                style={{
+              className="absolute rounded-lg bg-primary blur-[4px] transition-all duration-300 "
+              style={{
                 left: `${boxPosition.left}px`,
                 width: '48px',
                 height: '60px',
                 top: '15%',
                 zIndex: -1,
-                }}
+              }}
             ></div>
-            )}
-  
+          )}
+
           <div className="flex justify-center gap-3 text-center font-bold">
             {weekDays.map((day, index) => {
               const dateStr = format(day, 'yyyy-MM-dd');
               const isSelected = isSelectedDateInView && dateStr === selectedDate;
-              
+
               return (
                 <div
                   key={index}
@@ -116,44 +141,23 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect, tasks }) => {
             })}
           </div>
         </div>
-  
+
         <button onClick={handleNextWeek} className="p-2 cursor-pointer hover:scale-105 hover:translate-x-[5px] transition-all duration-200">
           <img src={ArrowRight} alt="Next Week" className='w-[20px] h-[20px]'/>
         </button>
       </div>
 
-      {/* placeholder*/}
-      {selectedDate && (
+      {/* Task List */}
+      {loading && <div>Loading tasks...</div>}
+      {error && <div>{error}</div>}
+
+      {selectedDate && !loading && !error && (
         <div className="mt-3 w-full">
-            {/*<h3 className="font-bold text-center mb-4">Tasks for {selectedDate} -this is placeholder-</h3> */}
-    {/* Tasklist*/}   
-    <TaskList 
-      tasks={tasks[selectedDate] || []}
-      onTaskUpdate={(taskId, updates) => {
-        // Handle task update logic
-        const updatedTasks = {
-          ...tasks,
-          [selectedDate]: tasks[selectedDate].map(task => 
-            task.id === taskId ? { ...task, ...updates } : task
-          )
-        };
-        // Save to state/backend
-      }}
-      onTaskDelete={(taskId) => {
-        // Handle task deletion
-        {/* */}
-        const updatedTasks = {
-          ...tasks,
-          [selectedDate]: tasks[selectedDate].filter(task => task.id !== taskId)
-        };
-        // Save to state/backend
-      }}
-    />
-    
-  </div>
-)}
+          <TaskList tasks={tasks[selectedDate] || []} />
+        </div>
+      )}
     </div>
-  );
+  )
 };
 
 export default WeeklyCalendar;
