@@ -3,6 +3,7 @@ import type { TaskStatus, User } from '../types/index.js';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 import * as dotenv from 'dotenv';
 import type { Context } from 'hono';
+import type { Task } from '../schemas/Schemas.js';
 dotenv.config();
 
 const now = new Date();
@@ -15,20 +16,6 @@ export async function getTasksByDate(date: string): Promise<Task[]> {
         [date]
     );
     return rows as Task[];
-}
-
-export interface Task {
-    TaskID: number;
-    Task_Title: string;
-    Task_Description: string | null;
-    Task_Start_Date: string;
-    Task_End_Date: string;
-    Task_Status: TaskStatus;
-    Task_Color: string;
-    Task_Icon: string | null;
-    Task_Start_Time: string;
-    Task_End_Time: string;
-    UserID: number;
 }
 
 export async function getTasksByUser(userId: number, date?: string): Promise<Task[]> {
@@ -59,28 +46,19 @@ export async function createTask(taskData: {
     Task_End_Time?: string;
   }): Promise<Task> {
    
-    const defaultTask = {
-        Task_Start_Date: formattedDate,
-        Task_End_Date: formattedDate,
-        Task_Status: 'Incomplete' as TaskStatus,
-        Task_Color: '#A7A7A7',
-        Task_Start_Time: currentTime,
-        Task_End_Time: '23:59:59'
-      };
-  
-      const taskToInsert = {
-        ...defaultTask,
-        ...taskData,  
-        Task_Description: taskData.Task_Description ?? null,
-        Task_Icon: taskData.Task_Icon ?? null,
-        Task_Start_Date: taskData.Task_Start_Date ?? formattedDate,
-        Task_End_Date: taskData.Task_End_Date ?? formattedDate,
-        Task_Status: taskData.Task_Status ?? defaultTask.Task_Status,
-        Task_Color: taskData.Task_Color ?? defaultTask.Task_Color,
-        Task_Start_Time: taskData.Task_Start_Time ?? currentTime,
-        Task_End_Time: taskData.Task_End_Time ?? '23:59:59'
-      };
-  
+    const taskToInsert = {
+      Task_Title: taskData.Task_Title,
+      Task_Description: taskData.Task_Description ?? null,
+      Task_Icon: taskData.Task_Icon ?? null,
+      Task_Start_Date: taskData.Task_Start_Date ?? formattedDate,
+      Task_End_Date: taskData.Task_End_Date ?? formattedDate,
+      Task_Status: taskData.Task_Status ?? 'Incomplete' as TaskStatus,
+      Task_Color: taskData.Task_Color ?? '#A7A7A7',
+      Task_Start_Time: taskData.Task_Start_Time ?? currentTime,
+      Task_End_Time: taskData.Task_End_Time ?? '23:59:59',
+      UserID: taskData.UserID
+    };
+
     const [result] = await db.query<ResultSetHeader>(
       `INSERT INTO task 
        (Task_Title, Task_Description, Task_Start_Date, Task_End_Date, 
@@ -104,29 +82,18 @@ export async function createTask(taskData: {
       throw new Error('Failed to insert task');
     }
   
-    const createdTask: Task = {
-        TaskID: result.insertId,
-        UserID: taskToInsert.UserID,
-        Task_Title: taskToInsert.Task_Title,
-        Task_Description: taskToInsert.Task_Description,
-        Task_Start_Date: taskToInsert.Task_Start_Date,
-        Task_End_Date: taskToInsert.Task_End_Date,
-        Task_Status: taskToInsert.Task_Status as TaskStatus, 
-        Task_Color: taskToInsert.Task_Color,
-        Task_Icon: taskToInsert.Task_Icon,
-        Task_Start_Time: taskToInsert.Task_Start_Time,
-        Task_End_Time: taskToInsert.Task_End_Time
-    };
-    
-    return createdTask;
+     return {
+    TaskID: result.insertId,
+    ...taskToInsert
+  };
 }
 
-  export const updateTask = async (c: Context) => {
-    const id = c.req.param('id');
-    const user = c.get('user') as { id: number };
-    const body = await c.req.json();
+export const updateTask = async (c: Context) => {
+  const id = c.req.param('id');
+  const user = c.get('user') as { id: number };
+  const body = await c.req.json();
   
-    try {
+  try {
       const [result] = await db.execute(
         `UPDATE task 
          SET Task_Title = ?, Task_Description = ?, Task_Status = ?, Task_Color = ?, 
@@ -153,22 +120,22 @@ export async function createTask(taskData: {
       console.error('Error updating task:', err);
       return c.json({ error: 'Failed to update task' }, 500);
     }
-  };
+};
   
-  export const deleteTask = async (c: Context) => {
-    const id = c.req.param('id');
-    const user = c.get('user') as { id: number };
+export const deleteTask = async (c: Context) => {
+  const id = c.req.param('id');
+  const user = c.get('user') as { id: number };
   
-    try {
-      const [result] = await db.execute(
-        'DELETE FROM task WHERE TaskID = ? AND UserID = ?',
-        [id, user.id]
-      );
+  try {
+    const [result] = await db.execute(
+      'DELETE FROM task WHERE TaskID = ? AND UserID = ?',
+      [id, user.id]
+    );
   
-      return c.json({ message: 'Task deleted successfully' });
-    } catch (error) {
+    return c.json({ message: 'Task deleted successfully' });
+  } catch (error) {
       console.error('Error deleting task:', error);
       return c.json({ error: 'Failed to delete task' }, 500);
-    }
-  };
+  }
+};
   

@@ -1,6 +1,5 @@
 import type { Context, Next } from 'hono';
 import { z } from 'zod';
-import type { TaskStatus } from '../types/index.js';
 
 export const TaskSchema = z.object({
   Task_Title: z.string().min(1, "Title is required"),
@@ -108,7 +107,7 @@ export async function validateUpdateTask(c: Context, next: Next) {
     }
     
     await next();
-  }
+}
   
   export async function validateStatusParam(c: Context, next: Next) {
     const status = c.req.query('status');

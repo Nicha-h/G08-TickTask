@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 import UserRoutes from './routes/User.Routes.js';
 
 import taskRoutes from './routes/Task.Routes.js';
+import CategoryRoute from './routes/Category.Routes.js';
 
 const app = new Hono()
 
@@ -16,6 +17,7 @@ app.use('*', async (c, next) => {
 });
 app.route('/tasks', taskRoutes);
 app.route('/api', UserRoutes);
+app.route('/category', CategoryRoute);
 serve({
   fetch: app.fetch,
   port: 3000

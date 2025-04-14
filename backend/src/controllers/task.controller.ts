@@ -3,7 +3,7 @@ import { db } from '../database/db.js';
 import { z } from 'zod';
 import { createTask } from '../models/Task.model.js';
 import type { CustomContext, TaskStatus } from '../types/index.js';
-import { TaskSchema } from '../middlewares/validators.js';
+import { TaskSchema } from '../middlewares/Task.validators.js';
 
 export const getAllTasks = async (c: Context) => {
   try {

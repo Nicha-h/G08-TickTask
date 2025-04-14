@@ -5,6 +5,16 @@ export interface Task {
     title: string;
     completed: boolean;
   }
+
+export interface Category{
+    CategoryID: number;
+    Category_Name: String;
+    Category_icon: String;
+    Category_Color: String;
+    Category_is_Primary: Boolean;
+    UserID: number;
+}
+
 export type email = string;
 export type plainPassword = string;
 
