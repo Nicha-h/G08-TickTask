@@ -8,6 +8,7 @@ import Pomodoro from "./pages/Pomodoro.jsx";
 import Calendar from "./pages/Calendar.jsx";
 import Overview from "./pages/Overview.jsx";
 import Home from "./pages/Home.jsx";
+import Category from "./pages/Category.jsx";
 
 
 const router = createBrowserRouter([
@@ -25,8 +26,11 @@ const router = createBrowserRouter([
         element: <Calendar/>
       },
       {path: "/overview",
-          element: <Overview/>
-        },
+        element: <Overview/>
+      },
+      {path: "/category",
+        element: <Category/>
+      },
     ]
   },
   
