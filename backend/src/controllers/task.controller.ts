@@ -1,33 +1,21 @@
 import type { Context } from 'hono';
 import { db } from '../database/db.js';
 import { z } from 'zod';
-import { createTask } from '../models/Task.model.js';
+import * as TaskModel from '../models/Task.model.js';
 import type { CustomContext, TaskStatus } from '../types/index.js';
 import { TaskSchema } from '../middlewares/Task.validators.js';
 
 export const getAllTasks = async (c: Context) => {
   try {
-    const user = c.get('user') as { id: number };
-    const userId = user.id;
-
-    const status = c.req.query('status');
-
-    let query = 'SELECT * FROM task WHERE UserID = ?';
-    const params: any[] = [userId];
-
-    if (status) {
-      query += ' AND Task_Status = ?';
-      params.push(status);
+      const user = c.get('user') as { id: number };
+      const categories = await TaskModel.getTasksByUser(user.id);
+      return c.json(categories);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      return c.json({ error: 'Failed to fetch tasks' }, 500);
     }
-
-    const [tasks] = await db.query(query, params);
-    return c.json(tasks);
-
-  } catch (error) {
-    console.error('Error fetching tasks:', error);
-    return c.json({ success: false, message: 'Internal server error' }, 500);
-  }
 };
+  
 
 
 export const getTasksByDate = async (c: Context) => {
@@ -39,17 +27,11 @@ export const getTasksByDate = async (c: Context) => {
 
   try {
     const user = c.get('user') as { id: number };
-    const userId = user.id;
-
-    const [tasks] = await db.query(
-      'SELECT * FROM task WHERE DATE(Task_Start_Date) = ? AND UserID = ?',
-      [date, userId]
-    );
-
-    return c.json({ success: true, data: tasks });
-  } catch (err) {
-    console.error('Error fetching tasks by date:', err);
-    return c.json({ success: false, message: 'Error fetching tasks' }, 500);
+    const categories = await TaskModel.getTasksByDate(date);
+    return c.json(categories);
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    return c.json({ error: 'Failed to fetch tasks' }, 500);
   }
 };
 
@@ -58,7 +40,7 @@ export const createTaskController = async (c: Context) => {
     const taskData = c.get('taskData');
     const user = c.get('user') as { id: number };
     
-    const task = await createTask({
+    const task = await TaskModel.createTask({
       ...taskData,
       UserID: user.id,
     });
@@ -109,15 +91,20 @@ export const patchTaskController = async (c: Context) => {
 };
 export const deleteTaskController = async (c: Context) => {
   const taskId = Number(c.req.param('id'));
-  const user = c.get('user') as { id: number };
+  try {
+    const taskData = c.get('taskData');
+    const user = c.get('user') as { id: number };
+    
+    const task = await TaskModel.deleteTask({
+      ...taskData,
+      UserID: user.id,
+    });
 
-  const [rows] = await db.query('SELECT * FROM task WHERE TaskID = ? AND UserID = ?', [taskId, user.id]);
-  if ((rows as any[]).length === 0) {
-    return c.json({ success: false, message: 'Task not found' }, 404);
+    return c.json({ success: true, data: task }, 201);
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    return c.json({ success: false, message: 'Error deleting task' }, 500);
   }
-
-  await db.query('DELETE FROM task WHERE TaskID = ?', [taskId]);
-  return c.json({ success: true, message: 'Task deleted successfully' });
 };
 
 export const toggleTaskStatus = async (c: Context) => {

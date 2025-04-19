@@ -109,13 +109,15 @@ export async function validateUpdateTask(c: Context, next: Next) {
     await next();
 }
   
-  export async function validateStatusParam(c: Context, next: Next) {
-    const status = c.req.query('status');
-    
-    if (status && !['Completed', 'Incomplete'].includes(status)) {
-      return c.json({
-        success: false,
-        message: 'Invalid status. Must be "Completed" or "Incomplete"',
-      }, 400);
-    }
+export async function validateStatusParam(c: Context, next: Next) {
+  const status = c.req.query('status');
+  
+  if (status && !['Completed', 'Incomplete'].includes(status)) {
+    return c.json({
+      success: false,
+      message: 'Invalid status. Must be "Completed" or "Incomplete"',
+    }, 400);
+  }
+
+  return await next();
 }

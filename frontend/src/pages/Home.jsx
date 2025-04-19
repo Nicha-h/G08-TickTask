@@ -20,6 +20,7 @@ function Home() {
 
     ],
   };
+  
 
   const [day, year] = [date.getUTCDate(), date.getFullYear()];
   const weekday = date.toLocaleString('default', { weekday: 'long' });
