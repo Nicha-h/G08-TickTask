@@ -11,10 +11,7 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect }) => {
   const [boxPosition, setBoxPosition] = useState({ left: 0, width: 0 });
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(date, { weekStartsOn: 0 }));
   const currentMonth = format(new Date(currentWeekStart.getTime() + 3 * 24 * 60 * 60 * 1000), 'MMMM');
-  
-  const [tasks, setTasks] = useState({}); 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [loading] = useState(false);
 
   const weekDays = eachDayOfInterval({
     start: currentWeekStart,
@@ -47,30 +44,6 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect }) => {
   };
 
   const isSelectedDateInView = selectedDate && isSameWeek(new Date(selectedDate), currentWeekStart);
-
-  const fetchTasksForDate = async (date) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/tasks?date=${date}`);
-      const data = await response.json();
-      if (response.ok) {
-        setTasks((prevTasks) => ({ ...prevTasks, [date]: data }));
-      } else {
-        setError('Error fetching tasks.');
-      }
-    // eslint-disable-next-line no-unused-vars
-    } catch (err) {
-      setError('Error fetching tasks.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (selectedDate) {
-      fetchTasksForDate(selectedDate);
-    }
-  }, [selectedDate]);
 
   useEffect(() => {
     if (calendarRef.current && isSelectedDateInView) {
@@ -149,11 +122,9 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect }) => {
 
       {/* Task List */}
       {loading && <div>Loading tasks...</div>}
-      {error && <div>{error}</div>}
-
-      {selectedDate && !loading && !error && (
+      {selectedDate && (
         <div className="mt-3 w-full">
-          <TaskList tasks={tasks[selectedDate] || []} />
+          <TaskList selectedDate={selectedDate} />
         </div>
       )}
     </div>

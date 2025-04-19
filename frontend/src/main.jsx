@@ -16,50 +16,23 @@ import AllTaskList from "./pages/AllTaskList.jsx";
 
 const router = createBrowserRouter([
   {
-    path: "/", 
+    path: "*", 
     element: <App />,
     children: [
-      {path: "/",
-        element: <Home/>
-      },
-      {path: "/home",
-        element: <Home/>
-      },
-      {path: "/pomodoro",
-      element: <Pomodoro/>
-      },
-      {path: "/calendar",
-        element: <Calendar/>
-      },
-      {path: "/overview",
-          element: <Overview/>
-        },
-      {
-        path: "/taskList",
-        element: <AllTaskList/>
-      },
+      { index: true, element: <Home /> },
+      { path: "home", element: <Home /> },
+      { path: "pomodoro", element: <Pomodoro /> },
+      { path: "calendar", element: <Calendar /> },
+      { path: "overview", element: <Overview /> },
+      { path: "taskList", element: <AllTaskList /> },
     ],
-    
   },
-  {
-    path: "/signup",
-    element: <Signup/>
-  },
-  {
-    path: "/login",
-    element: <Login/>
-  },
-  {
-    path: "/findYourAccount",
-    element: <FindYourAccount/>
-  },
-  {
-    path: "/resetPassword",
-    element: <ResetPassword/>
-  },
-  
-
+  { path: "/signup", element: <Signup /> },
+  { path: "/login", element: <Login /> },
+  { path: "/findYourAccount", element: <FindYourAccount /> },
+  { path: "/resetPassword", element: <ResetPassword /> },
 ]);
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

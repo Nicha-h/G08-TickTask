@@ -12,7 +12,7 @@ const currentTime = now.toTimeString().split(' ')[0];
 
 export async function getTasksByDate(date: string): Promise<Task[]> {
     const [rows] = await db.query<RowDataPacket[]>(
-        'SELECT * FROM tasks WHERE date = ? ORDER BY start_time ASC',
+        'SELECT * FROM task WHERE Task_Start_Date = ? ORDER BY Task_Start_Time ASC',
         [date]
     );
     return rows as Task[];

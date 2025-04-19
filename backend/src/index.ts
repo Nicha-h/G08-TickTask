@@ -15,9 +15,9 @@ app.use('*', async (c, next) => {
   console.log(`[${c.req.method}] ${c.req.url}`);
   await next();
 });
-app.route('/tasks', taskRoutes);
-app.route('/api', UserRoutes);
-app.route('/category', CategoryRoute);
+app.route('/api/tasks', taskRoutes);
+app.route('/api/users', UserRoutes);
+app.route('/api/categories', CategoryRoute);
 serve({
   fetch: app.fetch,
   port: 3000

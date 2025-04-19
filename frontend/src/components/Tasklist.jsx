@@ -4,41 +4,32 @@ import { Icon } from '@iconify/react';
 //import deleteIcon from '@iconify-icons/mdi/delete';
 import { useLocation, NavLink } from 'react-router-dom';
 
-const TaskList = ({ tasks: initialTasks = [] }) => {
-  const [tasks, setTasks] = useState(initialTasks);
+const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
+  const [tasks, setTasks] = useState(initialTasks || []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [date, setDate] = useState(''); 
-  
+
   const location = useLocation();
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
-  //const isTaskListPage = location.pathname === '/taskList';
-  const simplifiedTasks = isHomePage ? tasks : tasks.slice(0, 4);
+  const simplifiedTasks = isHomePage ? tasks.slice(0, 4) : tasks;
 
 
   useEffect(() => {
-    if (initialTasks.length === 0) {
-      fetchTasks();
-    } else {
-      setTasks(initialTasks);
+    if (!initialTasks && selectedDate) {
+      fetchTasks(selectedDate);
     }
-  }, [initialTasks, date]);
+  }, [initialTasks, selectedDate]);
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (date) => {
     setLoading(true);
     try {
-      const url = date 
-        ? `/tasks/by-date?date=${date}` 
-        : '/tasks';
-      
-      const response = await fetch(url, {
+      const response = await fetch('http://localhost:3000/api/tasks/by-date?date=' + date, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch tasks');
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      }); 
       
+      if (!response.ok) throw new Error('Failed to fetch tasks');
       const data = await response.json();
       setTasks(data);
     } catch (err) {
