@@ -75,7 +75,7 @@ export default function Category() {
             onClick={handleAddCategory}
             className="ml-2 p-1 hover:scale-105 transition rounded-md"
           >
-            <img src={addcate} alt="addcate" className="w-6 h-6" />
+            <img src={addcate} alt="addcate" className="w-10 h-10" />
           </button>
         </div>
 
@@ -84,7 +84,7 @@ export default function Category() {
           {categories.map((cat, idx) => (
             <div
               key={idx}
-              className={`relative rounded-2xl p-3 h-[120px] ${cat.color} shadow-sm w-full cursor-pointer border-1 border-black`}
+              className={`relative rounded-2xl p-3 h-[120px] ${cat.color} shadow-sm w-full hover:opacity-80 transition-all duration-200 ease-in-out transform hover:scale-105 border border-black `}
               onClick={() => setSelectedCategory(cat.name)}
             >
               {/* Icon */}
@@ -92,7 +92,7 @@ export default function Category() {
                 <img
                   src={cat.icon} 
                   alt={`${cat.name} icon`}
-                  className="absolute top-3 left-3 w-5 h-5 opacity-90"
+                  className="absolute top-3 left-3 w-7 h-7 opacity-90"
                 />
               )}
 
@@ -126,8 +126,8 @@ export default function Category() {
 
               {/* Edit menu */}
               {openMenu === idx && (
-                <div className="absolute top-12 right-4 bg-white border-1 border-black rounded-md shadow-md text-sm px-3 py-1 z-10">
-                  <button className="hover:text-purple-600">Edit</button>
+                <div className="absolute top-12 right-4 bg-white border-1 border-black rounded-md shadow-md text-sm px-3 py-1 z-10 hover:bg-gray-200">
+                  <button className="font-bold">Edit</button>
                 </div>
               )}
             </div>
@@ -146,7 +146,7 @@ export default function Category() {
           {filteredTasks.map((task) => (
             <div
               key={task.id}
-              className={`relative rounded-2xl px-6 py-4 flex justify-between items-center shadow-sm border-1 border-black cursor-pointer ${
+              className={`relative rounded-2xl px-6 py-4 flex justify-between items-center shadow-sm border-1 border-black cursor-pointer  hover:opacity-80 transition-opacity ${
                 selectedCategory === "All" ? "bg-purple-300" : 
                 selectedCategory === "Pet" ? "bg-rose-200" :
                 selectedCategory === "Study" ? "bg-yellow-200" :
@@ -160,7 +160,7 @@ export default function Category() {
                 <img
                   src={categories.find(c => c.name === selectedCategory)?.icon || iconAll}
                   alt="icon"
-                  className="w-5 h-5 mt-1 opacity-90"
+                  className="w-7 h-7 mt-1 opacity-90"
                 />
                 <div>
                   <div className="font-bold text-sm uppercase">

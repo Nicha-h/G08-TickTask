@@ -139,7 +139,7 @@ const Calendar = () => {
 
         <div className="space-y-3">
           {[{ day: "FRI", date: "07", name: "CSC122 Quiz#2" }, { day: "TUE", date: "11", name: "Midterm #209" }].map((task, idx) => (
-            <div key={idx} className="border border-black w-full bg-[#FFECB4] rounded-md px-6 py-3 flex justify-between items-center cursor-pointer hover:bg-[#f3e4a4] transition">
+            <div key={idx} className="border border-black w-full bg-[#FFECB4] rounded-md px-6 py-3 flex justify-between items-center cursor-pointer hover:bg-[#f3e4a4] transition ">
               <div className="text-center mr-4">
                 <div className="text-xs font-bold">{task.day}</div>
                 <div className="text-lg font-bold">{task.date}</div>
@@ -158,8 +158,8 @@ const Calendar = () => {
       </div>
 
       {/* Floating Add Button */}
-      <button className="fixed bottom-8 right-8 bg-[#D7D9FF] rounded-full w-14 h-14 shadow-lg flex items-center justify-center hover:bg-[#c0c2ff] transition">
-        <img src={plus} alt="add" className="w-6 h-6" />
+      <button className="fixed bottom-12 right-16 bg-[#D7D9FF] border-1 border-black  rounded-full w-20 h-20 shadow-lg flex items-center justify-center hover:bg-[#c0c2ff] transition-all duration-200 ease-in-out transform hover:scale-105 transition">
+        <img src={plus} alt="add" className="w-8 h-8" />
       </button>
     </div>
   );
