@@ -7,6 +7,8 @@ import UserRoutes from './routes/User.Routes.js';
 
 import taskRoutes from './routes/Task.Routes.js';
 import CategoryRoute from './routes/Category.Routes.js';
+import { authMiddleware } from './middlewares/authenticator.js';
+import { fetchProfileController } from './controllers/user.controller.js';
 
 const app = new Hono()
 
@@ -17,7 +19,9 @@ app.use('*', async (c, next) => {
 });
 app.route('/api/tasks', taskRoutes);
 app.route('/api/users', UserRoutes);
-app.route('/api/categories', CategoryRoute);
+app.route('/api/category', CategoryRoute);
+
+
 serve({
   fetch: app.fetch,
   port: 3000

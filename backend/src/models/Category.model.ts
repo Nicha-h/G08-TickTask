@@ -51,9 +51,8 @@ export async function patchCategory(categoryId: number, userId: number,updates: 
   return result.affectedRows > 0;
 }
 
-export async function assignTaskToCategories(taskId: number, categoryIds: number[]) {
-  const values = categoryIds.map(id => `(${taskId}, ${id})`).join(',');
-  await db.execute(`INSERT INTO task_category (TaskID, CategoryID) VALUES ${values}`);
+export async function assignTaskToCategories(taskId: number, categoryId: number) {
+  await db.execute(`INSERT INTO task_category (TaskID, CategoryID) VALUES (${taskId}, ${categoryId})`);
 }
 
 export async function removeTaskCategories(taskId: number) {
@@ -79,3 +78,4 @@ export const getCategoryProgress = async (categoryId:number, userId:number) => {
     return{total, completed, progress};
     
 };
+

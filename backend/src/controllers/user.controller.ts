@@ -1,6 +1,6 @@
 import type { Context } from 'hono';
 import { z } from 'zod';
-import { createUserInDb } from '../models/User.model.js';
+import { createUserInDb, fetchProfile, updateProfile } from '../models/User.model.js';
 import  jwt  from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { db } from '../database/db.js';
@@ -82,4 +82,37 @@ export async function loginUserController(c: Context) {
         email: user.User_Email,
       },
     });
+}
+
+export async function fetchProfileController(c: Context) {
+    try {
+      const user = c.get('user'); 
+      const profile = await fetchProfile(user.id);
+      return c.json(profile);
+
+    } catch (err) {
+      console.error(err);
+      return c.json({ error: 'Failed to fetch profile' }, 500);
+    }
+}
+
+export async function updateProfileController(c: Context) {
+  try {
+    const user = c.get('user');
+    const body = await c.req.json();
+
+    await updateProfile(user.id, {
+      name: body.name,
+      iconType: body.iconType,
+      iconPath: body.iconPath,
+    });
+
+    return c.json({ message: 'Profile updated successfully' });
+  } catch (err) {
+    console.error(err);
+    return c.json({ error: 'Failed to update profile' }, 500);
   }
+}
+
+
+

@@ -127,3 +127,23 @@ export const getCategoryProgress = async (c: Context) => {
     return c.json({ error: 'Failed to calculate category progress' }, 500);
   }
 };
+
+export async function assignTaskToCategoryController(c: Context) {
+  const taskId = Number(c.req.param('id'));
+
+  try {
+    const body = await c.req.json();
+    const CategoryId = Number(body.CategoryId); 
+
+    if (isNaN(CategoryId)) {
+      return c.json({ success: false, message: 'Invalid CategoryId' }, 400);
+    }
+
+   
+    const task = await categoryModel.assignTaskToCategories(taskId, CategoryId); 
+
+    return c.json({ success: true, data: task });
+  } catch (error) {
+    return c.json({ success: false, message: 'Failed to assign task to session', error: String(error) }, 500);
+  }
+}

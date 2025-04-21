@@ -13,4 +13,5 @@ CategoryRoute.put('/:id',Validator.validateUpdateCategory, CategoryController.up
 CategoryRoute.patch('/:id',Validator.validatePatchCategory, CategoryController.patchCategoryController); 
 CategoryRoute.delete('/:id',Validator.validateCategoryId, CategoryController.deleteCategoryController); 
 CategoryRoute.get('/:id/progress', CategoryController.getCategoryProgress);
+CategoryRoute.put('/:id/assign', CategoryController.assignTaskToCategoryController);
 export default CategoryRoute;
