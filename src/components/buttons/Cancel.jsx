@@ -1,6 +1,6 @@
 import React from 'react'
 
-function LoginPage() {
+function Cancel() {
   return (
     <div>
       
@@ -8,4 +8,4 @@ function LoginPage() {
   )
 }
 
-export default LoginPage
+export default Cancel

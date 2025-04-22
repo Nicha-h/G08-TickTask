@@ -22,7 +22,7 @@ function Navbar() {
           <div className="flex justify-center items-center gap-[38px] font-poppins  font-semibold">
             {/* Home Button */}
             <NavLink
-              to="/"
+              to="/home"
               end
               onClick={() => handleClick('Home')}
               className={`rounded-xl w-[158px] h-[41px] flex justify-center items-center transition-all duration-200 ease-in-out transform ${
