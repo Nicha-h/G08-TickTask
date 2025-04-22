@@ -105,7 +105,7 @@ function Home() {
         <div className='ml-300 mr-300 mt-8 flex flex-col font-poppins font-bold text-2xl'>Category
         <div className="w-[1008px] flex justify-end mb-2">
         <NavLink to="/category" className="flex justify-end text-xs underline cursor-pointer hover:text-blue-600">
-            view all
+            View all
         </NavLink>
         </div>
       </div>
