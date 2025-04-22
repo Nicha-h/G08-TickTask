@@ -63,9 +63,13 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
           >
             <div className="w-full flex items-center justify-between">
               <div className="flex justify-center items-center">
-                <div className="ml-4 flex flex-col justify-start items-start w-[600px] h-auto">
-                  <h3 className="text-base font-bold">{task.Task_Title}</h3>
-                  <p className="text-xs text-gray-700">{task.Task_Description}</p>
+                <div className="ml-4 flex flex-row justify-start items-start w-[600px] h-auto">
+                  
+                  <div className='ml-4 flex flex-col justify-start items-start w-[600px] h-auto'>
+                    <h3 className="text-base font-bold">{task.Task_Title}</h3>
+                    <p className="text-xs text-gray-700">{task.Task_Description}</p>
+                  </div>
+                  
                 </div>
                 {task.time && (   
                   <p className="flex justify-end items-end text-xs font-bold">{task.Task_Start_Time}</p>
