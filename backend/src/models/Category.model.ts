@@ -1,8 +1,8 @@
 import type { ResultSetHeader } from 'mysql2';
 import {db} from '../database/db.js';
 import type { Context } from 'hono';
-
-
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export async function getUserCategories(userId: number) {
   const [rows] = await db.query('SELECT * FROM category WHERE UserID = ?', [userId]);

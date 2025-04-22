@@ -17,7 +17,8 @@
   --color-darkgray: #3c4045;
   --color-azureblue: #4078F3;
   --color-royalblue: #004cfe;
-  --color-bluegray: #6A8DD9
+  --color-bluegray: #6A8DD9;
+  --color-greensubmit: #83FD7A;
 }
 .calendar-week {
   transition: transform 0.3s ease;
