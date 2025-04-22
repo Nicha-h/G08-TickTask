@@ -70,7 +70,7 @@ export async function loginUserController(c: Context) {
     const token = jwt.sign(
       { id: user.UserID, email: user.User_Email },
       process.env.JWT_SECRET as string,
-      { expiresIn: '1h' }
+      { expiresIn: '1d' }
     );
   
     return c.json({

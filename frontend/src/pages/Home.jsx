@@ -4,6 +4,8 @@ import {format} from 'date-fns';
 import AddTask from '../components/AddTask';
 import CategoryBox from '../components/CategoryBox';
 import { NavLink } from 'react-router-dom';
+import axios from 'axios';
+import {jwtDecode} from 'jwt-decode';
 
 function Home() {
   const date = new Date();
@@ -20,39 +22,58 @@ function Home() {
 
   const [userID, setUserID] = useState('');
   const [username, setUsername] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-useEffect(() => {
+  
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const decoded = jwtDecode(token);
+      const idFromToken = decoded.id || decoded.userId || decoded._id; // just in case
+      setUserID(idFromToken);
+      
+    } catch (err) {
+      console.error("Invalid token:", err);
+      setError("Authentication failed");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  
+  useEffect(() => {
     if (userID) {
       fetchUsername();
     }
-}, [userID]);
+  }, [userID]);
   
-    const fetchUsername = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`http://localhost:3000/api/users/profile/${userID}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-    
-        if (!response.ok) throw new Error('Failed to fetch user profile');
-        const data = await response.json();
-        
-        setUsername(data.username); // Adjust according to your actual response shape
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUsername = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:3000/api/users/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      console.log("Profile response:", response.data);
+      setUsername(response.data.Username);
+    } catch (err) {
+      console.error("Error fetching username:", err);
+      setError("Failed to fetch user data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       {/*Clock + User Greetings*/}
       <div className="flex grid-cols-2 justify-center gap-[249px] items-center w-full font-poppins">
-        <div className="font-bold text-2xl">Welcome, ${fetchUsername}</div>
+        <div className="font-bold text-2xl">Welcome, {username ? username : 'Guest'}!</div>
         <div className="flex flex-row">
           <div className="flex justify-center items-center w-[100px] h-[100px] border-2 rounded-xl font-fredoka">
             <div className="text-[60px]">{day}</div>
@@ -83,7 +104,7 @@ useEffect(() => {
       <div className='flex flex-col justify-start items-center'>
         <div className='ml-50 mt-8 flex flex-col font-poppins font-bold text-2xl w-full'>Category
         <div className="w-[1008px] flex justify-end mb-2">
-        <NavLink to="/taskList" className="flex justify-end text-xs underline cursor-pointer hover:text-blue-600">
+        <NavLink to="/category" className="flex justify-end text-xs underline cursor-pointer hover:text-blue-600">
             view all
         </NavLink>
         </div>

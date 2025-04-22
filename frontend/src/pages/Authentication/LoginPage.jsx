@@ -7,6 +7,7 @@ import Logo from '../../assets/Logo.svg';
 import Hidden from '../../assets/Hidden.svg';
 import Reveal from '../../assets/Eye.svg';
 import axios from 'axios';
+import {jwtDecode} from 'jwt-decode';
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -26,9 +27,17 @@ function LoginPage() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/login', data);
+      const response = await axios.post('http://localhost:3000/api/users/login', data);
       const { token } = response.data;
+  
       localStorage.setItem('token', token);
+      const decoded = jwtDecode(token);
+      const userId = decoded.id; 
+  
+      localStorage.setItem('userId', userId);
+  
+      console.log('User ID:', userId); // or use it however you want
+  
       navigate('/home');
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -38,6 +47,7 @@ function LoginPage() {
       }
     }
   };
+  
 
   useEffect(() => {
     if (users.length > 0) {
