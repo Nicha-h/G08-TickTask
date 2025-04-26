@@ -76,20 +76,21 @@ function Home() {
   return (
     <div className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-6 w-full font-poppins">
       {/* Clock + Greeting */}
-      <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-4">
+      <div className="flex flex-col sm:flex-col md:flex-row lg:flex-row sm:justify-between items-center gap-4">
         <div className='grid grid-cols-2 justify-center'>
         <div className="font-bold text-2xl sm:text-3xl text-center sm:text-left">Welcome, {username || 'Guest'}!</div>
-        {isMobile && <img 
+        {isMobile && <div className='flex justify-center'><img 
               onClick={() => navigate('/profile')}
               className="h-20 w-20 md:h-6 md:w-6 transition-all duration-200 ease-in-out transform" 
               src={Men1} 
               alt="profile"
-            />}
+            />
+            </div>}
         
         </div>
         <div className="flex items-center gap-4">
-          <div className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] lg:w-[100px] lg:h-[100px] border-2 rounded-xl font-fredoka flex items-center justify-center">
-            <div className="text-xl sm:text-2xl md:text-3xl lg:text-[50px]">{day}</div>
+          <div className="w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] md:w-[100px] md:h-[100px] lg:w-[100px] lg:h-[100px] border-2 rounded-xl font-fredoka flex items-center justify-center">
+            <div className="text-[50px] sm:text-[50px] md:text-[50px] lg:text-[50px]">{day}</div>
           </div>
           <div className="flex flex-col text-sm sm:text-base font-bold">
             <div>{weekday}, {month} {year}</div>
@@ -97,16 +98,25 @@ function Home() {
           </div>
         </div>
       </div>
+        {/* Divider */}
+          {!isMobile &&<div className="w-full my-4 border-t border-gray-300"></div>}
 
-      {/* Divider */}
-      <div className="w-full my-4 border-t border-gray-300"></div>
+        {/* Search Bar */}
+        {isMobile && <div className="mb-6">
+          <input 
+            type="text"
+            placeholder="Search"
+            className="mt-3 w-full px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>}
+      
 
       {/* Calendar */}
       <WeeklyCalendar selectedDate={selectedDate} onDateSelect={setSelectedDate} />
 
       {/* Divider */}
       <div className="w-full my-4 border-t border-gray-300"></div>
-
+        
       {/* Category */}
       <div className="mt-6">
         <div className="flex justify-between items-center mb-2">

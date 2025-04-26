@@ -72,7 +72,7 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect }) => {
 
   return (
     <div className="flex justify-center items-center flex-col font-poppins">
-      <div className="text-center font-bold text-xl mb-2">
+      <div className="text-center font-bold text-base sm:text-base md:text-lg lg:text-xl mb-2">
         {currentMonth.toUpperCase()}
       </div>
       <div className="flex items-center">
@@ -80,13 +80,13 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect }) => {
           <img src={ArrowLeft} alt="Previous Week" className='w-[20px] h-[20px]'/>
         </button>
         
-        <div ref={calendarRef} className="p-4 relative mx-4 min-w-[420px]">
+        <div ref={calendarRef} className="p-4 relative mx-4 md:min-w-[390px] lg:min-w-[420px]">
           {isSelectedDateInView && selectedDateElement && (
             <div
               className="absolute rounded-lg bg-primary blur-[4px] transition-all duration-300 "
               style={{
                 left: `${boxPosition.left}px`,
-                width: '48px',
+                width: '12%',
                 height: '60px',
                 top: '15%',
                 zIndex: -1,
@@ -104,7 +104,7 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect }) => {
                   key={index}
                   data-date={dateStr}
                   ref={(el) => isSelected && setSelectedDateElement(el)}
-                  className={`cursor-pointer flex flex-col items-center p-1 w-12 ${isSelected ? 'text-black' : ''}`}
+                  className={`cursor-pointer flex flex-col items-center p-1 w-8 sm:w-9 md:w-10 lg:w-12 ${isSelected ? 'text-black' : ''}`}
                   onClick={(e) => handleDateClick(day, e.currentTarget)}
                 >
                   <div className="text-[16px]">{format(day, 'EEE')}</div>
@@ -123,7 +123,7 @@ const WeeklyCalendar = ({ selectedDate, onDateSelect }) => {
       {/* Task List */}
       {loading && <div>Loading tasks...</div>}
       {selectedDate && (
-        <div className="mt-3 w-full">
+        <div className=" -mt-2 md:mt-2 lg:mt-3 w-full">
           <TaskList selectedDate={selectedDate} />
         </div>
       )}

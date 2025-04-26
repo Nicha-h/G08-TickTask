@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Close from '../../assets/close.svg';
+import DeletePomo from './DeletePomo';
+
 function PomoSetting({ task, onClose }) {
   const [title, setTitle] = useState(task.Pomo_Task_Title || '');
   const [pomodoro, setPomodoro] = useState('');
@@ -7,7 +9,7 @@ function PomoSetting({ task, onClose }) {
   const [longBreak, setLongBreak] = useState('');
 
   const [isClosing, setIsClosing] = useState(false);
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const closeModal = () => {
     setIsClosing(true);
     setTimeout(() => {
@@ -19,6 +21,14 @@ function PomoSetting({ task, onClose }) {
   const handleSave = () => {
     console.log("Saved changes:", { title, pomodoro, shortBreak, longBreak });
     onClose();
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true); 
+  };
+
+  const handleDeleteClose = () => {
+    setShowDeleteModal(false); 
   };
 
   return (
@@ -86,7 +96,7 @@ function PomoSetting({ task, onClose }) {
           <div className="flex justify-between items-center w-full -mt-2 gap-4">
             {/* Delete button */}
                 <button 
-                onClick={closeModal}
+                onClick={handleDeleteClick}
                 className="text-sm px-2 py-1 sm:px-4 sm:py-1 md:px-4 md:py-1 lg:px-4 lg:py-2 bg-red-400 text-black border-2 rounded-lg hover:bg-red-600 hover:scale-105 transition"
                 >
                 Delete
@@ -112,6 +122,7 @@ function PomoSetting({ task, onClose }) {
 
         </div>
       </div>
+      {showDeleteModal && <DeletePomo onClose={handleDeleteClose} />}
     </div>
   );
 }

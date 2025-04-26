@@ -96,7 +96,7 @@ function PomoTask() {
           <p className="text-sm text-gray-400 mt-1">Click the + button to add your first task</p>
         </div>
       )}
-      
+
       {/* Task list */}
         <div className="w-full space-y-3 max-h-[60vh] overflow-y-auto pr-2">
           {tasks.map((task, index) => (
@@ -120,6 +120,7 @@ function PomoTask() {
               </div>
               
               {/* Settings icon */}
+              <div>??/??</div>
               <Icon 
                 icon={setting} 
                 className='w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex-shrink-0 ml-2 hover:cursor-pointer hover:scale-105 transition-transform' 

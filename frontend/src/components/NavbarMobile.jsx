@@ -74,8 +74,9 @@ function NavbarMobile() {
         </div>
       </div>
 
+      
       {/* Page Content */}
-      <div className="w-full max-w-7xl mx-auto p-4 md-5">
+      <div className="mb-32 w-full max-w-7xl mx-auto p-4 md-5">
         <Outlet />
       </div>
     </div>
