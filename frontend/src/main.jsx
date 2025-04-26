@@ -14,7 +14,7 @@ import FindYourAccount from "./pages/Authentication/FindYourAccount.jsx";
 import ResetPassword from "./pages/Authentication/ResetPassword.jsx";
 import AllTaskList from "./pages/AllTaskList.jsx";
 import Category from "./pages/Category.jsx";
-
+import ProfileEdit from "./pages/ProfileEdit.jsx";
 const router = createBrowserRouter([
   {
     path: "*", 
@@ -26,6 +26,7 @@ const router = createBrowserRouter([
       { path: "overview", element: <Overview /> },
       { path: "taskList", element: <AllTaskList /> },
       { path: "category", element: <Category/> },
+      { path: "profile", element: <ProfileEdit/> },
     ],
   },
   { path: "/signup", element: <Signup /> },

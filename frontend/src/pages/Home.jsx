@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import WeeklyCalendar from '../components/WeeklyCalendar';
-import {format} from 'date-fns';
+import { format } from 'date-fns';
 import AddTask from '../components/AddTask';
 import CategoryBox from '../components/CategoryBox';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
+import { useWindowSize } from '../hooks/useWindowSize';
+import Men1 from '../assets/ProfilePics/men1.svg';
+
 
 function Home() {
   const date = new Date();
   const [selectedDate, setSelectedDate] = useState(format(date, 'yyyy-MM-dd'));
-  
   const [day, year] = [date.getUTCDate(), date.getFullYear()];
   const weekday = date.toLocaleString('default', { weekday: 'long' });
   const month = date.toLocaleString('default', { month: 'long' });
@@ -22,21 +24,23 @@ function Home() {
 
   const [userID, setUserID] = useState('');
   const [username, setUsername] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
+  const [, setLoading] = useState(true);
+  const [, setError] = useState(null);
+  const navigate = useNavigate();
+  const { width } = useWindowSize();
+  const isMobile = width <= 768;
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       setLoading(false);
       return;
     }
-  
+
     try {
       const decoded = jwtDecode(token);
-      const idFromToken = decoded.id || decoded.userId || decoded._id; // just in case
+      const idFromToken = decoded.id || decoded.userId || decoded._id;
       setUserID(idFromToken);
-      
     } catch (err) {
       console.error("Invalid token:", err);
       setError("Authentication failed");
@@ -44,13 +48,13 @@ function Home() {
       setLoading(false);
     }
   }, []);
-  
+
   useEffect(() => {
     if (userID) {
       fetchUsername();
     }
   }, [userID]);
-  
+
   const fetchUsername = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -70,51 +74,53 @@ function Home() {
   };
 
   return (
-    <>
-      {/*Clock + User Greetings*/}
-      <div className="flex grid-cols-2 justify-center gap-[249px] items-center w-full font-poppins">
-        <div className="font-bold text-2xl">Welcome, {username ? username : 'Guest'}!</div>
-        <div className="flex flex-row">
-          <div className="flex justify-center items-center w-[100px] h-[100px] border-2 rounded-xl font-fredoka">
-            <div className="text-[60px]">{day}</div>
+    <div className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-6 w-full font-poppins">
+      {/* Clock + Greeting */}
+      <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-4">
+        <div className='grid grid-cols-2 justify-center'>
+        <div className="font-bold text-2xl sm:text-3xl text-center sm:text-left">Welcome, {username || 'Guest'}!</div>
+        {isMobile && <img 
+              onClick={() => navigate('/profile')}
+              className="h-20 w-20 md:h-6 md:w-6 transition-all duration-200 ease-in-out transform" 
+              src={Men1} 
+              alt="profile"
+            />}
+        
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="w-[70px] h-[70px] sm:w-[80px] sm:h-[80px] lg:w-[100px] lg:h-[100px] border-2 rounded-xl font-fredoka flex items-center justify-center">
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-[50px]">{day}</div>
           </div>
-          <div className="flex flex-col">
-            <div className="mt-[25px] ml-[14px] font-bold text-base">
-              {weekday}, {month} {year}
-            </div>
-            <div className="mt-[12px] ml-[14px] font-bold text-base">{time}</div>
+          <div className="flex flex-col text-sm sm:text-base font-bold">
+            <div>{weekday}, {month} {year}</div>
+            <div>{time}</div>
           </div>
         </div>
       </div>
-      <div className="flex justify-center">
-        <div className="w-[1078px] my-4 border-t border-1 border-gray"></div>
-      </div>
-      
-      {/* Calendar*/}
-      <WeeklyCalendar 
-        selectedDate={selectedDate} 
-        onDateSelect={setSelectedDate}
-      />
 
-      <div className="flex justify-center">
-        <div className="w-[1078px] my-4 border-t border-1 border-gray"></div>
-      </div>
+      {/* Divider */}
+      <div className="w-full my-4 border-t border-gray-300"></div>
 
-      {/*Category*/}
-      <div className='flex flex-col justify-start items-center'>
-        <div className='ml-300 mr-300 mt-8 flex flex-col font-poppins font-bold text-2xl'>Category
-        <div className="w-[1008px] flex justify-end mb-2">
-        <NavLink to="/category" className="flex justify-end text-xs underline cursor-pointer hover:text-blue-600">
+      {/* Calendar */}
+      <WeeklyCalendar selectedDate={selectedDate} onDateSelect={setSelectedDate} />
+
+      {/* Divider */}
+      <div className="w-full my-4 border-t border-gray-300"></div>
+
+      {/* Category */}
+      <div className="mt-6">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl sm:text-2xl font-bold">Category</h2>
+          <NavLink to="/category" className="text-xs underline hover:text-blue-600">
             View all
-        </NavLink>
+          </NavLink>
         </div>
+        <CategoryBox />
       </div>
-      
-        <CategoryBox/>
-      </div>
-      <AddTask/>
-    </>
 
+      {/* AddTask - show on desktop only */}
+      {!isMobile && <AddTask />}
+    </div>
   );
 }
 

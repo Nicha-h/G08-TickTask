@@ -3,6 +3,7 @@ import { Icon } from '@iconify/react';
 //import editIcon from '@iconify-icons/mdi/pencil';
 //import deleteIcon from '@iconify-icons/mdi/delete';
 import { useLocation, NavLink } from 'react-router-dom';
+import briefcase from '@iconify-icons/mdi/briefcase-outline';
 
 const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
   const [tasks, setTasks] = useState(initialTasks || []);
@@ -64,7 +65,7 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
             <div className="w-full flex items-center justify-between">
               <div className="flex justify-center items-center">
                 <div className="ml-4 flex flex-row justify-start items-start w-[600px] h-auto">
-                  
+                  <Icon icon={briefcase} className='w-10 h-10'/>
                   <div className='ml-4 flex flex-col justify-start items-start w-[600px] h-auto'>
                     <h3 className="text-base font-bold">{task.Task_Title}</h3>
                     <p className="text-xs text-gray-700">{task.Task_Description}</p>

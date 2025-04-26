@@ -1,44 +1,117 @@
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import PomoTask from '../components/PomoTask';
 
 function Pomodoro() {
+  const [activeMode, setActiveMode] = useState('Pomodoro');
+  const [timer, setTimer] = useState(25 * 60);
+  const [isRunning, setIsRunning] = useState(false);
+  const [intervalId, setIntervalId] = useState(null);
+
+  const modes = {
+    'Pomodoro': 25 * 60,   
+    'Short - Break': 5 * 60, 
+    'Long - Break': 15 * 60, 
+  };
+
+  useEffect(() => {
+    setTimer(modes[activeMode]);
+    if (intervalId) {
+      clearInterval(intervalId);
+      setIsRunning(false);
+      setIntervalId(null);
+    }
+  }, [activeMode]);
+
+  useEffect(() => {
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [intervalId]);
+
+  const startTimer = () => {
+    if (isRunning) {
+      clearInterval(intervalId);
+      setIsRunning(false);
+      setIntervalId(null);
+    } else {
+      const id = setInterval(() => {
+        setTimer(prevTime => {
+          if (prevTime <= 1) {
+            clearInterval(id);
+            setIsRunning(false);
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+      setIntervalId(id);
+      setIsRunning(true);
+    }
+  };
+
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
+
   return (
-    <div className='flex flex-col justify-center items-center max-w-screen max-h-screen'>
-      <div className="w-[746px] h-[500px] border-2 flex flex-col items-center font-fredoka">
+    <div className='flex flex-col justify-center items-center w-full min-h-screen px-4'>
+      <div className="w-full max-w-2xl border-2 flex flex-col items-center font-fredoka rounded-lg shadow-md">
         {/* Header */}
-        <div className="w-full h-[86px] flex justify-center items-center border-b-2">
-          <h1 className="text-3xl font-bold">Pomodoro!</h1>
+        <div className="w-full py-4 flex justify-center items-center border-b-2">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">Pomodoro!</h1>
         </div>
 
         {/* Body */}
-        <div className="w-full h-[381px] flex flex-col items-center justify-around">
+        <div className="w-full flex flex-col items-center justify-between p-4 md:p-6">
           {/* Mode buttons */}
-          <div className="flex space-x-4 mt-4">
-            <button className="px-4 py-2 bg-[#EEF1C9] border rounded-lg">Pomodoro</button>
-            <button className="px-4 py-2 bg-white border rounded-lg">Short - Break</button>
-            <button className="px-4 py-2 bg-white border rounded-lg">Long - Break</button>
+          <div className="flex flex-wrap justify-center gap-2 w-full">
+            {Object.keys(modes).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setActiveMode(mode)}
+                className={`px-2 py-1 md:px-4 md:py-2 border rounded-lg text-sm md:text-base transition-transform ${
+                  activeMode === mode ? 'bg-green text-black border-2 hover:scale-105' 
+                  : 'bg-white hover:scale-105'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
 
           {/* Timer */}
-          <div className="border rounded-md mt-8 px-16 py-10">
-            <p className="text-[90px] font-bold">25:00</p>
+          <div className="border rounded-md mt-6 px-6 py-4 md:px-12 md:py-8 lg:px-16 lg:py-10">
+            <p className="text-4xl md:text-6xl lg:text-8xl font-bold">{formatTime(timer)}</p>
           </div>
 
-          {/* Start Button */}
-          <button className="text-normal mt-7 px-9 py-2 mb-10 bg-greensubmit hover:bg-[#6ed864] rounded border-2 ">
-            START !
-          </button>
+          {/* Action Buttons */}
+          <div className="flex gap-4 mt-6 mb-6">
+            <button 
+              onClick={startTimer}
+              className={`text-sm md:text-base px-4 md:px-8 py-2 rounded border-2 transition-all ${
+                isRunning ? 'bg-red-500 hover:bg-red-400 text-black border-2 hover:scale-105 hover:cursor-pointer' : 'bg-greensubmit hover:bg-green-400 text-black hover:cursor-pointer hover:scale-105'
+              }`}
+            >
+              {isRunning ? 'STOP !' : 'START !'}
+            </button>
+          </div>
         </div>
       </div>
-      {/*Task Name */}
-      <div className="flex flex-col *:justify-center items-center w-[746px] font-poppins font-black text-[18px] mt-3.5 h-auto">
+
+      {/* Task Name */}
+      <div className="flex flex-col justify-center items-center w-full max-w-2xl font-poppins font-black text-base md:text-lg mt-4 h-auto">
         <div>#1</div>
         <div>Task</div>
-        <PomoTask/>
+        <div className="w-full">
+          <PomoTask />
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default Pomodoro
+export default Pomodoro;

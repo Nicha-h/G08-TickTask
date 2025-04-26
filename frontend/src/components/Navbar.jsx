@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import Logo from '../assets/Logo.svg';
-import { NavLink, Outlet } from "react-router-dom";
-import Men1 from '../assets/men1.svg'
+import { NavLink, Outlet, useNavigate  } from "react-router-dom";
+import Men1 from '../assets/ProfilePics/men1.svg';
 import SearchIcon from '../assets/Search.svg'
+import ProfileEdit from '../pages/ProfileEdit';
 function Navbar() {
+  const navigate = useNavigate();
   const [activeButton, setActiveButton] = useState('Home');
 
   const handleClick = (buttonName) => {
@@ -16,7 +18,7 @@ function Navbar() {
       <div className="fixed top-0 w-full bg-white shadow-[0px_4px_8px_0px_rgba(0,0,0,0.25)] z-10 border-2">
         <div className="flex justify-between items-center max-w-7xl mx-auto p-2 ">
           {/* Logo */}
-          <img className="flex justify-start w-20 h-20" src={Logo} alt="Logo" />
+          <img className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20" src={Logo} alt="Logo" />
 
           {/* Buttons Container */}
           <div className="flex justify-center items-center gap-[38px] font-poppins  font-semibold">
@@ -72,7 +74,12 @@ function Navbar() {
           {/* pfp Container */}
           <div className='flex flex-row gap-[10px]'>
             <img className='hover:scale-105 transition-all duration-200 ease-in-out transform' src={SearchIcon} alt="search"></img>
-            <img className='hover:scale-105 transition-all duration-200 ease-in-out transform' src={Men1} alt="profile"/>
+            <img 
+              onClick={() => navigate('/profile')}
+              className="hover:scale-105 transition-all duration-200 ease-in-out transform cursor-pointer" 
+              src={Men1} 
+              alt="profile"
+            />
           </div>
         </div>
       </div>
