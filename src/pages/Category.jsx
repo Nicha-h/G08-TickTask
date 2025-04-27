@@ -57,6 +57,7 @@ export default function Category() {
 
   const handleTaskClick = (taskId) => {
     console.log(`Task ${taskId} clicked`);
+    
     // ยังไม่ได้ใส่ฟังช้น
   };
 

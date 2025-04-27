@@ -9,6 +9,7 @@ import Calendar from "./pages/Calendar.jsx";
 import Overview from "./pages/Overview.jsx";
 import Home from "./pages/Home.jsx";
 import Category from "./pages/Category.jsx";
+import AddTask from "./pages/AddTask.jsx";
 
 
 const router = createBrowserRouter([
@@ -30,6 +31,9 @@ const router = createBrowserRouter([
       },
       {path: "/category",
         element: <Category/>
+      },
+      {path: "/addtask",
+        element: <AddTask/>
       },
     ]
   },
