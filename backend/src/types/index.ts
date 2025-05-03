@@ -76,7 +76,7 @@ export interface Task {
 }
 
 export interface CreateSession {
-  UserId: number;
+  UserID: number;
   duration_seconds?: number;
   timer_type?: TimerType;
   PausedTime?: number;

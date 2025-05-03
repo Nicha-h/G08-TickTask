@@ -166,6 +166,7 @@ exports.Prisma.Pomodoro_sessionsScalarFieldEnum = {
   EndTime: 'EndTime',
   PausedTime: 'PausedTime',
   duration_seconds: 'duration_seconds',
+  remaining_seconds: 'remaining_seconds',
   timer_type: 'timer_type',
   last_updated: 'last_updated'
 };
@@ -184,6 +185,11 @@ exports.Prisma.Pomodoro_taskScalarFieldEnum = {
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
 };
 exports.TaskStatus = exports.$Enums.TaskStatus = {
   Completed: 'Completed',

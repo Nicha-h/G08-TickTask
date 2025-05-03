@@ -1,8 +1,6 @@
 import { PrismaClient, type task } from '../generated/prisma/index.js';
-import { db } from '../index.js'
 import type { Context } from 'hono';
 import type { TaskStatus } from '../types/index.js';
-import type { Task } from '../schemas/Schemas.js';
 import * as dotenv from 'dotenv';
 dotenv.config();
 

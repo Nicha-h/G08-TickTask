@@ -1,7 +1,4 @@
-import { db } from "../index.js";
 import * as dotenv from 'dotenv';
-import { type CreateTask, type Task, type UpdateTask } from '../types/index.js';
-import { PomoTaskStatus } from '../types/index.js';
 dotenv.config();
 import { Prisma, PrismaClient } from '../generated/prisma/index.js';
 const prisma = new PrismaClient();
@@ -48,10 +45,11 @@ export async function getAllPomoTask(userId: number) {
         Pomo_Task_Title: data.Pomo_Task_Title,
         Pomo_Task_Short: data.Pomo_Task_Short ?? 5,
         Pomo_Task_Long: data.Pomo_Task_Long ?? 15,
-        session: data.session,
+        SessionId: data.SessionId,
         Pomo_Task_Status: false, 
         Pomo_Completed_Count: 0,
         Pomo_Target_Count: data.Pomo_Target_Count ?? 0,
+        session: data.session
       },
     });
   }

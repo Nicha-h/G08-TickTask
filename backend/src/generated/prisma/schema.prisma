@@ -39,8 +39,8 @@ enum TimerType {
 model User {
   UserID        Int        @id @default(autoincrement())
   profile       profile?
-  User_Email    String
-  User_Password String     @unique
+  User_Email    String     @unique
+  User_Password String
   tasks         task[]
   category      category[]
 
@@ -50,12 +50,12 @@ model User {
 model task {
   TaskID           Int        @id @default(autoincrement())
   Task_Title       String
-  Task_Description String
-  Task_Start_Date  DateTime
-  Task_End_Date    DateTime
-  Task_Start_Time  String
-  Task_End_Time    String
-  Task_Icon        String
+  Task_Description String?
+  Task_Start_Date  DateTime?
+  Task_End_Date    DateTime?
+  Task_Start_Time  DateTime?  @default(now())
+  Task_End_Time    DateTime?
+  Task_Icon        String?    @default("default.svg")
   Task_Status      TaskStatus @default(Incomplete)
   Task_Color       String
   UserID           Int
@@ -66,7 +66,7 @@ model task {
 
 model profile {
   UserID                 Int      @id
-  Username               String
+  Username               String?
   User_profile_icon_type IconType @default(preset)
   User_profile_icon_path String
   user                   User     @relation(fields: [UserID], references: [UserID])
@@ -95,16 +95,17 @@ model task_category {
 }
 
 model pomodoro_sessions {
-  SessionId        Int        @id @default(autoincrement())
-  UserID           Int
-  Status           PomoStatus
-  StartTime        DateTime
-  EndTime          DateTime
-  PausedTime       Int
-  duration_seconds Int        @default(1500)
-  timer_type       TimerType
-  last_updated     DateTime   @default(now())
-  user             User       @relation(fields: [UserID], references: [UserID])
+  SessionId         Int        @id @default(autoincrement())
+  UserID            Int
+  Status            PomoStatus
+  StartTime         DateTime
+  EndTime           DateTime?
+  PausedTime        Int
+  duration_seconds  Int        @default(1500)
+  remaining_seconds Int        @default(1500)
+  timer_type        TimerType
+  last_updated      DateTime   @default(now())
+  user              User       @relation(fields: [UserID], references: [UserID])
 
   pomodoro_task pomodoro_task[]
 }
