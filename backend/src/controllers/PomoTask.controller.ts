@@ -36,12 +36,17 @@ export async function getTaskById(c: Context) {
 export async function createPomoTaskController(c: Context) {
     try {
         const body = await c.req.json();
-        const taskData: CreateTask = {
+        const taskData ={
             Pomo_Task_Title: body.title,
             Pomo_Task_Short: body.shortBreak || 5,
             Pomo_Task_Long: body.longBreak || 15,
             SessionId: body.sessionId,
-            Pomo_Target_Count: body.targetCount || 0 // Add target count support
+            Pomo_Target_Count: body.targetCount || 0,
+            session: {
+              connect: {
+                SessionId: body.sessionId, 
+              },
+            },
         }
         const tasks = await TaskModel.CreatePomoTask(taskData);
         return c.json({ success: true, data: tasks }, 201);
@@ -55,14 +60,14 @@ export async function updatePomoTaskController(c: Context) {
     
     try {
       const body = await c.req.json();
-      const taskData: UpdateTask = {
+      const taskData = {
         Pomo_Task_Title: body.title,
         Pomo_Task_Short: body.shortBreak,
         Pomo_Task_Long: body.longBreak,
         SessionId: body.sessionId,
         Pomo_Task_Status: body.status,
-        Pomo_Completed_Count: body.completedCount, // Add completed count support
-        Pomo_Target_Count: body.targetCount // Add target count support
+        Pomo_Completed_Count: body.completedCount, 
+        Pomo_Target_Count: body.targetCount 
       };
       
       const updatedTask = await TaskModel.updatePomoTask(taskId, taskData);
@@ -120,7 +125,7 @@ export async function completePomoTask(c: Context): Promise<Response> {
     const taskId = Number(c.req.param('id'));
     
     try {
-      const task = await TaskModel.updatePomoTask(taskId, { Pomo_Task_Status: PomoTaskStatus.COMPLETED });
+      const task = await TaskModel.updatePomoTask(taskId, { Pomo_Task_Status: true });
       
       if (!task) {
         return c.json({ success: false, message: 'Task not found' }, 404);

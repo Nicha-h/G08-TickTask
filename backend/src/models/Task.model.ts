@@ -109,6 +109,46 @@ export const updateTask = async (c: Context) => {
   }
 };
 
+export const patchTask = async (c: Context) => {
+  const id = Number(c.req.param('id'));
+  const user = c.get('user') as { id: number };
+  const body = await c.req.json();
+
+  const allowedFields = [
+    'Task_Title',
+    'Task_Description',
+    'Task_Status',
+    'Task_Color',
+    'Task_Icon',
+    'Task_Start_Date',
+    'Task_End_Date',
+    'Task_Start_Time',
+    'Task_End_Time'
+  ];
+
+  const data: Record<string, any> = {};
+  for (const key of allowedFields) {
+    if (body[key] !== undefined) {
+      data[key] = body[key];
+    }
+  }
+
+  try {
+    await prisma.task.updateMany({
+      where: {
+        TaskID: id,
+        UserID: user.id
+      },
+      data
+    });
+
+    return c.json({ message: 'Task patched successfully' });
+  } catch (error) {
+    console.error('Error patching task:', error);
+    return c.json({ error: 'Failed to patch task' }, 500);
+  }
+};
+
 export const deleteTask = async (c: Context) => {
   const id = Number(c.req.param('id'));
   const user = c.get('user') as { id: number };
