@@ -1,4 +1,4 @@
-import {React, useState} from 'react';
+import {React} from 'react';
 import { Icon } from '@iconify/react';
 import addIcon from '@iconify-icons/mdi/add';
 import TaskModal from './modals/AddTaskModal';

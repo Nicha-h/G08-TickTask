@@ -4,7 +4,7 @@ export interface Task {
     id: number;
     title: string;
     completed: boolean;
-  }
+}
 
 export interface Category{
     CategoryID: number;
@@ -22,7 +22,7 @@ export type User = {
     id: number;
     email: string;
     password: string;
-  };
+};
   
 export type TaskStatus = 'Incomplete' | 'Complete'; 
 
@@ -45,13 +45,13 @@ export enum TimerType {
 }
 
 export interface Session {
-  SessionId?: number; // Auto-increment
+  SessionId?: number; 
   UserId: number;
   Status: SessionStatus;
   StartTime: Date;
   EndTime: Date | null;
   PausedTime: Date | null;
-  duration_seconds: number; // Default 1500
+  duration_seconds: number; 
   remaining_seconds: number;
   timer_type: TimerType;
   last_updated: Date;
@@ -59,16 +59,20 @@ export interface Session {
 
 export enum PomoTaskStatus {
   PENDING = 0,
-  COMPLETED = 1
+  IN_PROGRESS = 1,
+  COMPLETED = 2,
+  CANCELLED = 3
 }
 
 export interface Task {
   Pomo_TaskId?: number;
   Pomo_Task_Title: string;
-  Pomo_Task_Short: number; // Default 5
-  Pomo_Task_Long: number; // Default 15
+  Pomo_Task_Short: number; 
+  Pomo_Task_Long: number; 
   SessionId: number | null;
-  Pomo_Task_Status: PomoTaskStatus; // Default 
+  Pomo_Task_Status: PomoTaskStatus; 
+  Pomo_Completed_Count: number; 
+  Pomo_Target_Count: number;   
 }
 
 export interface CreateSession {
@@ -89,6 +93,7 @@ export interface CreateTask {
   Pomo_Task_Short?: number;
   Pomo_Task_Long?: number;
   SessionId?: number;
+  Pomo_Target_Count?: number; 
 }
 
 export interface UpdateTask {
@@ -96,5 +101,7 @@ export interface UpdateTask {
   Pomo_Task_Short?: number;
   Pomo_Task_Long?: number;
   SessionId?: number | null;
-  Pomo_Task_Status?: PomoTaskStatus ;
+  Pomo_Task_Status?: PomoTaskStatus;
+  Pomo_Completed_Count?: number; 
+  Pomo_Target_Count?: number;    
 }

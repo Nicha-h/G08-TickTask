@@ -1,5 +1,5 @@
 import type { ResultSetHeader } from 'mysql2';
-import {db} from '../database/db.js';
+import { db } from '../index'
 import type { Context } from 'hono';
 import * as dotenv from 'dotenv';
 dotenv.config();

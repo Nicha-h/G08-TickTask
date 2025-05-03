@@ -1,4 +1,4 @@
-import { db } from '../database/db.js';
+import { db } from '../index.ts'
 import * as dotenv from 'dotenv';
 import { SessionStatus, TimerType, type CreateSession, type Session, type UpdateSession } from '../types/index.js';
 import type {RowDataPacket } from 'mysql2';

@@ -15,4 +15,10 @@ PomotaskRoutes.delete('/:id', TaskController.deletePomoTaskController);
 PomotaskRoutes.put('/:id/assign', TaskController.assignTaskToSession);
 PomotaskRoutes.put('/:id/complete', TaskController.completePomoTask);
 
+//counter functionality
+PomotaskRoutes.post('/:id/increment', TaskController.incrementPomoCounter);
+PomotaskRoutes.post('/:id/reset', TaskController.resetPomoCounter);
+PomotaskRoutes.post('/:id/target', TaskController.setPomoTargetCount);
+PomotaskRoutes.get('/:id/progress', TaskController.getTaskProgress);
+
 export default PomotaskRoutes;

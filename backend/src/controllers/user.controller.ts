@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { createUserInDb, fetchProfile, updateProfile } from '../models/User.model.js';
 import  jwt  from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { db } from '../database/db.js';
+import {db} from '../index.js'
 import type { User } from '../types/index.js';
 import type { RowDataPacket } from 'mysql2';
 import * as dotenv from 'dotenv';

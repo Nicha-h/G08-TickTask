@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import { db } from '../database/db.js';
+import { db } from '../index.js';
 import { z } from 'zod';
 import * as TaskModel from '../models/Task.model.js';
 import type { CustomContext, TaskStatus } from '../types/index.js';
