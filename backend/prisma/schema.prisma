@@ -102,6 +102,7 @@ model pomodoro_sessions {
   EndTime           DateTime
   PausedTime        Int
   duration_seconds  Int         @default(1500)
+  remaining_seconds Int @default(1500)
   timer_type        TimerType
   last_updated      DateTime    @default(now())
   user              User        @relation(fields: [UserID], references: [UserID])

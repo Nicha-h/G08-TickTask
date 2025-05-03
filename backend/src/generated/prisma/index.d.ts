@@ -11592,6 +11592,7 @@ export namespace Prisma {
   }
 
   export type pomodoro_sessionsCreateNestedOneWithoutPomodoro_taskInput = {
+    SessionId: null;
     create?: XOR<pomodoro_sessionsCreateWithoutPomodoro_taskInput, pomodoro_sessionsUncheckedCreateWithoutPomodoro_taskInput>
     connectOrCreate?: pomodoro_sessionsCreateOrConnectWithoutPomodoro_taskInput
     connect?: pomodoro_sessionsWhereUniqueInput

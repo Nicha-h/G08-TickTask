@@ -139,6 +139,7 @@ exports.Prisma.Pomodoro_sessionsScalarFieldEnum = {
   EndTime: 'EndTime',
   PausedTime: 'PausedTime',
   duration_seconds: 'duration_seconds',
+  remaining_seconds: 'remaining_seconds',
   timer_type: 'timer_type',
   last_updated: 'last_updated'
 };
