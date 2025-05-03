@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma/index.js';
+import { PrismaClient, type category } from '../generated/prisma/index.js';
 import * as dotenv from 'dotenv';
 import { Category } from '../middlewares/Category.validators.js';
 
@@ -14,10 +14,9 @@ export async function getUserCategories(userId: number) {
   });
 }
 
-export async function createCategory(userId: number, name: string, color: string, icon: string, isCustom = false) {
+export async function createCategory(userId: number, name: string, color: string, icon: string, isCustom = false): Promise<category> {
   const category = await prisma.category.create({
     data: {
-      CategoryId,
       Category_Name: name,
       userId: userId,
       Category_Color: color,

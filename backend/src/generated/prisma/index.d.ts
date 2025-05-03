@@ -59,6 +59,7 @@ export namespace $Enums {
   } as const;
 }
 
+
 export const IconType: {
   preset: 'preset',
   custom: 'custom'
@@ -83,7 +84,8 @@ export const TimerType: {
 };
 
 export type TimerType = (typeof TimerType)[keyof typeof TimerType]
-  
+
+
 
 export type TaskStatus = $Enums.TaskStatus
 
@@ -10444,7 +10446,6 @@ export namespace Prisma {
   }
 
   export type categoryCreateInput = {
-    CategoryId: number
     Category_Name: string
     Category_icon: string
     Category_Color?: string
@@ -10454,7 +10455,7 @@ export namespace Prisma {
   }
 
   export type categoryUncheckedCreateInput = {
-    CategoryId: number
+    CategoryId?: number
     Category_Name: string
     Category_icon: string
     Category_Color?: string
@@ -10464,7 +10465,6 @@ export namespace Prisma {
   }
 
   export type categoryUpdateInput = {
-    CategoryId?: IntFieldUpdateOperationsInput | number
     Category_Name?: StringFieldUpdateOperationsInput | string
     Category_icon?: StringFieldUpdateOperationsInput | string
     Category_Color?: StringFieldUpdateOperationsInput | string
@@ -10484,7 +10484,7 @@ export namespace Prisma {
   }
 
   export type categoryCreateManyInput = {
-    CategoryId: number
+    CategoryId?: number
     Category_Name: string
     Category_icon: string
     Category_Color?: string
@@ -10493,7 +10493,6 @@ export namespace Prisma {
   }
 
   export type categoryUpdateManyMutationInput = {
-    CategoryId?: IntFieldUpdateOperationsInput | number
     Category_Name?: StringFieldUpdateOperationsInput | string
     Category_icon?: StringFieldUpdateOperationsInput | string
     Category_Color?: StringFieldUpdateOperationsInput | string
@@ -12010,7 +12009,6 @@ export namespace Prisma {
   }
 
   export type categoryCreateWithoutUserInput = {
-    CategoryId: number
     Category_Name: string
     Category_icon: string
     Category_Color?: string
@@ -12019,7 +12017,7 @@ export namespace Prisma {
   }
 
   export type categoryUncheckedCreateWithoutUserInput = {
-    CategoryId: number
+    CategoryId?: number
     Category_Name: string
     Category_icon: string
     Category_Color?: string
@@ -12443,7 +12441,6 @@ export namespace Prisma {
   }
 
   export type categoryCreateWithoutTask_categoryInput = {
-    CategoryId: number
     Category_Name: string
     Category_icon: string
     Category_Color?: string
@@ -12452,7 +12449,7 @@ export namespace Prisma {
   }
 
   export type categoryUncheckedCreateWithoutTask_categoryInput = {
-    CategoryId: number
+    CategoryId?: number
     Category_Name: string
     Category_icon: string
     Category_Color?: string
@@ -12515,7 +12512,6 @@ export namespace Prisma {
   }
 
   export type categoryUpdateWithoutTask_categoryInput = {
-    CategoryId?: IntFieldUpdateOperationsInput | number
     Category_Name?: StringFieldUpdateOperationsInput | string
     Category_icon?: StringFieldUpdateOperationsInput | string
     Category_Color?: StringFieldUpdateOperationsInput | string
@@ -12720,7 +12716,7 @@ export namespace Prisma {
   }
 
   export type categoryCreateManyUserInput = {
-    CategoryId: number
+    CategoryId?: number
     Category_Name: string
     Category_icon: string
     Category_Color?: string
@@ -12780,7 +12776,6 @@ export namespace Prisma {
   }
 
   export type categoryUpdateWithoutUserInput = {
-    CategoryId?: IntFieldUpdateOperationsInput | number
     Category_Name?: StringFieldUpdateOperationsInput | string
     Category_icon?: StringFieldUpdateOperationsInput | string
     Category_Color?: StringFieldUpdateOperationsInput | string

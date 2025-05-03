@@ -73,7 +73,7 @@ model profile {
 }
 
 model category {
-  CategoryId          Int     @id
+  CategoryId          Int     @id @default(autoincrement())
   Category_Name       String
   Category_icon       String
   Category_Color      String  @default("#A7A7A7")
