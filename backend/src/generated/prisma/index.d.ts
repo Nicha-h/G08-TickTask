@@ -53,9 +53,10 @@ export type pomodoro_task = $Result.DefaultSelection<Prisma.$pomodoro_taskPayloa
  * Enums
  */
 export namespace $Enums {
-  export const TaskStatus: {
-  Completed: 'Completed',
-  Incomplete: 'Incomplete'
+  export const TaskStatus = {
+    Completed: 'Completed',
+    Incomplete: 'Incomplete',
+  } as const;
 };
 
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
@@ -86,7 +87,7 @@ export const TimerType: {
 
 export type TimerType = (typeof TimerType)[keyof typeof TimerType]
 
-}
+
 
 export type TaskStatus = $Enums.TaskStatus
 

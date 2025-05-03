@@ -56,9 +56,9 @@ export async function createTask(taskData: {
   Task_End_Time?: string;
 }): Promise<task> {
 
-  const taskToInsert = {
+    const taskToInsert = {
     Task_Title: taskData.Task_Title,
-    Task_Description: taskData.Task_Description ?? null,
+    Task_Description: taskData.Task_Description ?? '',
     Task_Icon: taskData.Task_Icon ?? 'default.svg',
     Task_Start_Date: taskData.Task_Start_Date ?? formattedDate,
     Task_End_Date: taskData.Task_End_Date ?? formattedDate,
@@ -66,9 +66,9 @@ export async function createTask(taskData: {
     Task_Color: taskData.Task_Color ?? '#A7A7A7',
     Task_Start_Time: taskData.Task_Start_Time ?? currentTime,
     Task_End_Time: taskData.Task_End_Time ?? '23:59:59',
-    user: {
+user: {
       connect: {
-        id: taskData.UserID
+    UserID: taskData.UserID
       }
     }
   };
