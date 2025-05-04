@@ -12,9 +12,10 @@ const formattedDate = now.toISOString().split('T')[0];
 const currentTime = now.toTimeString().split(' ')[0];
 
 export async function getTasksByDate(date: string): Promise<task[]> {
+  const cleanedDate = date.trim(); // Ensure no extra spaces
   const tasks = await prisma.task.findMany({
     where: {
-      Task_Start_Date: formattedDate
+      Task_Start_Date: cleanedDate
     },
     orderBy: {
       Task_Start_Time: 'asc'
@@ -22,6 +23,7 @@ export async function getTasksByDate(date: string): Promise<task[]> {
   });
   return tasks;
 }
+
 
 export async function getTasksByUser(userId: number, date?: string): Promise<task[]> {
   const whereClause: any = { UserID: userId };
