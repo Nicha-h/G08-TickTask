@@ -10,6 +10,10 @@ import {
 
 dotenv.config();
 const prisma = new PrismaClient();
+const now = new Date();
+
+const formattedDate = now.toISOString().split('T')[0];
+const currentTime = now.toTimeString().split(' ')[0];
 
 export async function getPomoSession(userId: number): Promise<pomodoro_sessions[]> {
   return await prisma.pomodoro_sessions.findMany({
@@ -31,8 +35,8 @@ export async function createSession(this: any, sessionData: CreateSession): Prom
     data: {
       UserID,
       Status: SessionStatus.ACTIVE,
-      StartTime: new Date(),
-      PausedTime: 0,
+      StartTime: formattedDate,
+      PausedTime: "0",
       duration_seconds,
       remaining_seconds: duration_seconds,
       timer_type,
@@ -51,12 +55,14 @@ export async function updatePomo(this: any, sessionId: number, data: UpdateSessi
   if (data.Status !== undefined) {
     updateData.Status = data.Status;
     if (data.Status === SessionStatus.PAUSED) {
-      updateData.PausedTime = new Date();
+      updateData.PausedTime = new Date().toISOString(); 
     }
     if (data.Status === SessionStatus.COMPLETED) {
-      updateData.EndTime = new Date();
+      updateData.EndTime = new Date().toISOString(); 
     }
   }
+  updateData.last_updated = new Date().toISOString(); 
+  
 
   if (data.remaining_seconds !== undefined) {
     updateData.remaining_seconds = data.remaining_seconds;
@@ -72,11 +78,16 @@ export async function updatePomo(this: any, sessionId: number, data: UpdateSessi
   });
 }
 
-export async function deletePomo(sessionId: number): Promise<boolean> {
-  const deleted = await prisma.pomodoro_sessions.delete({
+export async function deletePomo(sessionId: number): Promise<pomodoro_sessions> {
+  await prisma.pomodoro_task.deleteMany({
     where: { SessionId: sessionId },
   });
-  return !!deleted;
+
+  const deletedSession = await prisma.pomodoro_sessions.delete({
+    where: { SessionId: sessionId },
+  });
+
+  return deletedSession;
 }
 
 export async function getActiveSession(userId: number): Promise<pomodoro_sessions | null> {

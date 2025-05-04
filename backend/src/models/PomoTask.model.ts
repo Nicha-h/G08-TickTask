@@ -45,22 +45,28 @@ export async function getAllPomoTask(userId: number) {
         Pomo_Task_Title: data.Pomo_Task_Title,
         Pomo_Task_Short: data.Pomo_Task_Short ?? 5,
         Pomo_Task_Long: data.Pomo_Task_Long ?? 15,
-        SessionId: data.SessionId,
-        Pomo_Task_Status: false, 
+        Pomo_Task_Status: false,
         Pomo_Completed_Count: 0,
         Pomo_Target_Count: data.Pomo_Target_Count ?? 0,
-        session: data.session
+        session: data.session, 
       },
     });
   }
   
   
+  
   export async function updatePomoTask(taskId: number, data: Prisma.pomodoro_taskUpdateInput) {
     return prisma.pomodoro_task.update({
       where: { Pomo_TaskId: taskId },
-      data,
+      data: {
+        ...data,
+        session: data.SessionId ? {
+          connect: { SessionId: data.SessionId }
+        } : undefined, 
+      },
     });
   }
+  
   
   export async function deletePomoTask(taskId: number) {
     await prisma.pomodoro_task.delete({

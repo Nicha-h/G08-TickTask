@@ -100,7 +100,7 @@ export const getCategoryProgress = async (categoryId: number, userId: number) =>
       CategoryId: categoryId,
       task: {
         UserID: userId,
-        Task_Status: 'completed',
+        Task_Status: 'Completed',
       },
     },
   });

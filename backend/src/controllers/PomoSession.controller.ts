@@ -32,7 +32,7 @@ export async function createSessionController(c: Context) {
     try {
         const body = await c.req.json();
         const sessionData: CreateSession = {
-            UserId: body.UserId,
+            UserID: body.UserId,
             duration_seconds: body.duration || 1500,
             timer_type: body.timer_type as TimerType,
             PausedTime: body.duration || 1500,
@@ -108,7 +108,7 @@ export async function startSession(c:Context) {
           await SessionModel.updatePomo(activeSession.SessionId!, { Status: SessionStatus.PAUSED });
         }
         const session = await SessionModel.createSession({
-            UserId: userId,
+            UserID: userId,
             duration_seconds: durationSeconds,
             timer_type: timerType
           });

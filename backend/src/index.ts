@@ -20,7 +20,7 @@ app.use('*', async (c, next) => {
 });
 app.route('/api/tasks', taskRoutes);
 app.route('/api/users', UserRoutes);
-app.route('/api/categories', CategoryRoute);
+app.route('/api/category', CategoryRoute);
 app.route('/api/pomodoroSession', SessionRoutes);
 app.route('/api/pomodoroTask', PomoTaskRoute);
 

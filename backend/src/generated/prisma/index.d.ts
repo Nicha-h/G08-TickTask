@@ -59,7 +59,6 @@ export namespace $Enums {
   } as const;
 }
 
-
 export const IconType: {
   preset: 'preset',
   custom: 'custom'
@@ -84,7 +83,6 @@ export const TimerType: {
 };
 
 export type TimerType = (typeof TimerType)[keyof typeof TimerType]
-
 
 
 export type TaskStatus = $Enums.TaskStatus
@@ -2791,10 +2789,10 @@ export namespace Prisma {
     TaskID: number | null
     Task_Title: string | null
     Task_Description: string | null
-    Task_Start_Date: Date | null
-    Task_End_Date: Date | null
-    Task_Start_Time: Date | null
-    Task_End_Time: Date | null
+    Task_Start_Date: string | null
+    Task_End_Date: string | null
+    Task_Start_Time: string | null
+    Task_End_Time: string | null
     Task_Icon: string | null
     Task_Status: $Enums.TaskStatus | null
     Task_Color: string | null
@@ -2805,10 +2803,10 @@ export namespace Prisma {
     TaskID: number | null
     Task_Title: string | null
     Task_Description: string | null
-    Task_Start_Date: Date | null
-    Task_End_Date: Date | null
-    Task_Start_Time: Date | null
-    Task_End_Time: Date | null
+    Task_Start_Date: string | null
+    Task_End_Date: string | null
+    Task_Start_Time: string | null
+    Task_End_Time: string | null
     Task_Icon: string | null
     Task_Status: $Enums.TaskStatus | null
     Task_Color: string | null
@@ -2974,10 +2972,10 @@ export namespace Prisma {
     TaskID: number
     Task_Title: string
     Task_Description: string | null
-    Task_Start_Date: Date | null
-    Task_End_Date: Date | null
-    Task_Start_Time: Date | null
-    Task_End_Time: Date | null
+    Task_Start_Date: string | null
+    Task_End_Date: string | null
+    Task_Start_Time: string | null
+    Task_End_Time: string | null
     Task_Icon: string | null
     Task_Status: $Enums.TaskStatus
     Task_Color: string
@@ -3087,10 +3085,10 @@ export namespace Prisma {
       TaskID: number
       Task_Title: string
       Task_Description: string | null
-      Task_Start_Date: Date | null
-      Task_End_Date: Date | null
-      Task_Start_Time: Date | null
-      Task_End_Time: Date | null
+      Task_Start_Date: string | null
+      Task_End_Date: string | null
+      Task_Start_Time: string | null
+      Task_End_Time: string | null
       Task_Icon: string | null
       Task_Status: $Enums.TaskStatus
       Task_Color: string
@@ -3523,10 +3521,10 @@ export namespace Prisma {
     readonly TaskID: FieldRef<"task", 'Int'>
     readonly Task_Title: FieldRef<"task", 'String'>
     readonly Task_Description: FieldRef<"task", 'String'>
-    readonly Task_Start_Date: FieldRef<"task", 'DateTime'>
-    readonly Task_End_Date: FieldRef<"task", 'DateTime'>
-    readonly Task_Start_Time: FieldRef<"task", 'DateTime'>
-    readonly Task_End_Time: FieldRef<"task", 'DateTime'>
+    readonly Task_Start_Date: FieldRef<"task", 'String'>
+    readonly Task_End_Date: FieldRef<"task", 'String'>
+    readonly Task_Start_Time: FieldRef<"task", 'String'>
+    readonly Task_End_Time: FieldRef<"task", 'String'>
     readonly Task_Icon: FieldRef<"task", 'String'>
     readonly Task_Status: FieldRef<"task", 'TaskStatus'>
     readonly Task_Color: FieldRef<"task", 'String'>
@@ -7259,7 +7257,6 @@ export namespace Prisma {
   export type Pomodoro_sessionsAvgAggregateOutputType = {
     SessionId: number | null
     UserID: number | null
-    PausedTime: number | null
     duration_seconds: number | null
     remaining_seconds: number | null
   }
@@ -7267,7 +7264,6 @@ export namespace Prisma {
   export type Pomodoro_sessionsSumAggregateOutputType = {
     SessionId: number | null
     UserID: number | null
-    PausedTime: number | null
     duration_seconds: number | null
     remaining_seconds: number | null
   }
@@ -7276,9 +7272,9 @@ export namespace Prisma {
     SessionId: number | null
     UserID: number | null
     Status: $Enums.PomoStatus | null
-    StartTime: Date | null
-    EndTime: Date | null
-    PausedTime: number | null
+    StartTime: string | null
+    EndTime: string | null
+    PausedTime: string | null
     duration_seconds: number | null
     remaining_seconds: number | null
     timer_type: $Enums.TimerType | null
@@ -7289,9 +7285,9 @@ export namespace Prisma {
     SessionId: number | null
     UserID: number | null
     Status: $Enums.PomoStatus | null
-    StartTime: Date | null
-    EndTime: Date | null
-    PausedTime: number | null
+    StartTime: string | null
+    EndTime: string | null
+    PausedTime: string | null
     duration_seconds: number | null
     remaining_seconds: number | null
     timer_type: $Enums.TimerType | null
@@ -7316,7 +7312,6 @@ export namespace Prisma {
   export type Pomodoro_sessionsAvgAggregateInputType = {
     SessionId?: true
     UserID?: true
-    PausedTime?: true
     duration_seconds?: true
     remaining_seconds?: true
   }
@@ -7324,7 +7319,6 @@ export namespace Prisma {
   export type Pomodoro_sessionsSumAggregateInputType = {
     SessionId?: true
     UserID?: true
-    PausedTime?: true
     duration_seconds?: true
     remaining_seconds?: true
   }
@@ -7459,9 +7453,9 @@ export namespace Prisma {
     SessionId: number
     UserID: number
     Status: $Enums.PomoStatus
-    StartTime: Date
-    EndTime: Date | null
-    PausedTime: number
+    StartTime: string
+    EndTime: string | null
+    PausedTime: string
     duration_seconds: number
     remaining_seconds: number
     timer_type: $Enums.TimerType
@@ -7567,9 +7561,9 @@ export namespace Prisma {
       SessionId: number
       UserID: number
       Status: $Enums.PomoStatus
-      StartTime: Date
-      EndTime: Date | null
-      PausedTime: number
+      StartTime: string
+      EndTime: string | null
+      PausedTime: string
       duration_seconds: number
       remaining_seconds: number
       timer_type: $Enums.TimerType
@@ -8002,9 +7996,9 @@ export namespace Prisma {
     readonly SessionId: FieldRef<"pomodoro_sessions", 'Int'>
     readonly UserID: FieldRef<"pomodoro_sessions", 'Int'>
     readonly Status: FieldRef<"pomodoro_sessions", 'PomoStatus'>
-    readonly StartTime: FieldRef<"pomodoro_sessions", 'DateTime'>
-    readonly EndTime: FieldRef<"pomodoro_sessions", 'DateTime'>
-    readonly PausedTime: FieldRef<"pomodoro_sessions", 'Int'>
+    readonly StartTime: FieldRef<"pomodoro_sessions", 'String'>
+    readonly EndTime: FieldRef<"pomodoro_sessions", 'String'>
+    readonly PausedTime: FieldRef<"pomodoro_sessions", 'String'>
     readonly duration_seconds: FieldRef<"pomodoro_sessions", 'Int'>
     readonly remaining_seconds: FieldRef<"pomodoro_sessions", 'Int'>
     readonly timer_type: FieldRef<"pomodoro_sessions", 'TimerType'>
@@ -9727,13 +9721,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'DateTime'
-   */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-  /**
    * Reference to a field of type 'TaskStatus'
    */
   export type EnumTaskStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskStatus'>
@@ -9765,6 +9752,13 @@ export namespace Prisma {
    * Reference to a field of type 'TimerType'
    */
   export type EnumTimerTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TimerType'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
     
 
 
@@ -9841,10 +9835,10 @@ export namespace Prisma {
     TaskID?: IntFilter<"task"> | number
     Task_Title?: StringFilter<"task"> | string
     Task_Description?: StringNullableFilter<"task"> | string | null
-    Task_Start_Date?: DateTimeNullableFilter<"task"> | Date | string | null
-    Task_End_Date?: DateTimeNullableFilter<"task"> | Date | string | null
-    Task_Start_Time?: DateTimeNullableFilter<"task"> | Date | string | null
-    Task_End_Time?: DateTimeNullableFilter<"task"> | Date | string | null
+    Task_Start_Date?: StringNullableFilter<"task"> | string | null
+    Task_End_Date?: StringNullableFilter<"task"> | string | null
+    Task_Start_Time?: StringNullableFilter<"task"> | string | null
+    Task_End_Time?: StringNullableFilter<"task"> | string | null
     Task_Icon?: StringNullableFilter<"task"> | string | null
     Task_Status?: EnumTaskStatusFilter<"task"> | $Enums.TaskStatus
     Task_Color?: StringFilter<"task"> | string
@@ -9876,10 +9870,10 @@ export namespace Prisma {
     NOT?: taskWhereInput | taskWhereInput[]
     Task_Title?: StringFilter<"task"> | string
     Task_Description?: StringNullableFilter<"task"> | string | null
-    Task_Start_Date?: DateTimeNullableFilter<"task"> | Date | string | null
-    Task_End_Date?: DateTimeNullableFilter<"task"> | Date | string | null
-    Task_Start_Time?: DateTimeNullableFilter<"task"> | Date | string | null
-    Task_End_Time?: DateTimeNullableFilter<"task"> | Date | string | null
+    Task_Start_Date?: StringNullableFilter<"task"> | string | null
+    Task_End_Date?: StringNullableFilter<"task"> | string | null
+    Task_Start_Time?: StringNullableFilter<"task"> | string | null
+    Task_End_Time?: StringNullableFilter<"task"> | string | null
     Task_Icon?: StringNullableFilter<"task"> | string | null
     Task_Status?: EnumTaskStatusFilter<"task"> | $Enums.TaskStatus
     Task_Color?: StringFilter<"task"> | string
@@ -9914,10 +9908,10 @@ export namespace Prisma {
     TaskID?: IntWithAggregatesFilter<"task"> | number
     Task_Title?: StringWithAggregatesFilter<"task"> | string
     Task_Description?: StringNullableWithAggregatesFilter<"task"> | string | null
-    Task_Start_Date?: DateTimeNullableWithAggregatesFilter<"task"> | Date | string | null
-    Task_End_Date?: DateTimeNullableWithAggregatesFilter<"task"> | Date | string | null
-    Task_Start_Time?: DateTimeNullableWithAggregatesFilter<"task"> | Date | string | null
-    Task_End_Time?: DateTimeNullableWithAggregatesFilter<"task"> | Date | string | null
+    Task_Start_Date?: StringNullableWithAggregatesFilter<"task"> | string | null
+    Task_End_Date?: StringNullableWithAggregatesFilter<"task"> | string | null
+    Task_Start_Time?: StringNullableWithAggregatesFilter<"task"> | string | null
+    Task_End_Time?: StringNullableWithAggregatesFilter<"task"> | string | null
     Task_Icon?: StringNullableWithAggregatesFilter<"task"> | string | null
     Task_Status?: EnumTaskStatusWithAggregatesFilter<"task"> | $Enums.TaskStatus
     Task_Color?: StringWithAggregatesFilter<"task"> | string
@@ -10094,9 +10088,9 @@ export namespace Prisma {
     SessionId?: IntFilter<"pomodoro_sessions"> | number
     UserID?: IntFilter<"pomodoro_sessions"> | number
     Status?: EnumPomoStatusFilter<"pomodoro_sessions"> | $Enums.PomoStatus
-    StartTime?: DateTimeFilter<"pomodoro_sessions"> | Date | string
-    EndTime?: DateTimeNullableFilter<"pomodoro_sessions"> | Date | string | null
-    PausedTime?: IntFilter<"pomodoro_sessions"> | number
+    StartTime?: StringFilter<"pomodoro_sessions"> | string
+    EndTime?: StringNullableFilter<"pomodoro_sessions"> | string | null
+    PausedTime?: StringFilter<"pomodoro_sessions"> | string
     duration_seconds?: IntFilter<"pomodoro_sessions"> | number
     remaining_seconds?: IntFilter<"pomodoro_sessions"> | number
     timer_type?: EnumTimerTypeFilter<"pomodoro_sessions"> | $Enums.TimerType
@@ -10127,9 +10121,9 @@ export namespace Prisma {
     NOT?: pomodoro_sessionsWhereInput | pomodoro_sessionsWhereInput[]
     UserID?: IntFilter<"pomodoro_sessions"> | number
     Status?: EnumPomoStatusFilter<"pomodoro_sessions"> | $Enums.PomoStatus
-    StartTime?: DateTimeFilter<"pomodoro_sessions"> | Date | string
-    EndTime?: DateTimeNullableFilter<"pomodoro_sessions"> | Date | string | null
-    PausedTime?: IntFilter<"pomodoro_sessions"> | number
+    StartTime?: StringFilter<"pomodoro_sessions"> | string
+    EndTime?: StringNullableFilter<"pomodoro_sessions"> | string | null
+    PausedTime?: StringFilter<"pomodoro_sessions"> | string
     duration_seconds?: IntFilter<"pomodoro_sessions"> | number
     remaining_seconds?: IntFilter<"pomodoro_sessions"> | number
     timer_type?: EnumTimerTypeFilter<"pomodoro_sessions"> | $Enums.TimerType
@@ -10163,9 +10157,9 @@ export namespace Prisma {
     SessionId?: IntWithAggregatesFilter<"pomodoro_sessions"> | number
     UserID?: IntWithAggregatesFilter<"pomodoro_sessions"> | number
     Status?: EnumPomoStatusWithAggregatesFilter<"pomodoro_sessions"> | $Enums.PomoStatus
-    StartTime?: DateTimeWithAggregatesFilter<"pomodoro_sessions"> | Date | string
-    EndTime?: DateTimeNullableWithAggregatesFilter<"pomodoro_sessions"> | Date | string | null
-    PausedTime?: IntWithAggregatesFilter<"pomodoro_sessions"> | number
+    StartTime?: StringWithAggregatesFilter<"pomodoro_sessions"> | string
+    EndTime?: StringNullableWithAggregatesFilter<"pomodoro_sessions"> | string | null
+    PausedTime?: StringWithAggregatesFilter<"pomodoro_sessions"> | string
     duration_seconds?: IntWithAggregatesFilter<"pomodoro_sessions"> | number
     remaining_seconds?: IntWithAggregatesFilter<"pomodoro_sessions"> | number
     timer_type?: EnumTimerTypeWithAggregatesFilter<"pomodoro_sessions"> | $Enums.TimerType
@@ -10302,10 +10296,10 @@ export namespace Prisma {
   export type taskCreateInput = {
     Task_Title: string
     Task_Description?: string | null
-    Task_Start_Date?: Date | string | null
-    Task_End_Date?: Date | string | null
-    Task_Start_Time?: Date | string | null
-    Task_End_Time?: Date | string | null
+    Task_Start_Date?: string | null
+    Task_End_Date?: string | null
+    Task_Start_Time?: string | null
+    Task_End_Time?: string | null
     Task_Icon?: string | null
     Task_Status?: $Enums.TaskStatus
     Task_Color: string
@@ -10317,10 +10311,10 @@ export namespace Prisma {
     TaskID?: number
     Task_Title: string
     Task_Description?: string | null
-    Task_Start_Date?: Date | string | null
-    Task_End_Date?: Date | string | null
-    Task_Start_Time?: Date | string | null
-    Task_End_Time?: Date | string | null
+    Task_Start_Date?: string | null
+    Task_End_Date?: string | null
+    Task_Start_Time?: string | null
+    Task_End_Time?: string | null
     Task_Icon?: string | null
     Task_Status?: $Enums.TaskStatus
     Task_Color: string
@@ -10331,10 +10325,10 @@ export namespace Prisma {
   export type taskUpdateInput = {
     Task_Title?: StringFieldUpdateOperationsInput | string
     Task_Description?: NullableStringFieldUpdateOperationsInput | string | null
-    Task_Start_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_Start_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    Task_Start_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_Start_Time?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Time?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Icon?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     Task_Color?: StringFieldUpdateOperationsInput | string
@@ -10346,10 +10340,10 @@ export namespace Prisma {
     TaskID?: IntFieldUpdateOperationsInput | number
     Task_Title?: StringFieldUpdateOperationsInput | string
     Task_Description?: NullableStringFieldUpdateOperationsInput | string | null
-    Task_Start_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_Start_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    Task_Start_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_Start_Time?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Time?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Icon?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     Task_Color?: StringFieldUpdateOperationsInput | string
@@ -10361,10 +10355,10 @@ export namespace Prisma {
     TaskID?: number
     Task_Title: string
     Task_Description?: string | null
-    Task_Start_Date?: Date | string | null
-    Task_End_Date?: Date | string | null
-    Task_Start_Time?: Date | string | null
-    Task_End_Time?: Date | string | null
+    Task_Start_Date?: string | null
+    Task_End_Date?: string | null
+    Task_Start_Time?: string | null
+    Task_End_Time?: string | null
     Task_Icon?: string | null
     Task_Status?: $Enums.TaskStatus
     Task_Color: string
@@ -10374,10 +10368,10 @@ export namespace Prisma {
   export type taskUpdateManyMutationInput = {
     Task_Title?: StringFieldUpdateOperationsInput | string
     Task_Description?: NullableStringFieldUpdateOperationsInput | string | null
-    Task_Start_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_Start_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    Task_Start_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_Start_Time?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Time?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Icon?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     Task_Color?: StringFieldUpdateOperationsInput | string
@@ -10387,10 +10381,10 @@ export namespace Prisma {
     TaskID?: IntFieldUpdateOperationsInput | number
     Task_Title?: StringFieldUpdateOperationsInput | string
     Task_Description?: NullableStringFieldUpdateOperationsInput | string | null
-    Task_Start_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_Start_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    Task_Start_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_Start_Time?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Time?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Icon?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     Task_Color?: StringFieldUpdateOperationsInput | string
@@ -10544,9 +10538,9 @@ export namespace Prisma {
 
   export type pomodoro_sessionsCreateInput = {
     Status: $Enums.PomoStatus
-    StartTime: Date | string
-    EndTime?: Date | string | null
-    PausedTime: number
+    StartTime: string
+    EndTime?: string | null
+    PausedTime: string
     duration_seconds?: number
     remaining_seconds?: number
     timer_type: $Enums.TimerType
@@ -10559,9 +10553,9 @@ export namespace Prisma {
     SessionId?: number
     UserID: number
     Status: $Enums.PomoStatus
-    StartTime: Date | string
-    EndTime?: Date | string | null
-    PausedTime: number
+    StartTime: string
+    EndTime?: string | null
+    PausedTime: string
     duration_seconds?: number
     remaining_seconds?: number
     timer_type: $Enums.TimerType
@@ -10571,9 +10565,9 @@ export namespace Prisma {
 
   export type pomodoro_sessionsUpdateInput = {
     Status?: EnumPomoStatusFieldUpdateOperationsInput | $Enums.PomoStatus
-    StartTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    EndTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    PausedTime?: IntFieldUpdateOperationsInput | number
+    StartTime?: StringFieldUpdateOperationsInput | string
+    EndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    PausedTime?: StringFieldUpdateOperationsInput | string
     duration_seconds?: IntFieldUpdateOperationsInput | number
     remaining_seconds?: IntFieldUpdateOperationsInput | number
     timer_type?: EnumTimerTypeFieldUpdateOperationsInput | $Enums.TimerType
@@ -10586,9 +10580,9 @@ export namespace Prisma {
     SessionId?: IntFieldUpdateOperationsInput | number
     UserID?: IntFieldUpdateOperationsInput | number
     Status?: EnumPomoStatusFieldUpdateOperationsInput | $Enums.PomoStatus
-    StartTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    EndTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    PausedTime?: IntFieldUpdateOperationsInput | number
+    StartTime?: StringFieldUpdateOperationsInput | string
+    EndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    PausedTime?: StringFieldUpdateOperationsInput | string
     duration_seconds?: IntFieldUpdateOperationsInput | number
     remaining_seconds?: IntFieldUpdateOperationsInput | number
     timer_type?: EnumTimerTypeFieldUpdateOperationsInput | $Enums.TimerType
@@ -10600,9 +10594,9 @@ export namespace Prisma {
     SessionId?: number
     UserID: number
     Status: $Enums.PomoStatus
-    StartTime: Date | string
-    EndTime?: Date | string | null
-    PausedTime: number
+    StartTime: string
+    EndTime?: string | null
+    PausedTime: string
     duration_seconds?: number
     remaining_seconds?: number
     timer_type: $Enums.TimerType
@@ -10611,9 +10605,9 @@ export namespace Prisma {
 
   export type pomodoro_sessionsUpdateManyMutationInput = {
     Status?: EnumPomoStatusFieldUpdateOperationsInput | $Enums.PomoStatus
-    StartTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    EndTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    PausedTime?: IntFieldUpdateOperationsInput | number
+    StartTime?: StringFieldUpdateOperationsInput | string
+    EndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    PausedTime?: StringFieldUpdateOperationsInput | string
     duration_seconds?: IntFieldUpdateOperationsInput | number
     remaining_seconds?: IntFieldUpdateOperationsInput | number
     timer_type?: EnumTimerTypeFieldUpdateOperationsInput | $Enums.TimerType
@@ -10624,9 +10618,9 @@ export namespace Prisma {
     SessionId?: IntFieldUpdateOperationsInput | number
     UserID?: IntFieldUpdateOperationsInput | number
     Status?: EnumPomoStatusFieldUpdateOperationsInput | $Enums.PomoStatus
-    StartTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    EndTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    PausedTime?: IntFieldUpdateOperationsInput | number
+    StartTime?: StringFieldUpdateOperationsInput | string
+    EndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    PausedTime?: StringFieldUpdateOperationsInput | string
     duration_seconds?: IntFieldUpdateOperationsInput | number
     remaining_seconds?: IntFieldUpdateOperationsInput | number
     timer_type?: EnumTimerTypeFieldUpdateOperationsInput | $Enums.TimerType
@@ -10640,7 +10634,7 @@ export namespace Prisma {
     Pomo_Task_Status?: boolean
     Pomo_Completed_Count?: number
     Pomo_Target_Count?: number
-    SessionId?: number
+    SessionId?:number
     session: pomodoro_sessionsCreateNestedOneWithoutPomodoro_taskInput
   }
 
@@ -10662,6 +10656,7 @@ export namespace Prisma {
     Pomo_Task_Status?: BoolFieldUpdateOperationsInput | boolean
     Pomo_Completed_Count?: IntFieldUpdateOperationsInput | number
     Pomo_Target_Count?: IntFieldUpdateOperationsInput | number
+    SessionId?: number
     session?: pomodoro_sessionsUpdateOneRequiredWithoutPomodoro_taskNestedInput
   }
 
@@ -10840,17 +10835,6 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type EnumTaskStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.TaskStatus | EnumTaskStatusFieldRefInput<$PrismaModel>
     in?: $Enums.TaskStatus[]
@@ -10945,20 +10929,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
     _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -11114,6 +11084,13 @@ export namespace Prisma {
     not?: NestedEnumPomoStatusFilter<$PrismaModel> | $Enums.PomoStatus
   }
 
+  export type EnumTimerTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TimerType | EnumTimerTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TimerType[]
+    notIn?: $Enums.TimerType[]
+    not?: NestedEnumTimerTypeFilter<$PrismaModel> | $Enums.TimerType
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -11123,13 +11100,6 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
-  export type EnumTimerTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TimerType | EnumTimerTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TimerType[]
-    notIn?: $Enums.TimerType[]
-    not?: NestedEnumTimerTypeFilter<$PrismaModel> | $Enums.TimerType
   }
 
   export type Pomodoro_taskListRelationFilter = {
@@ -11158,7 +11128,6 @@ export namespace Prisma {
   export type pomodoro_sessionsAvgOrderByAggregateInput = {
     SessionId?: SortOrder
     UserID?: SortOrder
-    PausedTime?: SortOrder
     duration_seconds?: SortOrder
     remaining_seconds?: SortOrder
   }
@@ -11192,7 +11161,6 @@ export namespace Prisma {
   export type pomodoro_sessionsSumOrderByAggregateInput = {
     SessionId?: SortOrder
     UserID?: SortOrder
-    PausedTime?: SortOrder
     duration_seconds?: SortOrder
     remaining_seconds?: SortOrder
   }
@@ -11207,6 +11175,16 @@ export namespace Prisma {
     _max?: NestedEnumPomoStatusFilter<$PrismaModel>
   }
 
+  export type EnumTimerTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TimerType | EnumTimerTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TimerType[]
+    notIn?: $Enums.TimerType[]
+    not?: NestedEnumTimerTypeWithAggregatesFilter<$PrismaModel> | $Enums.TimerType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTimerTypeFilter<$PrismaModel>
+    _max?: NestedEnumTimerTypeFilter<$PrismaModel>
+  }
+
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -11219,16 +11197,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type EnumTimerTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.TimerType | EnumTimerTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TimerType[]
-    notIn?: $Enums.TimerType[]
-    not?: NestedEnumTimerTypeWithAggregatesFilter<$PrismaModel> | $Enums.TimerType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumTimerTypeFilter<$PrismaModel>
-    _max?: NestedEnumTimerTypeFilter<$PrismaModel>
   }
 
   export type Pomodoro_sessionsScalarRelationFilter = {
@@ -11481,10 +11449,6 @@ export namespace Prisma {
     set?: string | null
   }
 
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
-  }
-
   export type EnumTaskStatusFieldUpdateOperationsInput = {
     set?: $Enums.TaskStatus
   }
@@ -11655,12 +11619,12 @@ export namespace Prisma {
     set?: $Enums.PomoStatus
   }
 
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
-  }
-
   export type EnumTimerTypeFieldUpdateOperationsInput = {
     set?: $Enums.TimerType
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
   }
 
   export type UserUpdateOneRequiredWithoutPomodoro_sessionsNestedInput = {
@@ -11796,17 +11760,6 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type NestedEnumTaskStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.TaskStatus | EnumTaskStatusFieldRefInput<$PrismaModel>
     in?: $Enums.TaskStatus[]
@@ -11840,20 +11793,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -11903,6 +11842,13 @@ export namespace Prisma {
     not?: NestedEnumPomoStatusFilter<$PrismaModel> | $Enums.PomoStatus
   }
 
+  export type NestedEnumTimerTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.TimerType | EnumTimerTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TimerType[]
+    notIn?: $Enums.TimerType[]
+    not?: NestedEnumTimerTypeFilter<$PrismaModel> | $Enums.TimerType
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -11914,13 +11860,6 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type NestedEnumTimerTypeFilter<$PrismaModel = never> = {
-    equals?: $Enums.TimerType | EnumTimerTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TimerType[]
-    notIn?: $Enums.TimerType[]
-    not?: NestedEnumTimerTypeFilter<$PrismaModel> | $Enums.TimerType
-  }
-
   export type NestedEnumPomoStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.PomoStatus | EnumPomoStatusFieldRefInput<$PrismaModel>
     in?: $Enums.PomoStatus[]
@@ -11929,6 +11868,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPomoStatusFilter<$PrismaModel>
     _max?: NestedEnumPomoStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTimerTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.TimerType | EnumTimerTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.TimerType[]
+    notIn?: $Enums.TimerType[]
+    not?: NestedEnumTimerTypeWithAggregatesFilter<$PrismaModel> | $Enums.TimerType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumTimerTypeFilter<$PrismaModel>
+    _max?: NestedEnumTimerTypeFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -11943,16 +11892,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
-  }
-
-  export type NestedEnumTimerTypeWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.TimerType | EnumTimerTypeFieldRefInput<$PrismaModel>
-    in?: $Enums.TimerType[]
-    notIn?: $Enums.TimerType[]
-    not?: NestedEnumTimerTypeWithAggregatesFilter<$PrismaModel> | $Enums.TimerType
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumTimerTypeFilter<$PrismaModel>
-    _max?: NestedEnumTimerTypeFilter<$PrismaModel>
   }
 
   export type profileCreateWithoutUserInput = {
@@ -11975,10 +11914,10 @@ export namespace Prisma {
   export type taskCreateWithoutUserInput = {
     Task_Title: string
     Task_Description?: string | null
-    Task_Start_Date?: Date | string | null
-    Task_End_Date?: Date | string | null
-    Task_Start_Time?: Date | string | null
-    Task_End_Time?: Date | string | null
+    Task_Start_Date?: string | null
+    Task_End_Date?: string | null
+    Task_Start_Time?: string | null
+    Task_End_Time?: string | null
     Task_Icon?: string | null
     Task_Status?: $Enums.TaskStatus
     Task_Color: string
@@ -11989,10 +11928,10 @@ export namespace Prisma {
     TaskID?: number
     Task_Title: string
     Task_Description?: string | null
-    Task_Start_Date?: Date | string | null
-    Task_End_Date?: Date | string | null
-    Task_Start_Time?: Date | string | null
-    Task_End_Time?: Date | string | null
+    Task_Start_Date?: string | null
+    Task_End_Date?: string | null
+    Task_Start_Time?: string | null
+    Task_End_Time?: string | null
     Task_Icon?: string | null
     Task_Status?: $Enums.TaskStatus
     Task_Color: string
@@ -12036,9 +11975,9 @@ export namespace Prisma {
 
   export type pomodoro_sessionsCreateWithoutUserInput = {
     Status: $Enums.PomoStatus
-    StartTime: Date | string
-    EndTime?: Date | string | null
-    PausedTime: number
+    StartTime: string
+    EndTime?: string | null
+    PausedTime: string
     duration_seconds?: number
     remaining_seconds?: number
     timer_type: $Enums.TimerType
@@ -12049,9 +11988,9 @@ export namespace Prisma {
   export type pomodoro_sessionsUncheckedCreateWithoutUserInput = {
     SessionId?: number
     Status: $Enums.PomoStatus
-    StartTime: Date | string
-    EndTime?: Date | string | null
-    PausedTime: number
+    StartTime: string
+    EndTime?: string | null
+    PausedTime: string
     duration_seconds?: number
     remaining_seconds?: number
     timer_type: $Enums.TimerType
@@ -12114,10 +12053,10 @@ export namespace Prisma {
     TaskID?: IntFilter<"task"> | number
     Task_Title?: StringFilter<"task"> | string
     Task_Description?: StringNullableFilter<"task"> | string | null
-    Task_Start_Date?: DateTimeNullableFilter<"task"> | Date | string | null
-    Task_End_Date?: DateTimeNullableFilter<"task"> | Date | string | null
-    Task_Start_Time?: DateTimeNullableFilter<"task"> | Date | string | null
-    Task_End_Time?: DateTimeNullableFilter<"task"> | Date | string | null
+    Task_Start_Date?: StringNullableFilter<"task"> | string | null
+    Task_End_Date?: StringNullableFilter<"task"> | string | null
+    Task_Start_Time?: StringNullableFilter<"task"> | string | null
+    Task_End_Time?: StringNullableFilter<"task"> | string | null
     Task_Icon?: StringNullableFilter<"task"> | string | null
     Task_Status?: EnumTaskStatusFilter<"task"> | $Enums.TaskStatus
     Task_Color?: StringFilter<"task"> | string
@@ -12175,9 +12114,9 @@ export namespace Prisma {
     SessionId?: IntFilter<"pomodoro_sessions"> | number
     UserID?: IntFilter<"pomodoro_sessions"> | number
     Status?: EnumPomoStatusFilter<"pomodoro_sessions"> | $Enums.PomoStatus
-    StartTime?: DateTimeFilter<"pomodoro_sessions"> | Date | string
-    EndTime?: DateTimeNullableFilter<"pomodoro_sessions"> | Date | string | null
-    PausedTime?: IntFilter<"pomodoro_sessions"> | number
+    StartTime?: StringFilter<"pomodoro_sessions"> | string
+    EndTime?: StringNullableFilter<"pomodoro_sessions"> | string | null
+    PausedTime?: StringFilter<"pomodoro_sessions"> | string
     duration_seconds?: IntFilter<"pomodoro_sessions"> | number
     remaining_seconds?: IntFilter<"pomodoro_sessions"> | number
     timer_type?: EnumTimerTypeFilter<"pomodoro_sessions"> | $Enums.TimerType
@@ -12411,10 +12350,10 @@ export namespace Prisma {
   export type taskCreateWithoutTask_categoryInput = {
     Task_Title: string
     Task_Description?: string | null
-    Task_Start_Date?: Date | string | null
-    Task_End_Date?: Date | string | null
-    Task_Start_Time?: Date | string | null
-    Task_End_Time?: Date | string | null
+    Task_Start_Date?: string | null
+    Task_End_Date?: string | null
+    Task_Start_Time?: string | null
+    Task_End_Time?: string | null
     Task_Icon?: string | null
     Task_Status?: $Enums.TaskStatus
     Task_Color: string
@@ -12425,10 +12364,10 @@ export namespace Prisma {
     TaskID?: number
     Task_Title: string
     Task_Description?: string | null
-    Task_Start_Date?: Date | string | null
-    Task_End_Date?: Date | string | null
-    Task_Start_Time?: Date | string | null
-    Task_End_Time?: Date | string | null
+    Task_Start_Date?: string | null
+    Task_End_Date?: string | null
+    Task_Start_Time?: string | null
+    Task_End_Time?: string | null
     Task_Icon?: string | null
     Task_Status?: $Enums.TaskStatus
     Task_Color: string
@@ -12476,10 +12415,10 @@ export namespace Prisma {
   export type taskUpdateWithoutTask_categoryInput = {
     Task_Title?: StringFieldUpdateOperationsInput | string
     Task_Description?: NullableStringFieldUpdateOperationsInput | string | null
-    Task_Start_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_Start_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    Task_Start_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_Start_Time?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Time?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Icon?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     Task_Color?: StringFieldUpdateOperationsInput | string
@@ -12490,10 +12429,10 @@ export namespace Prisma {
     TaskID?: IntFieldUpdateOperationsInput | number
     Task_Title?: StringFieldUpdateOperationsInput | string
     Task_Description?: NullableStringFieldUpdateOperationsInput | string | null
-    Task_Start_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_Start_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    Task_Start_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_Start_Time?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Time?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Icon?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     Task_Color?: StringFieldUpdateOperationsInput | string
@@ -12638,9 +12577,9 @@ export namespace Prisma {
 
   export type pomodoro_sessionsCreateWithoutPomodoro_taskInput = {
     Status: $Enums.PomoStatus
-    StartTime: Date | string
-    EndTime?: Date | string | null
-    PausedTime: number
+    StartTime: string
+    EndTime?: string | null
+    PausedTime: string
     duration_seconds?: number
     remaining_seconds?: number
     timer_type: $Enums.TimerType
@@ -12652,9 +12591,9 @@ export namespace Prisma {
     SessionId?: number
     UserID: number
     Status: $Enums.PomoStatus
-    StartTime: Date | string
-    EndTime?: Date | string | null
-    PausedTime: number
+    StartTime: string
+    EndTime?: string | null
+    PausedTime: string
     duration_seconds?: number
     remaining_seconds?: number
     timer_type: $Enums.TimerType
@@ -12679,9 +12618,9 @@ export namespace Prisma {
 
   export type pomodoro_sessionsUpdateWithoutPomodoro_taskInput = {
     Status?: EnumPomoStatusFieldUpdateOperationsInput | $Enums.PomoStatus
-    StartTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    EndTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    PausedTime?: IntFieldUpdateOperationsInput | number
+    StartTime?: StringFieldUpdateOperationsInput | string
+    EndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    PausedTime?: StringFieldUpdateOperationsInput | string
     duration_seconds?: IntFieldUpdateOperationsInput | number
     remaining_seconds?: IntFieldUpdateOperationsInput | number
     timer_type?: EnumTimerTypeFieldUpdateOperationsInput | $Enums.TimerType
@@ -12693,9 +12632,9 @@ export namespace Prisma {
     SessionId?: IntFieldUpdateOperationsInput | number
     UserID?: IntFieldUpdateOperationsInput | number
     Status?: EnumPomoStatusFieldUpdateOperationsInput | $Enums.PomoStatus
-    StartTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    EndTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    PausedTime?: IntFieldUpdateOperationsInput | number
+    StartTime?: StringFieldUpdateOperationsInput | string
+    EndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    PausedTime?: StringFieldUpdateOperationsInput | string
     duration_seconds?: IntFieldUpdateOperationsInput | number
     remaining_seconds?: IntFieldUpdateOperationsInput | number
     timer_type?: EnumTimerTypeFieldUpdateOperationsInput | $Enums.TimerType
@@ -12706,10 +12645,10 @@ export namespace Prisma {
     TaskID?: number
     Task_Title: string
     Task_Description?: string | null
-    Task_Start_Date?: Date | string | null
-    Task_End_Date?: Date | string | null
-    Task_Start_Time?: Date | string | null
-    Task_End_Time?: Date | string | null
+    Task_Start_Date?: string | null
+    Task_End_Date?: string | null
+    Task_Start_Time?: string | null
+    Task_End_Time?: string | null
     Task_Icon?: string | null
     Task_Status?: $Enums.TaskStatus
     Task_Color: string
@@ -12726,9 +12665,9 @@ export namespace Prisma {
   export type pomodoro_sessionsCreateManyUserInput = {
     SessionId?: number
     Status: $Enums.PomoStatus
-    StartTime: Date | string
-    EndTime?: Date | string | null
-    PausedTime: number
+    StartTime: string
+    EndTime?: string | null
+    PausedTime: string
     duration_seconds?: number
     remaining_seconds?: number
     timer_type: $Enums.TimerType
@@ -12738,10 +12677,10 @@ export namespace Prisma {
   export type taskUpdateWithoutUserInput = {
     Task_Title?: StringFieldUpdateOperationsInput | string
     Task_Description?: NullableStringFieldUpdateOperationsInput | string | null
-    Task_Start_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_Start_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    Task_Start_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_Start_Time?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Time?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Icon?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     Task_Color?: StringFieldUpdateOperationsInput | string
@@ -12752,10 +12691,10 @@ export namespace Prisma {
     TaskID?: IntFieldUpdateOperationsInput | number
     Task_Title?: StringFieldUpdateOperationsInput | string
     Task_Description?: NullableStringFieldUpdateOperationsInput | string | null
-    Task_Start_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_Start_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    Task_Start_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_Start_Time?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Time?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Icon?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     Task_Color?: StringFieldUpdateOperationsInput | string
@@ -12766,10 +12705,10 @@ export namespace Prisma {
     TaskID?: IntFieldUpdateOperationsInput | number
     Task_Title?: StringFieldUpdateOperationsInput | string
     Task_Description?: NullableStringFieldUpdateOperationsInput | string | null
-    Task_Start_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Date?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_Start_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    Task_End_Time?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    Task_Start_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Date?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_Start_Time?: NullableStringFieldUpdateOperationsInput | string | null
+    Task_End_Time?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Icon?: NullableStringFieldUpdateOperationsInput | string | null
     Task_Status?: EnumTaskStatusFieldUpdateOperationsInput | $Enums.TaskStatus
     Task_Color?: StringFieldUpdateOperationsInput | string
@@ -12802,9 +12741,9 @@ export namespace Prisma {
 
   export type pomodoro_sessionsUpdateWithoutUserInput = {
     Status?: EnumPomoStatusFieldUpdateOperationsInput | $Enums.PomoStatus
-    StartTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    EndTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    PausedTime?: IntFieldUpdateOperationsInput | number
+    StartTime?: StringFieldUpdateOperationsInput | string
+    EndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    PausedTime?: StringFieldUpdateOperationsInput | string
     duration_seconds?: IntFieldUpdateOperationsInput | number
     remaining_seconds?: IntFieldUpdateOperationsInput | number
     timer_type?: EnumTimerTypeFieldUpdateOperationsInput | $Enums.TimerType
@@ -12815,9 +12754,9 @@ export namespace Prisma {
   export type pomodoro_sessionsUncheckedUpdateWithoutUserInput = {
     SessionId?: IntFieldUpdateOperationsInput | number
     Status?: EnumPomoStatusFieldUpdateOperationsInput | $Enums.PomoStatus
-    StartTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    EndTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    PausedTime?: IntFieldUpdateOperationsInput | number
+    StartTime?: StringFieldUpdateOperationsInput | string
+    EndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    PausedTime?: StringFieldUpdateOperationsInput | string
     duration_seconds?: IntFieldUpdateOperationsInput | number
     remaining_seconds?: IntFieldUpdateOperationsInput | number
     timer_type?: EnumTimerTypeFieldUpdateOperationsInput | $Enums.TimerType
@@ -12828,9 +12767,9 @@ export namespace Prisma {
   export type pomodoro_sessionsUncheckedUpdateManyWithoutUserInput = {
     SessionId?: IntFieldUpdateOperationsInput | number
     Status?: EnumPomoStatusFieldUpdateOperationsInput | $Enums.PomoStatus
-    StartTime?: DateTimeFieldUpdateOperationsInput | Date | string
-    EndTime?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    PausedTime?: IntFieldUpdateOperationsInput | number
+    StartTime?: StringFieldUpdateOperationsInput | string
+    EndTime?: NullableStringFieldUpdateOperationsInput | string | null
+    PausedTime?: StringFieldUpdateOperationsInput | string
     duration_seconds?: IntFieldUpdateOperationsInput | number
     remaining_seconds?: IntFieldUpdateOperationsInput | number
     timer_type?: EnumTimerTypeFieldUpdateOperationsInput | $Enums.TimerType

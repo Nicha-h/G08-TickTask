@@ -10,6 +10,7 @@ export const getAllTasks = async (c: Context) => {
   try {
     const user = c.get('user') as { id: number };
     const categories = await TaskModel.getTasksByUser(user.id);
+    console.log(categories);
     return c.json(categories);
   } catch (error) {
     console.error('Error fetching tasks:', error);

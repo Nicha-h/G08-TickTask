@@ -7,13 +7,14 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 const now = new Date();
+
 const formattedDate = now.toISOString().split('T')[0];
 const currentTime = now.toTimeString().split(' ')[0];
 
 export async function getTasksByDate(date: string): Promise<task[]> {
   const tasks = await prisma.task.findMany({
     where: {
-      Task_Start_Date: date
+      Task_Start_Date: formattedDate
     },
     orderBy: {
       Task_Start_Time: 'asc'
@@ -26,8 +27,15 @@ export async function getTasksByUser(userId: number, date?: string): Promise<tas
   const whereClause: any = { UserID: userId };
 
   if (date) {
-    whereClause.Task_Start_Date = { lte: date };
-    whereClause.Task_End_Date = { gte: date };
+    // Ensure the date is in ISO format and valid
+    const parsedDate = new Date(date);
+    if (!isNaN(parsedDate.getTime())) {
+      const isoDate = parsedDate.toISOString().split('T')[0];
+      whereClause.Task_Start_Date = isoDate;
+      whereClause.Task_End_Date = isoDate;
+    } else {
+      throw new Error('Invalid date format');
+    }
   }
 
   const tasks = await prisma.task.findMany({
@@ -40,6 +48,7 @@ export async function getTasksByUser(userId: number, date?: string): Promise<tas
 
   return tasks;
 }
+
 
 export async function createTask(taskData: {
   UserID: number;

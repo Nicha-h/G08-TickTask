@@ -51,10 +51,10 @@ model task {
   TaskID           Int        @id @default(autoincrement())
   Task_Title       String
   Task_Description String?
-  Task_Start_Date  DateTime?
-  Task_End_Date    DateTime?
-  Task_Start_Time  DateTime?  @default(now())
-  Task_End_Time    DateTime?
+  Task_Start_Date  String?
+  Task_End_Date    String?
+  Task_Start_Time  String?
+  Task_End_Time    String?
   Task_Icon        String?    @default("default.svg")
   Task_Status      TaskStatus @default(Incomplete)
   Task_Color       String
@@ -98,9 +98,9 @@ model pomodoro_sessions {
   SessionId         Int        @id @default(autoincrement())
   UserID            Int
   Status            PomoStatus
-  StartTime         DateTime
-  EndTime           DateTime?
-  PausedTime        Int
+  StartTime         String
+  EndTime           String?
+  PausedTime        String
   duration_seconds  Int        @default(1500)
   remaining_seconds Int        @default(1500)
   timer_type        TimerType
@@ -120,5 +120,5 @@ model pomodoro_task {
   Pomo_Target_Count    Int     @default(4)
   SessionId            Int
 
-  session pomodoro_sessions @relation(fields: [SessionId], references: [SessionId])
+  session pomodoro_sessions @relation(fields: [SessionId], references: [SessionId], onDelete: Cascade)
 }
