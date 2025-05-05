@@ -24,7 +24,7 @@ export type User = {
     password: string;
 };
   
-export type TaskStatus = 'Incomplete' | 'Complete'; 
+export type TaskStatus = 'Completed' | 'Incomplete';
 
 export interface CustomContext extends Context {
   user: { id: number, email: string }; 
@@ -105,3 +105,14 @@ export interface UpdateTask {
   Pomo_Completed_Count?: number; 
   Pomo_Target_Count?: number;    
 }
+
+export interface UpdatePomoTaskInput {
+  Pomo_Task_Title?: string;
+  Pomo_Task_Short?: number;
+  Pomo_Task_Long?: number;
+  Pomo_Task_Status?: boolean;
+  Pomo_Completed_Count?: number; 
+  Pomo_Target_Count?: number;
+  SessionId?: number | null;
+}
+

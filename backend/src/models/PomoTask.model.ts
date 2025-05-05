@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
+import type { UpdatePomoTaskInput } from '../types/index.js';
 import { Prisma, PrismaClient } from '../generated/prisma/index.js';
 const prisma = new PrismaClient();
-
+dotenv.config();
 export async function getAllPomoTask(userId: number) {
     return prisma.pomodoro_task.findMany({
       where: {
@@ -55,15 +55,17 @@ export async function getAllPomoTask(userId: number) {
   
   
   
-  export async function updatePomoTask(taskId: number, data: Prisma.pomodoro_taskUpdateInput) {
+  export async function updatePomoTask(taskId: number, data: UpdatePomoTaskInput) {
+    const updateData: any = {
+      ...data,
+      session: data.SessionId ? {
+        connect: { SessionId: data.SessionId }
+      } : undefined,
+    };
+      
     return prisma.pomodoro_task.update({
       where: { Pomo_TaskId: taskId },
-      data: {
-        ...data,
-        session: data.SessionId ? {
-          connect: { SessionId: data.SessionId }
-        } : undefined, 
-      },
+      data: updateData
     });
   }
   
