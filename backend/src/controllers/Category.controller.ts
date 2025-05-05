@@ -129,7 +129,7 @@ export const getCategoryProgress = async (c: Context) => {
 };
 
 export async function assignTaskToCategoryController(c: Context) {
-  const taskId = Number(c.req.param('id'));
+  const taskID = Number(c.req.param('id'));
 
   try {
     const body = await c.req.json();
@@ -140,10 +140,22 @@ export async function assignTaskToCategoryController(c: Context) {
     }
 
    
-    const task = await categoryModel.assignTaskToCategories(taskId, CategoryId); 
+    const task = await categoryModel.assignTaskToCategories(taskID, CategoryId); 
 
     return c.json({ success: true, data: task });
   } catch (error) {
     return c.json({ success: false, message: 'Failed to assign task to session', error: String(error) }, 500);
   }
 }
+
+export const getTaskCountController = async (c: Context) => {
+  const userId =  Number(c.req.param('id'));
+  
+  try {
+    const categories = await categoryModel.getTaskCount(userId);
+    return c.json(categories);
+  } catch (error) {
+    return c.json({ success: false, message: 'Failed to fetch task', error: String(error) }, 500);
+  }
+};
+

@@ -68,14 +68,31 @@ export async function patchCategory(categoryId: number, userId: number, updates:
   return updatedCategory.count > 0; 
 }
 
-export async function assignTaskToCategories(taskId: number, categoryId: number) {
+export async function assignTaskToCategories(TaskID: number, categoryId: number) {
+  const task = await prisma.task.findUnique({
+    where: { TaskID: TaskID },
+  });
+
+  if (!task) {
+    throw new Error('Task not found');
+  }
+
+  const category = await prisma.category.findUnique({
+    where: { CategoryId: categoryId },
+  });
+
+  if (!category) {
+    throw new Error('Category not found');
+  }
+
   await prisma.task_category.create({
     data: {
-      TaskID: taskId,
+      TaskID: TaskID,
       CategoryId: categoryId,
     },
   });
 }
+
 
 export async function removeTaskCategories(taskId: number) {
   await prisma.task_category.deleteMany({
@@ -108,4 +125,22 @@ export const getCategoryProgress = async (categoryId: number, userId: number) =>
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return { total, completed, progress };
+};
+
+export const getTaskCount = async (userId: number) => {
+  const categories = await prisma.category.findMany({
+    where: { userId }, 
+    include: {
+      _count: {
+        select: {
+          task_category: true,
+        },
+      },
+    },
+  });
+
+  return categories.map(category => ({
+    ...category,
+    taskCount: category._count.task_category, 
+  }));
 };
