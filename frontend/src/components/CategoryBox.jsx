@@ -93,18 +93,7 @@ function CategoryBox() {
 
       let categories = response.data;
 
-      // Remove "All" category and sort remaining categories alphabetically
-      const allCategoryIndex = categories.findIndex(cat => cat.Category_Name.toLowerCase() === 'all');
-      let allCategory = null;
-      if (allCategoryIndex > -1) {
-        [allCategory] = categories.splice(allCategoryIndex, 1); // Remove "All" category
-      }
-
       categories.sort((a, b) => a.Category_Name.localeCompare(b.Category_Name));
-
-      if (allCategory) {
-        categories.unshift(allCategory);
-      }
 
       setCategory(categories);
 
@@ -165,11 +154,13 @@ function CategoryBox() {
           
           <div
             key={index}
-            className={`w-[120px] h-[140px] sm:w-[140px] sm:h-[140px] md:w-[130px] md:h-[130px] lg:w-[140px] lg:h-[140px] border-2 rounded-lg p-3 flex flex-col ${
+            className={`w-[120px] h-[140px] sm:w-[140px] sm:h-[140px] md:w-[130px] md:h-[130px] lg:w-[140px] lg:h-[140px] border-2 rounded-lg p-3 flex flex-col 
+              transition duration-300 hover:brightness-90 hover:scale-105 ${
               (index > 2 && index < 4) ? 'hidden md:flex' : index > 3 ? 'hidden lg:flex' : 'flex'
             }`}
             style={{ backgroundColor: category.Category_Color }}
           >
+
             <img src={iconMap[category.Category_icon]} alt={category.Category_Name} className="w-7 h-7 md:w-10 md:h-10" />
             <div className="mt-4 ml-1">
               <p className="text-lg sm:text-xl">{category.Category_Name}</p>
