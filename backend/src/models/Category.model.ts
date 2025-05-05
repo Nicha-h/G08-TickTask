@@ -127,20 +127,15 @@ export const getCategoryProgress = async (categoryId: number, userId: number) =>
   return { total, completed, progress };
 };
 
-export const getTaskCount = async (userId: number) => {
-  const categories = await prisma.category.findMany({
-    where: { userId }, 
+export const getTaskCount = async (categoryId: number) => {
+  const category = await prisma.category.findUnique({
+    where: { CategoryId: categoryId },
     include: {
       _count: {
-        select: {
-          task_category: true,
-        },
+        select: { task_category: true },
       },
     },
   });
 
-  return categories.map(category => ({
-    ...category,
-    taskCount: category._count.task_category, 
-  }));
+  return category?._count.task_category || 0;
 };

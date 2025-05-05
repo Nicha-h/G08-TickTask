@@ -149,13 +149,14 @@ export async function assignTaskToCategoryController(c: Context) {
 }
 
 export const getTaskCountController = async (c: Context) => {
-  const userId =  Number(c.req.param('id'));
-  
+  const categoryId = Number(c.req.param('id'));
+
   try {
-    const categories = await categoryModel.getTaskCount(userId);
-    return c.json(categories);
+    const count = await categoryModel.getTaskCount(categoryId);
+    return c.json({ taskCount: count });
   } catch (error) {
-    return c.json({ success: false, message: 'Failed to fetch task', error: String(error) }, 500);
+    return c.json({ success: false, message: 'Failed to fetch task count', error: String(error) }, 500);
   }
 };
+
 
