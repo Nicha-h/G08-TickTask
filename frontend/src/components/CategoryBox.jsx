@@ -154,7 +154,8 @@ function CategoryBox() {
           
           <div
             key={index}
-            className={`w-[120px] h-[140px] sm:w-[140px] sm:h-[140px] md:w-[130px] md:h-[130px] lg:w-[140px] lg:h-[140px] border-2 rounded-lg p-3 flex flex-col 
+            className={`w-[120px] h-[140px] sm:w-[140px] sm:h-[140px] md:w-[130px] md:h-[130px] lg:w-[140px] lg:h-[140px] 
+              border-2 rounded-lg p-3 flex flex-col 
               transition duration-300 hover:brightness-90 hover:scale-105 ${
               (index > 2 && index < 4) ? 'hidden md:flex' : index > 3 ? 'hidden lg:flex' : 'flex'
             }`}
