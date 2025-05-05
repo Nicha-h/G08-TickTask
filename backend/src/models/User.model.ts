@@ -14,13 +14,23 @@ export async function createUserInDb(email: string, plainPassword: string) {
           User_profile_icon_type: 'preset',
           User_profile_icon_path: 'default_icon.png'
         }
+      },
+      category: {
+        create: {
+          Category_Name: 'All',
+          Category_icon: 'all',
+          Category_Color: '#D4B4FF',
+        }
       }
+    },
+    include: {
+      profile: true,
+      category: true,
     }
   });
 
   return user.UserID;
 }
-
 export async function fetchProfile(userid: number) {
   const profile = await db.profile.findUnique({
     where: {

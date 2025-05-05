@@ -60,12 +60,11 @@ export async function createTask(taskData: {
   Task_End_Date?: string;
   Task_Status?: TaskStatus;
   Task_Color?: string;
-  Task_Icon?: string ;
+  Task_Icon?: string;
   Task_Start_Time?: string;
   Task_End_Time?: string;
 }): Promise<task> {
-
-    const taskToInsert = {
+  const taskToInsert = {
     Task_Title: taskData.Task_Title,
     Task_Description: taskData.Task_Description ?? '',
     Task_Icon: taskData.Task_Icon ?? 'default.svg',
@@ -75,19 +74,39 @@ export async function createTask(taskData: {
     Task_Color: taskData.Task_Color ?? '#A7A7A7',
     Task_Start_Time: taskData.Task_Start_Time ?? currentTime,
     Task_End_Time: taskData.Task_End_Time ?? '23:59:59',
-user: {
+    user: {
       connect: {
-    UserID: taskData.UserID
+        UserID: taskData.UserID
       }
     }
   };
+
+  const allCategory = await prisma.category.findFirst({
+    where: {
+      userId: taskData.UserID,
+      Category_Name: 'All'
+    }
+  });
+
+  if (!allCategory) {
+    throw new Error(`'All' category not found for user ${taskData.UserID}`);
+  }
+
 
   const task = await prisma.task.create({
     data: taskToInsert
   });
 
+  await prisma.task_category.create({
+    data: {
+      TaskID: task.TaskID,
+      CategoryId: allCategory.CategoryId
+    }
+  });
+
   return task;
 }
+
 
 export const updateTask = async (c: Context) => {
   const id = Number(c.req.param('id'));
