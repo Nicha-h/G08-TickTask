@@ -108,10 +108,6 @@ function CategoryBox() {
 
       setCategory(categories);
 
-      categories.forEach(cat => {
-        fetchTaskCount(cat.CategoryId);
-      });      
-
     } catch (err) {
       console.error("Error fetching categories:", err);
       setError("Failed to fetch categories");
@@ -133,8 +129,9 @@ function CategoryBox() {
       
       setTaskCounts(prevState => ({
         ...prevState,
-        [categoryId]: count 
+        [String(categoryId)]: count
       }));
+      
 
     } catch (err) {
       console.error("Error fetching task count:", err);
@@ -177,7 +174,7 @@ function CategoryBox() {
             <div className="mt-4 ml-1">
               <p className="text-lg sm:text-xl">{category.Category_Name}</p>
               <p className="mt-1 sm:mt-2 text-sm sm:text-base">
-                {taskCounts[category.CategoryId] || 0} 
+              {taskCounts[String(category.CategoryId)] || 0} Tasks
               </p>
             </div>
           </div>
