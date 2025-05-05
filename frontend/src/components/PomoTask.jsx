@@ -6,11 +6,12 @@ import setting from '@iconify-icons/mdi/settings-outline';
 import add from '@iconify-icons/mdi/add-circle-outline';
 import PomoSetting from '../components/modals/PomoSetting'
 import PomoAdd from './modals/PomoAdd';
+
 function PomoTask() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedTask, setSelectedTask] = useState(null); // State to track selected task for settings
+  const [selectedTask, setSelectedTask] = useState(null); 
   const [isAdding, setIsAdding] = useState(false);
 
   useEffect(() => {
@@ -37,9 +38,31 @@ function PomoTask() {
     }
   };
 
-  const handleTaskCompletion = (taskId) => {
-    console.log(`Task ${taskId} completion status changed`);
+  const handleTaskCompletion = async (pomo_TaskId, currentStatus) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/pomodoroTask/${pomo_TaskId}/complete`, {
+        method: 'PUT', 
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          Pomo_Task_Status: !currentStatus,  
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update task completion status');
+      }
+      fetchTasks();
+    } catch (err) {
+      setError(err.message);
+    }
   };
+  
+  
+  
 
   const handleSettings = (task) => {
     setSelectedTask(task); 
@@ -98,22 +121,23 @@ function PomoTask() {
       )}
 
       {/* Task list */}
-        <div className="w-full space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-          {tasks.map((task, index) => (
-            <div 
-              key={task.id} 
-              className={`border-2 rounded-lg p-3 sm:p-4 w-full max-w-md sm:max-w-xl md:max-w-2xl flex items-center min-h-14 sm:min-h-16 md:min-h-18 
-              ${index === tasks.length - 1 ? 'bg-amber-100 sm:bg-amber-200' : 'bg-blue-100 sm:bg-blue-200'}
-              transition-all duration-200 hover:shadow-md hover:cursor-pointer`}
-            >
+      <div className="w-full space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+        {tasks.map((task, index) => (
+          <div 
+            key={task.id} 
+            className={`border-2 rounded-lg p-3 sm:p-4 w-full max-w-md sm:max-w-xl md:max-w-2xl flex items-center min-h-14 sm:min-h-16 md:min-h-18 
+            ${index === tasks.length - 1 ? 'bg-amber-100 sm:bg-amber-200' : 'bg-blue-100 sm:bg-blue-200'}
+            transition-all duration-200 hover:shadow-md hover:cursor-pointer`}
+          >
             <div className="w-full flex items-center justify-between">
               {/* Left part of task */}
               <div className="flex items-center flex-1 min-w-0">
-                <Icon 
-                  icon={task.completed ? check : uncheck} 
-                  className='w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex-shrink-0 hover:cursor-pointer hover:scale-105 transition-transform' 
-                  onClick={() => handleTaskCompletion(task.id)}
-                />
+              <Icon 
+                icon={task.Pomo_Task_Status ? check : uncheck} 
+                className='w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex-shrink-0 hover:cursor-pointer hover:scale-105 transition-transform' 
+                onClick={() => handleTaskCompletion(task.Pomo_TaskId, task.Pomo_Task_Status)} 
+              />
+
                 <h3 className="ml-2 sm:ml-3 md:ml-4 text-sm sm:text-base font-semibold truncate">
                   {task.Pomo_Task_Title}
                 </h3>
@@ -140,7 +164,6 @@ function PomoTask() {
         <PomoAdd onClose={handleCloseAdd} />
       )}
     </div>
-  
   );
 }
 
