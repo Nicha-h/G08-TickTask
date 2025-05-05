@@ -124,20 +124,22 @@ export async function assignTaskToSession(c: Context) {
 }
 
 export async function completePomoTask(c: Context): Promise<Response> {
-    const taskId = Number(c.req.param('id'));
-    
-    try {
-      const task = await TaskModel.updatePomoTask(taskId, { Pomo_Task_Status: true });
-      
-      if (!task) {
-        return c.json({ success: false, message: 'Task not found' }, 404);
-      }
-      
-      return c.json({ success: true, data: task });
-    } catch (error) {
-      return c.json({ success: false, message: 'Failed to complete task', error: String(error) }, 500);
+  const taskId = Number(c.req.param('id'));
+  const { Pomo_Task_Status } = await c.req.json(); 
+
+  try {
+    const task = await TaskModel.updatePomoTask(taskId, { Pomo_Task_Status });
+
+    if (!task) {
+      return c.json({ success: false, message: 'Task not found' }, 404);
     }
+
+    return c.json({ success: true, data: task });
+  } catch (error) {
+    return c.json({ success: false, message: 'Failed to complete task', error: String(error) }, 500);
+  }
 }
+
 
 // New controller functions for pomodoro counter features
 
