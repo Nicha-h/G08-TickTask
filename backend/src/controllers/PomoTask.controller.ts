@@ -1,7 +1,8 @@
 import type { Context } from 'hono';
 import * as TaskModel from '../models/PomoTask.model.js';
 import { PomoTaskStatus, type CreateTask, type UpdateTask } from '../types/index.js';
-
+import { createSession } from '../models/Pomodoro.model.js';
+import { TimerType } from '../types/index.js';
 export async function getAllTask(c: Context) {
   const user = c.get('user'); 
 
@@ -33,26 +34,36 @@ export async function getTaskById(c: Context) {
     }
 }
 
-export async function createPomoTaskController(c: Context) {
-    try {
-        const body = await c.req.json();
-        const taskData = {
-          Pomo_Task_Title: body.title,
-          Pomo_Task_Short: body.shortBreak || 5,
-          Pomo_Task_Long: body.longBreak || 15,
-          Pomo_Target_Count: body.targetCount || 0,
-          session: {
-            connect: {
-              SessionId: body.sessionId,
-            },
-          },
-        }        
-        const tasks = await TaskModel.CreatePomoTask(taskData);
-        return c.json({ success: true, data: tasks }, 201);
-    } catch (error) {
-        return c.json({ success: false, message:'Failed to create task', error: String(error) }, 500);
-    }
-}
+export const CreatePomoTaskController = async (c: Context) => {
+  const body = await c.req.json();
+  const user = c.get("user"); 
+  try{
+
+  // Step 1: Create new session for this task
+  const newSession = await createSession({
+    UserID: user.id, 
+    duration_seconds: 1500,
+    timer_type: TimerType.WORK,
+  });
+
+  // Step 2: Create new task linked to that session
+  const newTask = await TaskModel.CreatePomoTask({
+    Pomo_Task_Title: body.title,
+    Pomo_Task_Short: body.shortBreak,
+    Pomo_Task_Long: body.longBreak,
+    Pomo_Task_Status: false,
+    Pomo_Completed_Count: 0,
+    Pomo_Target_Count: body.targetCount,
+    session: { connect: { SessionId: newSession.SessionId } },
+  });
+
+  return c.json({ success: true, data: newTask }, 201);
+  } catch (error) {
+    console.error('CreatePomoTask error:', error);
+    return c.json({ success: false, message: 'Failed to create task', error: String(error) }, 500);
+  }
+
+};
 
 export async function updatePomoTaskController(c: Context) {
   const taskId = Number(c.req.param('id'));
