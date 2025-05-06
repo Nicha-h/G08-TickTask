@@ -61,8 +61,6 @@ function PomoTask() {
     }
   };
   
-  
-  
 
   const handleSettings = (task) => {
     setSelectedTask(task); 
@@ -70,7 +68,7 @@ function PomoTask() {
 
   const handleAddTask = () => {
     setIsAdding(true); 
-  };
+};
 
   const handleCloseAdd = () => {
     setIsAdding(false);
@@ -144,7 +142,8 @@ function PomoTask() {
               </div>
               
               {/* Settings icon */}
-              <div>??/??</div>
+
+              <div>{task.Pomo_Completed_Count}/{task.Pomo_Target_Count}</div>
               <Icon 
                 icon={setting} 
                 className='w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex-shrink-0 ml-2 hover:cursor-pointer hover:scale-105 transition-transform' 
