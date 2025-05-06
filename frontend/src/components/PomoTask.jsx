@@ -122,7 +122,7 @@ function PomoTask() {
       <div className="w-full space-y-3 max-h-[60vh] overflow-y-auto pr-2">
         {tasks.map((task, index) => (
           <div 
-            key={task.id} 
+            key={task.Pomo_TaskId}
             className={`border-2 rounded-lg p-3 sm:p-4 w-full max-w-md sm:max-w-xl md:max-w-2xl flex items-center min-h-14 sm:min-h-16 md:min-h-18 
             ${index === tasks.length - 1 ? 'bg-amber-100 sm:bg-amber-200' : 'bg-blue-100 sm:bg-blue-200'}
             transition-all duration-200 hover:shadow-md hover:cursor-pointer`}
