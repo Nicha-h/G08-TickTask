@@ -26,3 +26,9 @@ Delete:
 
 All of the tasks and category can be deleted, as well as the profile.
 If category is deleted, the tasks inside won't be deleted.
+
+How to run:
+First you have to run the backend file
+Then you have to run the frontend separately both using
+
+npm run dev
