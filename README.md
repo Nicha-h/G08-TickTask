@@ -1,12 +1,14 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Features:
+Create:
+Our application allows user to create a new task, with icon and colour customisation based on their preferences.
+Task can be assigned to different categories, all of which can e created by th user themselves.
+User can create a pomodoro session, which help aids user who wishes to study or focus on a specific task.
+Read:
+Our home page display a brief summary of task due on that specific day. User can navigate through the weekly calendar if they wishes to see task for other days.
+Our application provides an overviews page, which display the summary of the task user accomplished in a day, month, and year 
+Update:
+All of the task and category can be edited and customize.
+User can update their profile pictures and username, up to their preferences.
+Delete:
+All of the tasks and category can be deleted, as well as the profile.
+If category is deleted, the tasks inside won't be deleted.
