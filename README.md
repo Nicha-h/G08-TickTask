@@ -1,5 +1,6 @@
 Features:
 Create:
+
 Our application allows user to create a new task, with icon and colour customisation based on their preferences.
 Task can be assigned to different categories, all of which can e created by th user themselves.
 User can create a pomodoro session, which help aids user who wishes to study or focus on a specific task.
