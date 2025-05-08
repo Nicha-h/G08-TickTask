@@ -40,6 +40,16 @@ function PomoTask() {
 
   const handleTaskCompletion = async (pomo_TaskId, currentStatus) => {
     try {
+      // First, find the task to get its current values
+      const taskToUpdate = tasks.find(task => task.Pomo_TaskId === pomo_TaskId);
+      
+      if (!taskToUpdate) {
+        throw new Error('Task not found');
+      }
+      
+     
+      const completedCount = !currentStatus ? taskToUpdate.Pomo_Target_Count : taskToUpdate.Pomo_Completed_Count;
+      
       const response = await fetch(`http://localhost:3000/api/pomodoroTask/${pomo_TaskId}/complete`, {
         method: 'PUT', 
         headers: {
@@ -47,7 +57,8 @@ function PomoTask() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
-          Pomo_Task_Status: !currentStatus,  
+          Pomo_Task_Status: !currentStatus,
+          Pomo_Completed_Count: completedCount,
         }),
       });
   
@@ -55,20 +66,39 @@ function PomoTask() {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to update task completion status');
       }
-      fetchTasks();
+      
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.Pomo_TaskId === pomo_TaskId
+            ? { 
+                ...task, 
+                Pomo_Task_Status: !currentStatus,
+                Pomo_Completed_Count: completedCount
+              }
+            : task
+        )
+      );
+  
     } catch (err) {
       setError(err.message);
     }
   };
   
-
+  const handleUpdateTask = (updatedTask) => {
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        task.Pomo_TaskId === updatedTask.Pomo_TaskId ? updatedTask : task
+      )
+    );
+  };
+  
   const handleSettings = (task) => {
     setSelectedTask(task); 
   };
 
   const handleAddTask = () => {
     setIsAdding(true); 
-};
+  };
 
   const handleCloseAdd = () => {
     setIsAdding(false);
@@ -78,6 +108,16 @@ function PomoTask() {
     setSelectedTask(null); 
   };
 
+  const handleDelete = (taskId) => {
+    setTasks(prevTasks => prevTasks.filter(task => task.Pomo_TaskId !== taskId));
+  };
+  
+  const sortedTasks = [...tasks].sort((a, b) => {
+    if (a.Pomo_Task_Status && !b.Pomo_Task_Status) return 1;
+    if (!a.Pomo_Task_Status && b.Pomo_Task_Status) return -1;
+    return 0;
+  });
+  
   if (loading) return (
     <div className="flex justify-center py-4 w-full">
       <div className="animate-pulse text-center px-4">Loading tasks...</div>
@@ -118,13 +158,18 @@ function PomoTask() {
         </div>
       )}
 
-      {/* Task list */}
+      {/* Task list - now using sortedTasks instead of tasks */}
       <div className="w-full space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-        {tasks.map((task, index) => (
+        {sortedTasks.map((task, index) => (
           <div 
             key={task.Pomo_TaskId}
             className={`border-2 rounded-lg p-3 sm:p-4 w-full max-w-md sm:max-w-xl md:max-w-2xl flex items-center min-h-14 sm:min-h-16 md:min-h-18 
-            ${index === tasks.length - 1 ? 'bg-amber-100 sm:bg-amber-200' : 'bg-blue-100 sm:bg-blue-200'}
+            ${task.Pomo_Task_Status 
+              ? 'bg-gray-100 sm:bg-gray-200 opacity-75' // Completed tasks
+              : index === sortedTasks.filter(t => !t.Pomo_Task_Status).length - 1 
+                ? 'bg-amber-100 sm:bg-amber-200' // Last incomplete task
+                : 'bg-blue-100 sm:bg-blue-200' // Other incomplete tasks
+            }
             transition-all duration-200 hover:shadow-md hover:cursor-pointer`}
           >
             <div className="w-full flex items-center justify-between">
@@ -136,13 +181,13 @@ function PomoTask() {
                 onClick={() => handleTaskCompletion(task.Pomo_TaskId, task.Pomo_Task_Status)} 
               />
 
-                <h3 className="ml-2 sm:ml-3 md:ml-4 text-sm sm:text-base font-semibold truncate">
+                <h3 className={`ml-2 sm:ml-3 md:ml-4 text-sm sm:text-base font-semibold truncate 
+                  ${task.Pomo_Task_Status ? 'line-through text-gray-500' : ''}`}>
                   {task.Pomo_Task_Title}
                 </h3>
               </div>
               
               {/* Settings icon */}
-
               <div>{task.Pomo_Completed_Count}/{task.Pomo_Target_Count}</div>
               <Icon 
                 icon={setting} 
@@ -154,13 +199,21 @@ function PomoTask() {
         ))}
       </div>
 
-      {/* Render PomoSetting if a task is selected */}
+      
       {selectedTask && (
-        <PomoSetting task={selectedTask} onClose={handleCloseSettings} />
+        <PomoSetting 
+          task={selectedTask}
+          onClose={handleCloseSettings}
+          onDelete={handleDelete}
+          onUpdate={handleUpdateTask}
+        />
       )}
 
       {isAdding && (
-        <PomoAdd onClose={handleCloseAdd} />
+        <PomoAdd
+          onClose={handleCloseAdd} 
+          onAdd={(newTask) => setTasks(prev => [newTask, ...prev])}
+        /> 
       )}
     </div>
   );

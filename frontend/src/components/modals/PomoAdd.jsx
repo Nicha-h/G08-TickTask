@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Close from '../../assets/close.svg';
 
-function PomoAdd({ task = {}, onClose }) {
+function PomoAdd({ task = {}, onClose, onAdd }) {
   const [title, setTitle] = useState(task?.Pomo_Task_Title || '');
   const [pomodoro, setPomodoro] = useState('');
   const [shortBreak, setShortBreak] = useState('');
@@ -41,6 +41,7 @@ function PomoAdd({ task = {}, onClose }) {
   
       const body = await response.json(); 
       console.log('Received body:', body);
+      onAdd(body.data); 
       onClose();
     } catch (error) {
       console.error('Error saving settings:', error);

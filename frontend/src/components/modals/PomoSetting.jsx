@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Close from '../../assets/close.svg';
 import DeletePomo from './DeletePomo';
 
-function PomoSetting({ task, onClose }) {
+function PomoSetting({ task, onClose, onDelete, onUpdate }) {
+
   const [title, setTitle] = useState(task.Pomo_Task_Title || '');
   const [pomodoro, setPomodoro] = useState(task.Pomo_Target_Count || '');
   const [shortBreak, setShortBreak] = useState(task.Pomo_Task_Short || '');
@@ -34,9 +35,9 @@ function PomoSetting({ task, onClose }) {
       shortBreak: Number(shortBreak),
       longBreak: Number(longBreak),
       targetCount: Number(pomodoro),
-      status: task.Pomo_Task_Status,            // Send existing status if unchanged
-      completedCount: task.Pomo_Completed_Count, // Same here
-      sessionId: task.SessionId || null,         // Optional, if you have it
+      status: task.Pomo_Task_Status,            
+      completedCount: task.Pomo_Completed_Count, 
+      sessionId: task.SessionId || null,
     };
   
     try {
@@ -55,6 +56,7 @@ function PomoSetting({ task, onClose }) {
       
       const result = await response.json();
       console.log('Saved changes:', result);
+      onUpdate(result.data)
       onClose();
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -70,6 +72,7 @@ function PomoSetting({ task, onClose }) {
 
   const handleDeleteClose = () => {
     setShowDeleteModal(false); 
+    onClose();
   };
 
   return (
@@ -163,7 +166,16 @@ function PomoSetting({ task, onClose }) {
 
         </div>
       </div>
-      {showDeleteModal && <DeletePomo onClose={handleDeleteClose} />}
+      {showDeleteModal && (
+          <DeletePomo
+            task={task}
+            onClose={handleDeleteClose}
+            onDelete={() => {
+              onDelete(task.Pomo_TaskId);
+            }}
+          />
+      )}
+
     </div>
   );
 }
