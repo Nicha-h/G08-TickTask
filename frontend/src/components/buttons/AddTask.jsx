@@ -295,7 +295,7 @@ const AddTask = () => {
             </div>
 
             {category && (
-              <div className="flex mb-2 flex items-center font-poppins font-bold">
+              <div className="flex mb-2 items-center font-poppins font-bold">
                 <span className="bg-gray-200 text-[15px] px-2 py-1 rounded mr-2">
                   {category}
                 </span>
@@ -311,7 +311,7 @@ const AddTask = () => {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-70 sm:w-115 sm:h-40 text-[14px] font-poppins font-reg border p-2 border-black border-[1.5px] rounded-xl placeholder:text-[#A7A7A7]"
+              className="w-70 sm:w-115 sm:h-40 text-[14px] font-poppins font-reg p-2 border-black border-[1.5px] rounded-xl placeholder:text-[#A7A7A7]"
               placeholder="Your description"
             ></textarea>
           </div>

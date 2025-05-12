@@ -48,13 +48,11 @@ function Home() {
       setLoading(false);
     }
   }, []);
-
   useEffect(() => {
     if (userID) {
       fetchUsername();
     }
   }, [userID]);
-
   const fetchUsername = async () => {
     try {
       const token = localStorage.getItem('token');

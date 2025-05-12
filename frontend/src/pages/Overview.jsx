@@ -234,7 +234,6 @@ const Overview = () => {
             </div>
           </div>
         </div>
-
         {/* Indicator Dots */}
         <div className="flex justify-center mt-4">
           {[0, 1, 2].map((i) => (
