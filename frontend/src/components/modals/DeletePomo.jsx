@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Close from '../../assets/close.svg';
 
-function DeletePomo({onClose}) {
-    const [isClosing, setIsClosing] = useState(false);
+function DeletePomo({ onClose, task, onDelete}) {
 
+  const [isClosing, setIsClosing] = useState(false);
   const closeModal = () => {
     setIsClosing(true);
     setTimeout(() => {
@@ -12,9 +12,26 @@ function DeletePomo({onClose}) {
     }, 300);
   };
 
-  const handleDelete = () => {
-    localStorage.removeItem("userToken");
-    closeModal();
+  const handleDelete = async (PomotaskId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/pomodoroTask/${PomotaskId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error deleting task');
+      }
+      onDelete();
+      onClose();
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      alert(`Failed to delete task: ${error.message}`);
+    }
+    
   };
 
   return (
@@ -46,7 +63,7 @@ function DeletePomo({onClose}) {
 
             {/* delete*/}
             <button 
-                onClick={handleDelete} 
+                onClick={() => handleDelete(task.Pomo_TaskId)}
                 className="text-sm font-black font-poppins px-4 py-0.5 sm:px-4 sm:py-0.5 md:px-4 md:py-1 lg:px-4 lg:py-1 bg-red-400 text-black 
                 rounded-lg border-2 border-black hover:bg-red-600 hover:scale-105 transition"
             >

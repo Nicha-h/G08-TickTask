@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import Close from '../../assets/close.svg';
 
-function PomoAdd({ task = {}, onClose }) {
-    const [title, setTitle] = useState(task?.Pomo_Task_Title || '');
+function PomoAdd({ task = {}, onClose, onAdd }) {
+  const [title, setTitle] = useState(task?.Pomo_Task_Title || '');
   const [pomodoro, setPomodoro] = useState('');
   const [shortBreak, setShortBreak] = useState('');
   const [longBreak, setLongBreak] = useState('');
-
   const [isClosing, setIsClosing] = useState(false);
 
   const closeModal = () => {
@@ -17,11 +16,40 @@ function PomoAdd({ task = {}, onClose }) {
     }, 300);
   };
 
-  const handleSave = () => {
-    console.log("Saved changes:", { title, pomodoro, shortBreak, longBreak });
-    setTitle(title),
-    onClose();
+  const handleSave = async () => {
+    const data = {
+      title,
+      shortBreak: Number(shortBreak),
+      longBreak: Number(longBreak),
+      targetCount: Number(pomodoro),
+      sessionId: task.SessionId
+    };
+  
+    try {
+      const response = await fetch(`http://localhost:3000/api/pomodoroTask`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(data),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to save settings');
+      }
+  
+      const body = await response.json(); 
+      console.log('Received body:', body);
+      onAdd(body.data); 
+      onClose();
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('Failed to save changes.');
+    }
   };
+  
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
