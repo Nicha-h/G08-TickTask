@@ -8,7 +8,7 @@ import calendarIcon from "@iconify-icons/lucide/calendar";
 import barChartIcon from "@iconify-icons/lucide/bar-chart";
 
 function NavbarMobile() {
-  const [activeButton, setActiveButton] = useState("Home");
+  const [setActiveButton] = useState("Home");
 
   const handleClick = (buttonName) => {
     setActiveButton(buttonName);

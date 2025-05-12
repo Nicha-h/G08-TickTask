@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  Completed
+  Incomplete
+}
+
+enum IconType {
+  preset
+  custom
+}
+
+enum PomoStatus{
+  active
+  paused
+  completed
+}
+
+enum TimerType{
+  work
+  short
+  long
+}
+
+model User {
+  UserID        Int    @id @default(autoincrement())
+  profile profile?
+  User_Email String @unique
+  User_Password  String
+  tasks task[]
+  category category[]
+
+  pomodoro_sessions pomodoro_sessions[]
+}
+
+model task {
+  TaskID            Int        @id @default(autoincrement())
+  Task_Title        String
+  Task_Description  String?
+  Task_Start_Date   String?
+  Task_End_Date     String?
+  Task_Start_Time   String? 
+  Task_End_Time     String?
+  Task_Icon         String? @default("default.svg")
+  Task_Status       TaskStatus @default(Incomplete)
+  Task_Color        String
+  UserID            Int
+  user              User       @relation(fields: [UserID], references: [UserID])
+
+  task_category task_category[]
+}
+
+model profile{
+  UserID Int @id 
+  Username String?
+  User_profile_icon_type IconType @default(preset)
+  User_profile_icon_path String
+  user User   @relation(fields: [UserID], references: [UserID])
+}
+
+model category{
+  CategoryId Int @id @default(autoincrement())
+  Category_Name String
+  Category_icon String
+  Category_Color String @default("#A7A7A7")
+  Category_is_Primary Boolean @default(true)
+  userId Int
+  user User   @relation(fields: [userId], references: [UserID])
+
+  task_category task_category[]
+}
+
+model task_category {
+  TaskID     Int
+  CategoryId Int
+
+  task     task     @relation(fields: [TaskID], references: [TaskID])
+  category category @relation(fields: [CategoryId], references: [CategoryId])
+
+  @@id([TaskID, CategoryId]) 
+}
+
+model pomodoro_sessions {
+  SessionId         Int         @id @default(autoincrement())
+  UserID            Int
+  Status            PomoStatus
+  StartTime         String
+  EndTime           String?
+  PausedTime        String
+  duration_seconds  Int         @default(1500)
+  remaining_seconds Int @default(1500)
+  timer_type        TimerType
+  last_updated      DateTime    @default(now())
+  user              User        @relation(fields: [UserID], references: [UserID])
+
+  pomodoro_task pomodoro_task[]
+}
+
+model pomodoro_task {
+  Pomo_TaskId          Int                @id @default(autoincrement())
+  Pomo_Task_Title      String
+  Pomo_Task_Short      Int                @default(5)     // short break (minutes)
+  Pomo_Task_Long       Int                @default(15)    // long break (minutes)
+  Pomo_Task_Status     Boolean            @default(false) 
+  Pomo_Completed_Count Int                @default(0)
+  Pomo_Target_Count    Int                @default(4)    
+  SessionId            Int
+
+  session       pomodoro_sessions  @relation(fields: [SessionId], references: [SessionId], onDelete: Cascade)
+}

@@ -1,15 +1,13 @@
 import type { Context } from 'hono';
+import { PrismaClient } from '../generated/prisma/index.js';
 import { z } from 'zod';
 import { createUserInDb, fetchProfile, updateProfile } from '../models/User.model.js';
 import  jwt  from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { db } from '../database/db.js';
-import type { User } from '../types/index.js';
-import type { RowDataPacket } from 'mysql2';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-
+const prisma = new PrismaClient();
 const userSchema = z.object({
     email: z.string().email(),
     password: z.string().min(7),
@@ -49,39 +47,37 @@ export async function createUserController(c: Context) {
 }
 
 export async function loginUserController(c: Context) {
-    const { email, password } = await c.req.json();
-  
-    const [rows] = await db.query<User[] & RowDataPacket[]>(
-      'SELECT * FROM user WHERE User_Email = ?',
-      [email]
-    );
-  
-    if (rows.length === 0) {
-      return c.json({ message: 'Invalid credentials' }, 401);
-    }
-  
-    const user = rows[0];
-  
-    const match = await bcrypt.compare(password, user.User_Password);
-    if (!match) {
-      return c.json({ message: 'Invalid credentials' }, 401);
-    } 
-  
-    const token = jwt.sign(
-      { id: user.UserID, email: user.User_Email },
-      process.env.JWT_SECRET as string,
-      { expiresIn: '1d' }
-    );
-  
-    return c.json({
-      message: 'Login successful',
-      token,
-      user: {
-        id: user.UserID,
-        name: user.User_Name,
-        email: user.User_Email,
-      },
-    });
+  const { email, password } = await c.req.json();
+
+  const user = await prisma.user.findUnique({
+    where: {
+      User_Email: email,
+    },
+  });
+
+  if (!user) {
+    return c.json({ message: 'Invalid credentials' }, 401);
+  }
+
+  const match = await bcrypt.compare(password, user.User_Password);
+  if (!match) {
+    return c.json({ message: 'Invalid credentials' }, 401);
+  }
+
+  const token = jwt.sign(
+    { id: user.UserID, email: user.User_Email },
+    process.env.JWT_SECRET as string,
+    { expiresIn: '1d' }
+  );
+
+  return c.json({
+    message: 'Login successful',
+    token,
+    user: {
+      id: user.UserID,
+      email: user.User_Email,
+    },
+  });
 }
 
 export async function fetchProfileController(c: Context) {

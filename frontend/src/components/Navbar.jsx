@@ -7,6 +7,7 @@ import edit from '@iconify-icons/mdi/pencil-outline'
 import signout from '@iconify-icons/mdi/sign-out-variant'
 import { Icon } from '@iconify/react/dist/iconify.js';
 import ConfirmLogout from './modals/ConfirmLogout';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 function Navbar() {
