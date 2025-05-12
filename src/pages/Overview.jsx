@@ -2,15 +2,25 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import overviewTotaltask from '../assets/overviewTotaltask.svg';
 import overviewCompleted from '../assets/overviewCompleted.svg';
+<<<<<<< HEAD
 import overviewinComplete from '../assets/overviewinComplete.svg';
+=======
+import overviewInprogress from '../assets/overviewInprogress.svg';
+>>>>>>> development
 import overviewNotstarted from '../assets/overviewNotstarted.svg';
 
 const Overview = () => {
   const [activeTab, setActiveTab] = useState(0); // 0: Today, 1: Month, 2: Year
   const [data, setData] = useState({
+<<<<<<< HEAD
     today: { total: 125, completed: 75, inComplete: 15, pomodoro: 10 },
     month: { total: 842, completed: 68, inComplete: 22, pomodoro: 10 },
     year: { total: 10250, completed: 72, inComplete: 18, pomodoro: 10 }
+=======
+    today: { total: 123, completed: 75, inProgress: 15, notStarted: 10 },
+    month: { total: 842, completed: 68, inProgress: 22, notStarted: 10 },
+    year: { total: 10250, completed: 72, inProgress: 18, notStarted: 10 }
+>>>>>>> development
   });
  
   
@@ -18,8 +28,13 @@ const Overview = () => {
   const animationRefs = useRef({
     total: null,
     completed: null,
+<<<<<<< HEAD
     inComplete: null,
     pomodoro: null
+=======
+    inProgress: null,
+    notStarted: null
+>>>>>>> development
   });
 
   // Clean up animations on unmount
@@ -44,7 +59,11 @@ const Overview = () => {
     };
     animationRefs.current[element.id] = requestAnimationFrame(step);
   };
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> development
   // Animate percentage transition
   const animatePercentage = (element, start, end, duration = 800) => {
     const startTime = performance.now();
@@ -75,22 +94,37 @@ const Overview = () => {
       animatePercentage(completedElement, parseInt(completedElement.textContent) || 0, currentData.completed);
     }
     
+<<<<<<< HEAD
     const inCompleteElement = document.getElementById('inComplete-percent');
     if (inCompleteElement) {
       animatePercentage(inCompleteElement, parseInt(inCompleteElement.textContent) || 0, currentData.inComplete);
+=======
+    const inProgressElement = document.getElementById('inprogress-percent');
+    if (inProgressElement) {
+      animatePercentage(inProgressElement, parseInt(inProgressElement.textContent) || 0, currentData.inProgress);
+>>>>>>> development
     }
     
     const notStartedElement = document.getElementById('notstarted-percent');
     if (notStartedElement) {
+<<<<<<< HEAD
       animatePercentage(notStartedElement, parseInt(notStartedElement.textContent) || 0, currentData.pomodoro);
+=======
+      animatePercentage(notStartedElement, parseInt(notStartedElement.textContent) || 0, currentData.notStarted);
+>>>>>>> development
     }
     
     // Animate summary boxes
     const summaryValues = {
       total: document.getElementById('summary-total'),
       completed: document.getElementById('summary-completed'),
+<<<<<<< HEAD
       inComplete: document.getElementById('summary-inComplete'),
       pomodoro: document.getElementById('summary-notstarted')
+=======
+      inProgress: document.getElementById('summary-inprogress'),
+      notStarted: document.getElementById('summary-notstarted')
+>>>>>>> development
     };
     
     if (summaryValues.total) {
@@ -100,6 +134,7 @@ const Overview = () => {
       animateValue(summaryValues.completed, parseInt(summaryValues.completed.textContent) || 0, 
         Math.floor(currentData.total * currentData.completed / 100));
     }
+<<<<<<< HEAD
     if (summaryValues.inComplete) {
       animateValue(summaryValues.inComplete, parseInt(summaryValues.inComplete.textContent) || 0, 
         Math.floor(currentData.total * currentData.inComplete / 100));
@@ -107,6 +142,15 @@ const Overview = () => {
     if (summaryValues.pomodoro) {
       animateValue(summaryValues.pomodoro, parseInt(summaryValues.pomodoro.textContent) || 0, 
         Math.floor(currentData.total * currentData.pomodoro / 100));
+=======
+    if (summaryValues.inProgress) {
+      animateValue(summaryValues.inProgress, parseInt(summaryValues.inProgress.textContent) || 0, 
+        Math.floor(currentData.total * currentData.inProgress / 100));
+    }
+    if (summaryValues.notStarted) {
+      animateValue(summaryValues.notStarted, parseInt(summaryValues.notStarted.textContent) || 0, 
+        Math.floor(currentData.total * currentData.notStarted / 100));
+>>>>>>> development
     }
     
     // Update donut chart
@@ -119,8 +163,13 @@ const Overview = () => {
     if (donut) {
       donut.style.background = `conic-gradient(
         #E7F1A8 0% ${currentData.completed}%,
+<<<<<<< HEAD
         #95B1EE ${currentData.completed}% ${currentData.completed + currentData.inComplete}%,
         #FFFDF5 ${currentData.completed + currentData.inComplete}% 100%
+=======
+        #95B1EE ${currentData.completed}% ${currentData.completed + currentData.inProgress}%,
+        #FFFDF5 ${currentData.completed + currentData.inProgress}% 100%
+>>>>>>> development
       )`;
     }
   };
@@ -161,8 +210,13 @@ const Overview = () => {
             <div className="w-full h-full rounded-full border-1 donut-chart"
                   style={{ background: `conic-gradient(
                     #E7F1A8 0% ${currentData.completed}%,
+<<<<<<< HEAD
                     #95B1EE ${currentData.completed}% ${currentData.completed + currentData.inComplete}%,
                     #FFFDF5 ${currentData.completed + currentData.inComplete}% 100%
+=======
+                    #95B1EE ${currentData.completed}% ${currentData.completed + currentData.inProgress}%,
+                    #FFFDF5 ${currentData.completed + currentData.inProgress}% 100%
+>>>>>>> development
                   )`}}></div>
             {/* inside */}
             <div className="absolute border-1 top-1/2 left-1/2 w-[130px] h-[130px] sm:w-[150px] sm:h-[150px] 
@@ -194,15 +248,24 @@ const Overview = () => {
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 sm:w-5 sm:h-5 mr-3 rounded-full bg-[#95B1EE] border-1"></span>
               <div>
+<<<<<<< HEAD
                 <p id="inComplete-percent" className="font-fredoka text-[24px] font-reg">00%</p>
                 <p className="font-poppins text-[14px] font-bold">In progress</p>
+=======
+                <p id="inprogress-percent" className="font-fredoka text-[24px] font-reg">00%</p>
+                <p className="font-poppins text-[14px] font-bold">Incomplete</p>
+>>>>>>> development
               </div>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-4 h-4 sm:w-5 sm:h-5 mr-3 rounded-full bg-[#FFFDF5] border-1"></span>
               <div>
                 <p id="notstarted-percent" className="font-fredoka text-[24px] font-reg">00%</p>
+<<<<<<< HEAD
                 <p className="font-poppins text-[14px] font-bold">Not started</p>
+=======
+                <p className="font-poppins text-[14px] font-bold">Pomodoro</p>
+>>>>>>> development
               </div>
             </div>
           </div>
@@ -259,16 +322,27 @@ const Overview = () => {
               </div>
           </div>
           <div className="flex items-center bg-white rounded-lg inset-shadow-sm shadow-md p-3 sm:p-4">
+<<<<<<< HEAD
             <img className="w-8 h-8 sm:w-10 sm:h-10 object-contain mr-3 sm:mr-5" src={overviewinComplete} alt="ooverviewinComplete"/>
               <div className="flex items-center justify-between w-full">
                 <p className="text-[14px] sm:text-[16px] font-bold">In progress</p>
                 <p id="summary-inComplete" className="text-[18px] sm:text-[20px] text-[#A7A7A7] font-reg">00</p>
+=======
+            <img className="w-8 h-8 sm:w-10 sm:h-10 object-contain mr-3 sm:mr-5" src={overviewInprogress} alt="ooverviewInprogress"/>
+              <div className="flex items-center justify-between w-full">
+                <p className="text-[14px] sm:text-[16px] font-bold">Incomplete</p>
+                <p id="summary-inprogress" className="text-[18px] sm:text-[20px] text-[#A7A7A7] font-reg">00</p>
+>>>>>>> development
               </div>
           </div>
           <div className="flex items-center bg-white rounded-lg inset-shadow-sm shadow-md p-3 sm:p-4">
             <img className="w-7.5 h-7.5 sm:w-10 sm:h-9.5 object-contain mr-3 sm:mr-5" src={overviewNotstarted} alt="overviewNotstarted"/>
               <div className="flex items-center justify-between w-full">
+<<<<<<< HEAD
                 <p className="text-[14px] sm:text-[16px] font-bold">Not started</p>
+=======
+                <p className="text-[14px] sm:text-[16px] font-bold">Pomodoro</p>
+>>>>>>> development
                 <p id="summary-notstarted" className="text-[18px] sm:text-[20px] text-[#A7A7A7] font-reg">00</p>
               </div>
           </div>

@@ -1,0 +1,57 @@
+import React, { useState } from 'react';
+import Close from '../../assets/close.svg';
+import { useNavigate } from 'react-router-dom';
+
+function ConfirmLogout({onClose }) {
+    const navigate = useNavigate();
+    const [isClosing, setIsClosing] = useState(false);
+
+  const closeModal = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 300);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("userToken");
+    navigate("/login");
+  };
+
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+        <div className={`bg-white p-7 rounded-lg shadow-lg text-center w-full max-w-md relative ${
+            isClosing ? 'animate-scale-out' : 'animate-scale-in'}`}>
+            {/* Title */}
+            <h2 className="text-xl font-fredoka font-normal mb-4">Are you sure you want to sign out?</h2>
+
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center w-full mt-2 gap-4">
+            {/* Cancel button */}
+            <button 
+                onClick={closeModal} 
+                className="text-sm font-black px-4 py-1 sm:px-4 sm:py-1 md:px-4 md:py-1 lg:px-4 lg:py-2 bg-gray-300 border-2 text-gray-600 
+                rounded-lg hover:bg-gray-400 hover:scale-105 transition"
+            >
+                Cancel
+            </button>
+
+            {/* sign out */}
+            <button 
+                onClick={handleLogout} 
+                className="text-sm font-black font-poppins px-4 py-1 sm:px-4 sm:py-1 md:px-4 md:py-1 lg:px-4 lg:py-2 bg-red-400 text-black 
+                rounded-lg border-2 border-black hover:bg-red-600 hover:scale-105 transition"
+            >
+                Sign out
+            </button>
+            
+
+          </div>
+                
+        </div>
+    </div>
+  );
+}
+
+export default ConfirmLogout;
