@@ -1,0 +1,317 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { useSwipeable } from 'react-swipeable';
+import overviewTotaltask from '../assets/overviewTotaltask.svg';
+import overviewCompleted from '../assets/overviewCompleted.svg';
+import overviewinComplete from '../assets/overviewinComplete.svg';
+import overviewPomodoro from '../assets/overviewPomodoro.svg';
+import plus from '../assets/plus.svg';
+
+const Overview = () => {
+  const [activeTab, setActiveTab] = useState(0);
+  const [data] = useState({
+    today: { total: 125, completed: 75, inComplete: 15, pomodoro: 10 },
+    month: { total: 842, completed: 68, inComplete: 22, pomodoro: 10 },
+    year: { total: 10250, completed: 72, inComplete: 18, pomodoro: 10 }
+  });
+
+  const animationRefs = useRef({});
+  const donutRef = useRef(null);
+
+  // Clean up animations
+  useEffect(() => {
+    return () => {
+      Object.values(animationRefs.current).forEach(ref => {
+        if (ref) cancelAnimationFrame(ref);
+      });
+    };
+  }, []);
+
+  // Animation functions
+  const animateValue = (element, target, duration = 800, isPercentage = false) => {
+    if (!element) return;
+    
+    const id = element.id || Math.random().toString(36).substring(7);
+    element.id = id;
+    
+    if (animationRefs.current[id]) {
+      cancelAnimationFrame(animationRefs.current[id]);
+    }
+
+    const start = parseFloat(element.textContent.replace(/%|,/g, '')) || 0;
+    const startTime = performance.now();
+
+    const step = (timestamp) => {
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const value = Math.floor(progress * (target - start) + start);
+      
+      if (isPercentage) {
+        element.textContent = `${value}%`;
+      } else {
+        element.textContent = value.toLocaleString();
+      }
+      
+      if (progress < 1) {
+        animationRefs.current[id] = requestAnimationFrame(step);
+      }
+    };
+
+    animationRefs.current[id] = requestAnimationFrame(step);
+  };
+
+  // Initialize and animate donut chart
+  const initDonutChart = (currentData) => {
+    if (!donutRef.current) return;
+    
+    const { completed, inComplete } = currentData;
+    const total = completed + inComplete;
+    const remaining = 100 - total;
+
+    donutRef.current.style.background = `
+      conic-gradient(
+        #E7F1A8 0% ${completed}%,
+        #95B1EE ${completed}% ${completed + inComplete}%,
+        #FFFDF5 ${completed + inComplete}% 100%
+      )
+    `;
+  };
+
+  // Animate donut chart
+  const animateDonutChart = (targetData) => {
+    if (!donutRef.current) return;
+
+    const currentStyle = window.getComputedStyle(donutRef.current);
+    const background = currentStyle.backgroundImage;
+
+    // Extract current values from background
+    let currentCompleted = 0;
+    let currentInComplete = 0;
+
+    if (background.includes('conic-gradient')) {
+      const matches = background.match(/#E7F1A8 0% (\d+)%, #95B1EE \1% (\d+)%/);
+      if (matches && matches.length >= 3) {
+        currentCompleted = parseInt(matches[1]);
+        currentInComplete = parseInt(matches[2]) - currentCompleted;
+      }
+    }
+
+    const duration = 800;
+    const startTime = performance.now();
+
+    const step = (timestamp) => {
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      
+      const completed = Math.floor(
+        progress * (targetData.completed - currentCompleted) + currentCompleted
+      );
+      const inComplete = Math.floor(
+        progress * (targetData.inComplete - currentInComplete) + currentInComplete
+      );
+
+      donutRef.current.style.background = `
+        conic-gradient(
+          #E7F1A8 0% ${completed}%,
+          #95B1EE ${completed}% ${completed + inComplete}%,
+          #FFFDF5 ${completed + inComplete}% 100%
+        )
+      `;
+
+      if (progress < 1) {
+        animationRefs.current.donut = requestAnimationFrame(step);
+      }
+    };
+
+    animationRefs.current.donut = requestAnimationFrame(step);
+  };
+
+  // Initialize on first render
+  useEffect(() => {
+    initDonutChart(data.today);
+  }, []);
+
+  // Animate when tab changes
+  useEffect(() => {
+    const currentData = activeTab === 0 ? data.today : activeTab === 1 ? data.month : data.year;
+
+    // Animate numbers
+    animateValue(document.getElementById('total-tasks'), currentData.total);
+    animateValue(document.getElementById('completed-percent'), currentData.completed, 800, true);
+    animateValue(document.getElementById('inComplete-percent'), currentData.inComplete, 800, true);
+    animateValue(document.getElementById('pomodoro-percent'), currentData.pomodoro, 800, true);
+
+    // Animate summary numbers
+    const completedCount = Math.floor(currentData.total * currentData.completed / 100);
+    const inCompleteCount = Math.floor(currentData.total * currentData.inComplete / 100);
+    const pomodoroCount = Math.floor(currentData.total * currentData.pomodoro / 100);
+
+    animateValue(document.getElementById('summary-total'), currentData.total);
+    animateValue(document.getElementById('summary-completed'), completedCount);
+    animateValue(document.getElementById('summary-inComplete'), inCompleteCount);
+    animateValue(document.getElementById('summary-pomodoro'), pomodoroCount);
+
+    // Animate donut chart
+    animateDonutChart(currentData);
+  }, [activeTab, data]);
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => setActiveTab((prev) => (prev + 1) % 3),
+    onSwipedRight: () => setActiveTab((prev) => (prev - 1 + 3) % 3),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true
+  });
+
+  const OverviewCard = ({ type }) => {
+    const titles = ['Today', 'This Month', 'This Year'];
+    const title = titles[type];
+    const currentData = type === 0 ? data.today : type === 1 ? data.month : data.year;
+
+    const getFontSize = (num) => {
+      const length = num.toString().length;
+      if (length <= 3) return "text-[40px] sm:text-[50px]";
+      if (length <= 5) return "text-[32px] sm:text-[40px]";
+      if (length <= 7) return "text-[24px] sm:text-[32px]";
+      return "text-[20px] sm:text-[24px]";
+    };
+
+    return (
+      <div className="bg-white bg-clip-border inset-shadow-sm shadow-md rounded-4xl w-full max-w-md mx-auto p-6 pb-8">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+          {/* Donut Chart */}
+          <div className="flex-shrink-0">
+            <h2 className="font-poppins text-[22px] font-bold text-center mb-4">{title}</h2>
+            <div className="relative w-[200px] h-[200px] sm:w-[225px] sm:h-[225px]">
+              <div 
+                ref={donutRef}
+                className="w-full h-full rounded-full border-1 donut-chart"
+                style={{
+                  background: `conic-gradient(
+                    #E7F1A8 0% 0%,
+                    #95B1EE 0% 0%,
+                    #FFFDF5 0% 100%
+                  )`
+                }}
+              ></div>
+              {/* inside */}
+              <div className="absolute border-1 top-1/2 left-1/2 w-[130px] h-[130px] sm:w-[150px] sm:h-[150px] 
+                bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center text-center overflow-hidden px-1"
+              >
+                <div className="w-full">
+                  <p
+                    id="total-tasks"
+                    className={`font-fredoka font-reg leading-none p-1 ${getFontSize(currentData.total)}`}
+                    style={{ wordBreak: "break-word" }}
+                  >
+                    0
+                  </p>
+                  <p className="font-poppins text-[13px] sm:text-[15px] font-bold leading-none p-1">Total task</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Text */}
+          <div className="flex flex-col justify-center p-2 gap-3 sm:gap-5 mt-1 sm:mt-8 ml-0 sm:ml-3">
+            <div className="flex items-center gap-2">
+              <span className="w-4 h-4 sm:w-5 sm:h-5 mr-3 rounded-full bg-[#E7F1A8] border-1"></span>
+              <div>
+                <p id="completed-percent" className="font-fredoka text-[24px] font-reg">0%</p>
+                <p className="font-poppins text-[14px] font-bold">Completed</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-4 h-4 sm:w-5 sm:h-5 mr-3 rounded-full bg-[#95B1EE] border-1"></span>
+              <div>
+                <p id="inComplete-percent" className="font-fredoka text-[24px] font-reg">0%</p>
+                <p className="font-poppins text-[14px] font-bold">Incomplete</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-4 h-4 sm:w-5 sm:h-5 mr-3 rounded-full bg-[#FFFDF5] border-1"></span>
+              <div>
+                <p id="pomodoro-percent" className="font-fredoka text-[24px] font-reg">0%</p>
+                <p className="font-poppins text-[14px] font-bold">Pomodoro</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Indicator Dots */}
+        <div className="flex justify-center mt-4">
+          {[0, 1, 2].map((i) => (
+            <button
+              key={i}
+              onClick={() => setActiveTab(i)}
+              className={`w-2 h-2 mx-1 rounded-full transition-colors ${i === activeTab ? 'bg-black' : 'bg-[#A7A7A7]'}`}
+              aria-label={`Show ${titles[i]} view`}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="p-4 min-h-screen overflow-x-hidden">
+      {/* Header */}
+      <div className="mb-4">
+        <h1 className="flex text-[24px] font-poppins font-bold">Overview</h1>
+      </div>
+
+      {/* Main Dashboard */}
+      <div className="space-y-6 sm:space-y-8">
+        {/* Swipeable Area */}
+        <div {...handlers} className="relative overflow-visible">
+          {/* Overview Cards */}
+          <div className="transition-opacity duration-300">
+            {activeTab === 0 && <OverviewCard type={0} />}
+            {activeTab === 1 && <OverviewCard type={1} />}
+            {activeTab === 2 && <OverviewCard type={2} />}
+          </div>
+        </div>
+
+        {/* Summary Boxes */}
+        <div className="grid grid-cols-1 font-poppins gap-3 max-w-md mx-auto">
+          <div className="flex items-center bg-white rounded-lg inset-shadow-sm shadow-md p-3 sm:p-4">
+            <img className="w-8 h-8 sm:w-10 sm:h-10 object-contain mr-3 sm:mr-5" src={overviewTotaltask} alt="overviewTotaltask" />
+            <div className="flex items-center justify-between w-full">
+              <p className="text-[14px] sm:text-[16px] font-bold">Total task</p>
+              <p id="summary-total" className="text-[18px] sm:text-[20px] text-[#A7A7A7] font-reg">0</p>
+            </div>
+          </div>
+          <div className="flex items-center bg-white rounded-lg inset-shadow-sm shadow-md p-3 sm:p-4">
+            <img className="w-8 h-8 sm:w-10 sm:h-10 object-contain mr-3 sm:mr-5" src={overviewCompleted} alt="overviewCompleted" />
+            <div className="flex items-center justify-between w-full">
+              <p className="text-[14px] sm:text-[16px] font-bold">Completed</p>
+              <p id="summary-completed" className="text-[18px] sm:text-[20px] text-[#A7A7A7] font-reg">0</p>
+            </div>
+          </div>
+          <div className="flex items-center bg-white rounded-lg inset-shadow-sm shadow-md p-3 sm:p-4">
+            <img className="w-8 h-8 sm:w-10 sm:h-10 object-contain mr-3 sm:mr-5" src={overviewinComplete} alt="overviewinComplete" />
+            <div className="flex items-center justify-between w-full">
+              <p className="text-[14px] sm:text-[16px] font-bold">Incomplete</p>
+              <p id="summary-inComplete" className="text-[18px] sm:text-[20px] text-[#A7A7A7] font-reg">0</p>
+            </div>
+          </div>
+          <div className="flex items-center bg-white rounded-lg inset-shadow-sm shadow-md p-3 sm:p-4">
+            <img className="w-7.5 h-7.5 sm:w-10 sm:h-9.5 object-contain mr-3 sm:mr-5" src={overviewPomodoro} alt="overviewPomodoro" />
+            <div className="flex items-center justify-between w-full">
+              <p className="text-[14px] sm:text-[16px] font-bold">Pomodoro</p>
+              <p id="summary-pomodoro" className="text-[18px] sm:text-[20px] text-[#A7A7A7] font-reg">0</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Floating Add Button */}
+        <div>
+          <Link to="/addtask">
+            <button className="fixed bottom-12 right-16 bg-[#D7D9FF] border-1 border-black rounded-full w-20 h-20 shadow-lg flex items-center justify-center hover:bg-[#c0c2ff] transition-all duration-200 ease-in-out transform hover:scale-105 transition">
+              <img src={plus} alt="add" className="w-8 h-8" />   
+            </button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Overview;
