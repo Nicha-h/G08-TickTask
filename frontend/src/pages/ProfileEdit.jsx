@@ -10,7 +10,7 @@ import ConfirmLogout from "../components/modals/ConfirmLogout";
 
 function ProfileEdit() {
   const [user, setUser] = useState(null);
-  const [profilePicture, setProfilePicture] = useState(Men1); // default
+  const [profilePicture, setProfilePicture] = useState(Men1);
   const [loading, setLoading] = useState(true);
   const [showProfilePicModal, setShowProfilePicModal] = useState(false);
   const navigate = useNavigate();
