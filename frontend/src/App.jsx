@@ -1,5 +1,4 @@
 import Navbar from "./components/Navbar";
-<<<<<<< HEAD
 import NavbarMobile from "./components/NavbarMobile";
 import { BrowserRouter as Router } from 'react-router-dom';
 import AppRoutes from '../src/components/routes/AppRoutes';
@@ -23,19 +22,8 @@ function App() {
     <>
       {token && (isMobile ? <NavbarMobile /> : <Navbar />)}
       <AppRoutes />
-=======
-
-function App() {
-  return (
-    <>
-      <Navbar />
->>>>>>> 5b5d2c643b1bf74c8f93b7669e40e19bb3c056a9
     </>
   );
 }
 
-<<<<<<< HEAD
 export default App;
-=======
-export default App;
->>>>>>> 5b5d2c643b1bf74c8f93b7669e40e19bb3c056a9
