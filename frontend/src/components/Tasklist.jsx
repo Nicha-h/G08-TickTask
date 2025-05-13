@@ -74,7 +74,7 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
   const sortedTasks = tasks.sort((a, b) => {
     const timeA = a.Task_Start_Time.split(':').map(Number);
     const timeB = b.Task_Start_Time.split(':').map(Number);
-    return timeA[0] - timeB[0] || timeA[1] - timeB[1];  // Sort by hours, then minutes
+    return timeA[0] - timeB[0] || timeA[1] - timeB[1];  
   });
 
   if (loading) return <div className="flex justify-center py-4">Loading tasks...</div>;

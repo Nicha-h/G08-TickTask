@@ -38,33 +38,35 @@ function ProfileEdit() {
   });
 
   useEffect(() => {
-    async function fetchUser() {
-      try {
-        const userData = await new Promise((resolve) =>
-          setTimeout(
-            () =>
-              resolve({
-                Username: "SigmaBoy",
-                User_Email: "admin@gmail.com",
-              }),
-            1000
-          )
-        );
+  async function fetchUser() {
+    try {
+      const userData = await new Promise((resolve) =>
+        setTimeout(
+          () =>
+            resolve({
+              Username: "SigmaBoy",
+              User_Email: "admin@gmail.com",
+            }),
+          1000
+        )
+      );
 
-        setUser(userData);
-        reset({
-          username: userData.Username,
-          email: userData.User_Email,
-        });
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-      } finally {
-        setLoading(false);
-      }
+      setUser(userData);
+
+      reset({
+        username: userData.Username,
+        email: userData.User_Email,
+      });
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchUser();
-  }, [reset]);
+  fetchUser();
+}, [reset]);
+
 
   const handleProfilePicSelect = (pic) => {
     console.log("User picked:", pic.name);
@@ -116,54 +118,50 @@ function ProfileEdit() {
 
           {/* Right side - Form */}
           <div className="flex flex-col">
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col w-full gap-4"
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full gap-4">
+          {/* Username */}
+          <div className="flex flex-col w-full">
+            <label className="text-sm mb-1">Username</label>
+            <input
+              {...register("username")}
+              className="border-2 rounded-lg px-3 py-2 text-sm w-full"
+            />
+            {errors.username && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.username.message}
+              </p>
+            )}
+          </div>
+
+          {/* Email (read-only) */}
+          <div className="flex flex-col w-full">
+            <div className="flex items-center gap-2">
+              <label className="text-sm mb-1">Email</label>
+              <span className="text-xs text-gray-400">(cannot edit)</span>
+            </div>
+            <input
+              {...register("email")}
+              readOnly
+              className="border-2 bg-gray-100 text-gray-500 rounded-lg px-3 py-2 text-sm w-full cursor-not-allowed"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-center w-full mt-4">
+            <button
+              type="submit"
+              className="w-full bg-primary hover:bg-primary2 text-white font-semibold py-2 rounded-lg transition-all"
             >
-              <div className="flex flex-col w-full">
-                <label className="text-sm mb-1">Username</label>
-                <input
-                  {...register("username")}
-                  className="border-2 rounded-lg px-3 py-2 text-sm w-full"
-                />
-                {errors.username && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.username.message}
-                  </p>
-                )}
-              </div>
+              SAVE
+            </button>
+          </div>
+        </form>
 
-              <div className="flex flex-col w-full">
-                <div className="flex items-center gap-2">
-                  <label className="text-sm mb-1">Email</label>
-                  <button
-                    type="button"
-                    className="text-xs text-gray-400 underline hover:text-blue-600"
-                  >
-                    change email?
-                  </button>
-                </div>
-                <input
-                  {...register("email")}
-                  className="border-2 rounded-lg px-3 py-2 text-sm w-full"
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Save Button */}
-              <div className="flex justify-center w-full mt-4">
-                <button
-                  type="submit"
-                  className="w-full bg-primary hover:bg-primary2 text-white font-semibold py-2 rounded-lg transition-all"
-                >
-                  SAVE
-                </button>
-              </div>
-            </form>
           </div>
         </div>
         

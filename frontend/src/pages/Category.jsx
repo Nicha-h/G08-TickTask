@@ -6,9 +6,7 @@ import iconStudy from "../assets/iconStudy.svg";
 import iconWork from "../assets/iconWork.svg";
 import iconWorkout from "../assets/iconWorkout.svg";
 import edit from "../assets/edit.svg";
-// import editCategoryIcon from "../assets/editCategoryIcon.svg"
 import iconFilter from "../assets/iconFilter.svg";
-import close from "../assets/close.svg";
 import iconTickWH from "../assets/iconTickWH.svg";
 import iconComputer from "../assets/iconComputer.svg";
 import iconArt from "../assets/iconArt.svg";
@@ -592,17 +590,21 @@ export default function Category() {
                       >
                         Edit
                       </button>
-                      <div className="border-t border-gray-300"></div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteCategory(cat.name);
-                          closeMenu();
-                        }}
-                        className="font-bold w-full px-2 py-1 hover:bg-gray-200"
-                      >
-                        Delete
-                      </button>
+                      {cat.name !== "All" && (
+                        <>
+                          <div className="border-t border-gray-300"></div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteCategory(cat.name);
+                              closeMenu();
+                            }}
+                            className="font-bold w-full px-2 py-1 hover:bg-gray-200"
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
 
