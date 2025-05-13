@@ -51,4 +51,8 @@ const IconPickerModal = ({ selectedIcon, onSelect, onClose }) => {
   );
 };
 
+<<<<<<< HEAD
 export default IconPickerModal;
+=======
+export default IconPickerModal;
+>>>>>>> 5b5d2c643b1bf74c8f93b7669e40e19bb3c056a9
