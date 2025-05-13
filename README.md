@@ -12,20 +12,16 @@ Read:
 
 Our home page display a brief summary of task due on that specific day. User can navigate through the weekly calendar if they wishes to see task for other days.
 
-Our application provides an overviews page, which display the summary of the task user accomplished in a day, month, and year 
+Our application provides an overviews page, which display the summary of the task user accomplished in a day, month, and year
 
 Update:
 
-All of the task and category can be edited and customize.
-User can update their profile pictures and username, up to their preferences.
+All of the task and category can be edited and customize. User can update their profile pictures and username, up to their preferences.
 
 Delete:
 
-All of the tasks and category can be deleted, as well as the profile.
-If category is deleted, the tasks inside won't be deleted.
+All of the tasks and category can be deleted, as well as the profile. If category is deleted, the tasks inside won't be deleted.
 
-How to run:
-First you have to run the backend file
-Then you have to run the frontend separately both using
+How to run: First you have to run the backend file Then you have to run the frontend separately both using
 
 npm run dev
