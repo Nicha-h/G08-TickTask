@@ -40,12 +40,30 @@ function FindYourAccount() {
     }
   };
 
-  // Simulate checking email in database
   const checkEmailInDatabase = async (email) => {
-    // Replace this with an actual API call
-    const validEmails = ['ticktask@gmail.com', 'test@example.com', 'inwza0072000@gmail.com'];
-    return validEmails.includes(email);
-  };
+  try {
+    const response = await fetch('http://localhost:3000/api/users/check-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      console.error('Non-OK response:', response.status);
+      return false;
+    }
+
+    const result = await response.json();
+    return result.exists;
+  } catch (error) {
+    console.error('Error checking email:', error);
+    return false;
+  }
+};
+
+
 
   const closeModal = () => {
     setIsClosing(true);

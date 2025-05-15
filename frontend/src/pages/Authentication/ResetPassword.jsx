@@ -28,9 +28,32 @@ function ResetPassword() {
     formState: { errors },
   } = useForm({ resolver: zodResolver(userSchema) });
 
-  const onSubmit = () => {
-    setShowModal(true);
-  };
+  const onSubmit = async (data) => {
+  try {
+    const token = new URLSearchParams(window.location.search).get('token'); 
+
+    const response = await fetch('http://localhost:3000/api/users/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token,
+        newPassword: data.password,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      setShowModal(true); 
+    } else {
+      alert(result.error || 'Something went wrong');
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Something went wrong while resetting password');
+  }
+};
+
 
   const [showModal, setShowModal] = useState(false);
   const [isClosing, setIsClosing] = useState(false);

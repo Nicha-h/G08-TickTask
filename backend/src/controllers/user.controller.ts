@@ -5,9 +5,8 @@ import { createUserInDb, fetchProfile, updateProfile } from '../models/User.mode
 import  jwt  from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
-import { IncomingForm } from 'formidable';
-import fs from 'fs';
-import path from 'path';
+import crypto from 'crypto';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -114,3 +113,94 @@ export async function updateProfileController(c: Context) {
   }
 }
 
+export async function checkEmailController(c: Context) {
+  try {
+    const { email } = await c.req.json();
+
+    const user = await prisma.user.findUnique({
+      where: { User_Email: email },
+    });
+
+    if (!user) {
+      return c.json({ exists: false });
+    }
+
+    // Generate token
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiry = new Date(Date.now() + 1000 * 60 * 15); // 15 minutes
+
+    await prisma.user.update({
+      where: { UserID: user.UserID },
+      data: {
+        resetToken: token,
+        resetTokenExpiry: expiry,
+      },
+    });
+
+    const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    await transporter.sendMail({
+      from: '"TickTask" <no-reply@ticktask.com>',
+      to: email,
+      subject: 'Password Reset Request',
+      html: `
+        <h3>Password Reset</h3>
+        <p>Click the link below to reset your password:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>This link will expire in 15 minutes.</p>
+      `,
+    });
+
+    return c.json({ exists: true, message: 'Reset email sent' });
+
+  } catch (error) {
+    console.error('Server error in checkEmailController:', error);
+    return c.json({ exists: false, error: 'Internal server error' }, 500);
+  }
+}
+ 
+
+export async function resetPasswordController(c:Context) {
+  try {
+    const { token, newPassword } = await c.req.json();
+    
+
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: {
+          gt: new Date()
+        }
+      }
+    });
+
+    if (!user) {
+      return c.json({ error: 'Invalid or expired token' }, 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    await prisma.user.update({
+      where: { UserID: user.UserID },
+      data: {
+        User_Password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null
+      }
+    });
+
+    return c.json({ success: true, message: 'Password reset successful' });
+    
+  } catch (error) {
+    console.error('Server error in resetPasswordController:', error);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+}

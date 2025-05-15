@@ -53,11 +53,13 @@ export type pomodoro_task = $Result.DefaultSelection<Prisma.$pomodoro_taskPayloa
  * Enums
  */
 export namespace $Enums {
-  export const TaskStatus = {
-    Completed: 'Completed',
-    Incomplete: 'Incomplete',
-  } as const;
-}
+  export const TaskStatus: {
+  Completed: 'Completed',
+  Incomplete: 'Incomplete'
+};
+
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
+
 
 export const IconType: {
   preset: 'preset',
@@ -84,6 +86,7 @@ export const TimerType: {
 
 export type TimerType = (typeof TimerType)[keyof typeof TimerType]
 
+}
 
 export type TaskStatus = $Enums.TaskStatus
 
@@ -1632,18 +1635,24 @@ export namespace Prisma {
     UserID: number | null
     User_Email: string | null
     User_Password: string | null
+    resetToken: string | null
+    resetTokenExpiry: Date | null
   }
 
   export type UserMaxAggregateOutputType = {
     UserID: number | null
     User_Email: string | null
     User_Password: string | null
+    resetToken: string | null
+    resetTokenExpiry: Date | null
   }
 
   export type UserCountAggregateOutputType = {
     UserID: number
     User_Email: number
     User_Password: number
+    resetToken: number
+    resetTokenExpiry: number
     _all: number
   }
 
@@ -1660,18 +1669,24 @@ export namespace Prisma {
     UserID?: true
     User_Email?: true
     User_Password?: true
+    resetToken?: true
+    resetTokenExpiry?: true
   }
 
   export type UserMaxAggregateInputType = {
     UserID?: true
     User_Email?: true
     User_Password?: true
+    resetToken?: true
+    resetTokenExpiry?: true
   }
 
   export type UserCountAggregateInputType = {
     UserID?: true
     User_Email?: true
     User_Password?: true
+    resetToken?: true
+    resetTokenExpiry?: true
     _all?: true
   }
 
@@ -1765,6 +1780,8 @@ export namespace Prisma {
     UserID: number
     User_Email: string
     User_Password: string
+    resetToken: string | null
+    resetTokenExpiry: Date | null
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -1790,6 +1807,8 @@ export namespace Prisma {
     UserID?: boolean
     User_Email?: boolean
     User_Password?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
     profile?: boolean | User$profileArgs<ExtArgs>
     tasks?: boolean | User$tasksArgs<ExtArgs>
     category?: boolean | User$categoryArgs<ExtArgs>
@@ -1801,21 +1820,27 @@ export namespace Prisma {
     UserID?: boolean
     User_Email?: boolean
     User_Password?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     UserID?: boolean
     User_Email?: boolean
     User_Password?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
     UserID?: boolean
     User_Email?: boolean
     User_Password?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"UserID" | "User_Email" | "User_Password", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"UserID" | "User_Email" | "User_Password" | "resetToken" | "resetTokenExpiry", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     profile?: boolean | User$profileArgs<ExtArgs>
     tasks?: boolean | User$tasksArgs<ExtArgs>
@@ -1838,6 +1863,8 @@ export namespace Prisma {
       UserID: number
       User_Email: string
       User_Password: string
+      resetToken: string | null
+      resetTokenExpiry: Date | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2268,6 +2295,8 @@ export namespace Prisma {
     readonly UserID: FieldRef<"User", 'Int'>
     readonly User_Email: FieldRef<"User", 'String'>
     readonly User_Password: FieldRef<"User", 'String'>
+    readonly resetToken: FieldRef<"User", 'String'>
+    readonly resetTokenExpiry: FieldRef<"User", 'DateTime'>
   }
     
 
@@ -9602,7 +9631,9 @@ export namespace Prisma {
   export const UserScalarFieldEnum: {
     UserID: 'UserID',
     User_Email: 'User_Email',
-    User_Password: 'User_Password'
+    User_Password: 'User_Password',
+    resetToken: 'resetToken',
+    resetTokenExpiry: 'resetTokenExpiry'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -9721,6 +9752,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
    * Reference to a field of type 'TaskStatus'
    */
   export type EnumTaskStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TaskStatus'>
@@ -9756,13 +9794,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'DateTime'
-   */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -9779,6 +9810,8 @@ export namespace Prisma {
     UserID?: IntFilter<"User"> | number
     User_Email?: StringFilter<"User"> | string
     User_Password?: StringFilter<"User"> | string
+    resetToken?: StringNullableFilter<"User"> | string | null
+    resetTokenExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
     profile?: XOR<ProfileNullableScalarRelationFilter, profileWhereInput> | null
     tasks?: TaskListRelationFilter
     category?: CategoryListRelationFilter
@@ -9789,6 +9822,8 @@ export namespace Prisma {
     UserID?: SortOrder
     User_Email?: SortOrder
     User_Password?: SortOrder
+    resetToken?: SortOrderInput | SortOrder
+    resetTokenExpiry?: SortOrderInput | SortOrder
     profile?: profileOrderByWithRelationInput
     tasks?: taskOrderByRelationAggregateInput
     category?: categoryOrderByRelationAggregateInput
@@ -9802,6 +9837,8 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     User_Password?: StringFilter<"User"> | string
+    resetToken?: StringNullableFilter<"User"> | string | null
+    resetTokenExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
     profile?: XOR<ProfileNullableScalarRelationFilter, profileWhereInput> | null
     tasks?: TaskListRelationFilter
     category?: CategoryListRelationFilter
@@ -9812,6 +9849,8 @@ export namespace Prisma {
     UserID?: SortOrder
     User_Email?: SortOrder
     User_Password?: SortOrder
+    resetToken?: SortOrderInput | SortOrder
+    resetTokenExpiry?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -9826,6 +9865,8 @@ export namespace Prisma {
     UserID?: IntWithAggregatesFilter<"User"> | number
     User_Email?: StringWithAggregatesFilter<"User"> | string
     User_Password?: StringWithAggregatesFilter<"User"> | string
+    resetToken?: StringNullableWithAggregatesFilter<"User"> | string | null
+    resetTokenExpiry?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   }
 
   export type taskWhereInput = {
@@ -10241,6 +10282,8 @@ export namespace Prisma {
   export type UserCreateInput = {
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     profile?: profileCreateNestedOneWithoutUserInput
     tasks?: taskCreateNestedManyWithoutUserInput
     category?: categoryCreateNestedManyWithoutUserInput
@@ -10251,6 +10294,8 @@ export namespace Prisma {
     UserID?: number
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     profile?: profileUncheckedCreateNestedOneWithoutUserInput
     tasks?: taskUncheckedCreateNestedManyWithoutUserInput
     category?: categoryUncheckedCreateNestedManyWithoutUserInput
@@ -10260,6 +10305,8 @@ export namespace Prisma {
   export type UserUpdateInput = {
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     profile?: profileUpdateOneWithoutUserNestedInput
     tasks?: taskUpdateManyWithoutUserNestedInput
     category?: categoryUpdateManyWithoutUserNestedInput
@@ -10270,6 +10317,8 @@ export namespace Prisma {
     UserID?: IntFieldUpdateOperationsInput | number
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     profile?: profileUncheckedUpdateOneWithoutUserNestedInput
     tasks?: taskUncheckedUpdateManyWithoutUserNestedInput
     category?: categoryUncheckedUpdateManyWithoutUserNestedInput
@@ -10280,17 +10329,23 @@ export namespace Prisma {
     UserID?: number
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
   }
 
   export type UserUpdateManyMutationInput = {
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
     UserID?: IntFieldUpdateOperationsInput | number
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type taskCreateInput = {
@@ -10634,7 +10689,6 @@ export namespace Prisma {
     Pomo_Task_Status?: boolean
     Pomo_Completed_Count?: number
     Pomo_Target_Count?: number
-    SessionId?:number
     session: pomodoro_sessionsCreateNestedOneWithoutPomodoro_taskInput
   }
 
@@ -10656,7 +10710,6 @@ export namespace Prisma {
     Pomo_Task_Status?: BoolFieldUpdateOperationsInput | boolean
     Pomo_Completed_Count?: IntFieldUpdateOperationsInput | number
     Pomo_Target_Count?: IntFieldUpdateOperationsInput | number
-    SessionId?: number
     session?: pomodoro_sessionsUpdateOneRequiredWithoutPomodoro_taskNestedInput
   }
 
@@ -10727,6 +10780,31 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type ProfileNullableScalarRelationFilter = {
     is?: profileWhereInput | null
     isNot?: profileWhereInput | null
@@ -10750,6 +10828,11 @@ export namespace Prisma {
     none?: pomodoro_sessionsWhereInput
   }
 
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type taskOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -10766,6 +10849,8 @@ export namespace Prisma {
     UserID?: SortOrder
     User_Email?: SortOrder
     User_Password?: SortOrder
+    resetToken?: SortOrder
+    resetTokenExpiry?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -10776,12 +10861,16 @@ export namespace Prisma {
     UserID?: SortOrder
     User_Email?: SortOrder
     User_Password?: SortOrder
+    resetToken?: SortOrder
+    resetTokenExpiry?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
     UserID?: SortOrder
     User_Email?: SortOrder
     User_Password?: SortOrder
+    resetToken?: SortOrder
+    resetTokenExpiry?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -10821,7 +10910,7 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type StringNullableFilter<$PrismaModel = never> = {
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | null
     notIn?: string[] | null
@@ -10832,7 +10921,24 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type EnumTaskStatusFilter<$PrismaModel = never> = {
@@ -10851,11 +10957,6 @@ export namespace Prisma {
     every?: task_categoryWhereInput
     some?: task_categoryWhereInput
     none?: task_categoryWhereInput
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
   }
 
   export type task_categoryOrderByRelationAggregateInput = {
@@ -10912,23 +11013,6 @@ export namespace Prisma {
   export type taskSumOrderByAggregateInput = {
     TaskID?: SortOrder
     UserID?: SortOrder
-  }
-
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type EnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -11313,6 +11397,14 @@ export namespace Prisma {
     set?: string
   }
 
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type profileUpdateOneWithoutUserNestedInput = {
     create?: XOR<profileCreateWithoutUserInput, profileUncheckedCreateWithoutUserInput>
     connectOrCreate?: profileCreateOrConnectWithoutUserInput
@@ -11443,10 +11535,6 @@ export namespace Prisma {
     connectOrCreate?: task_categoryCreateOrConnectWithoutTaskInput | task_categoryCreateOrConnectWithoutTaskInput[]
     createMany?: task_categoryCreateManyTaskInputEnvelope
     connect?: task_categoryWhereUniqueInput | task_categoryWhereUniqueInput[]
-  }
-
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
   }
 
   export type EnumTaskStatusFieldUpdateOperationsInput = {
@@ -11702,6 +11790,31 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | null
+    notIn?: string[] | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -11746,27 +11859,6 @@ export namespace Prisma {
     _max?: NestedStringFilter<$PrismaModel>
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | null
-    notIn?: string[] | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
-  export type NestedEnumTaskStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.TaskStatus | EnumTaskStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.TaskStatus[]
-    notIn?: $Enums.TaskStatus[]
-    not?: NestedEnumTaskStatusFilter<$PrismaModel> | $Enums.TaskStatus
-  }
-
   export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel> | null
     in?: string[] | null
@@ -11793,6 +11885,27 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumTaskStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.TaskStatus | EnumTaskStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.TaskStatus[]
+    notIn?: $Enums.TaskStatus[]
+    not?: NestedEnumTaskStatusFilter<$PrismaModel> | $Enums.TaskStatus
   }
 
   export type NestedEnumTaskStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -12126,6 +12239,8 @@ export namespace Prisma {
   export type UserCreateWithoutTasksInput = {
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     profile?: profileCreateNestedOneWithoutUserInput
     category?: categoryCreateNestedManyWithoutUserInput
     pomodoro_sessions?: pomodoro_sessionsCreateNestedManyWithoutUserInput
@@ -12135,6 +12250,8 @@ export namespace Prisma {
     UserID?: number
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     profile?: profileUncheckedCreateNestedOneWithoutUserInput
     category?: categoryUncheckedCreateNestedManyWithoutUserInput
     pomodoro_sessions?: pomodoro_sessionsUncheckedCreateNestedManyWithoutUserInput
@@ -12176,6 +12293,8 @@ export namespace Prisma {
   export type UserUpdateWithoutTasksInput = {
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     profile?: profileUpdateOneWithoutUserNestedInput
     category?: categoryUpdateManyWithoutUserNestedInput
     pomodoro_sessions?: pomodoro_sessionsUpdateManyWithoutUserNestedInput
@@ -12185,6 +12304,8 @@ export namespace Prisma {
     UserID?: IntFieldUpdateOperationsInput | number
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     profile?: profileUncheckedUpdateOneWithoutUserNestedInput
     category?: categoryUncheckedUpdateManyWithoutUserNestedInput
     pomodoro_sessions?: pomodoro_sessionsUncheckedUpdateManyWithoutUserNestedInput
@@ -12217,6 +12338,8 @@ export namespace Prisma {
   export type UserCreateWithoutProfileInput = {
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     tasks?: taskCreateNestedManyWithoutUserInput
     category?: categoryCreateNestedManyWithoutUserInput
     pomodoro_sessions?: pomodoro_sessionsCreateNestedManyWithoutUserInput
@@ -12226,6 +12349,8 @@ export namespace Prisma {
     UserID?: number
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     tasks?: taskUncheckedCreateNestedManyWithoutUserInput
     category?: categoryUncheckedCreateNestedManyWithoutUserInput
     pomodoro_sessions?: pomodoro_sessionsUncheckedCreateNestedManyWithoutUserInput
@@ -12250,6 +12375,8 @@ export namespace Prisma {
   export type UserUpdateWithoutProfileInput = {
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tasks?: taskUpdateManyWithoutUserNestedInput
     category?: categoryUpdateManyWithoutUserNestedInput
     pomodoro_sessions?: pomodoro_sessionsUpdateManyWithoutUserNestedInput
@@ -12259,6 +12386,8 @@ export namespace Prisma {
     UserID?: IntFieldUpdateOperationsInput | number
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     tasks?: taskUncheckedUpdateManyWithoutUserNestedInput
     category?: categoryUncheckedUpdateManyWithoutUserNestedInput
     pomodoro_sessions?: pomodoro_sessionsUncheckedUpdateManyWithoutUserNestedInput
@@ -12267,6 +12396,8 @@ export namespace Prisma {
   export type UserCreateWithoutCategoryInput = {
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     profile?: profileCreateNestedOneWithoutUserInput
     tasks?: taskCreateNestedManyWithoutUserInput
     pomodoro_sessions?: pomodoro_sessionsCreateNestedManyWithoutUserInput
@@ -12276,6 +12407,8 @@ export namespace Prisma {
     UserID?: number
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     profile?: profileUncheckedCreateNestedOneWithoutUserInput
     tasks?: taskUncheckedCreateNestedManyWithoutUserInput
     pomodoro_sessions?: pomodoro_sessionsUncheckedCreateNestedManyWithoutUserInput
@@ -12317,6 +12450,8 @@ export namespace Prisma {
   export type UserUpdateWithoutCategoryInput = {
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     profile?: profileUpdateOneWithoutUserNestedInput
     tasks?: taskUpdateManyWithoutUserNestedInput
     pomodoro_sessions?: pomodoro_sessionsUpdateManyWithoutUserNestedInput
@@ -12326,6 +12461,8 @@ export namespace Prisma {
     UserID?: IntFieldUpdateOperationsInput | number
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     profile?: profileUncheckedUpdateOneWithoutUserNestedInput
     tasks?: taskUncheckedUpdateManyWithoutUserNestedInput
     pomodoro_sessions?: pomodoro_sessionsUncheckedUpdateManyWithoutUserNestedInput
@@ -12470,6 +12607,8 @@ export namespace Prisma {
   export type UserCreateWithoutPomodoro_sessionsInput = {
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     profile?: profileCreateNestedOneWithoutUserInput
     tasks?: taskCreateNestedManyWithoutUserInput
     category?: categoryCreateNestedManyWithoutUserInput
@@ -12479,6 +12618,8 @@ export namespace Prisma {
     UserID?: number
     User_Email: string
     User_Password: string
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     profile?: profileUncheckedCreateNestedOneWithoutUserInput
     tasks?: taskUncheckedCreateNestedManyWithoutUserInput
     category?: categoryUncheckedCreateNestedManyWithoutUserInput
@@ -12531,6 +12672,8 @@ export namespace Prisma {
   export type UserUpdateWithoutPomodoro_sessionsInput = {
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     profile?: profileUpdateOneWithoutUserNestedInput
     tasks?: taskUpdateManyWithoutUserNestedInput
     category?: categoryUpdateManyWithoutUserNestedInput
@@ -12540,6 +12683,8 @@ export namespace Prisma {
     UserID?: IntFieldUpdateOperationsInput | number
     User_Email?: StringFieldUpdateOperationsInput | string
     User_Password?: StringFieldUpdateOperationsInput | string
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     profile?: profileUncheckedUpdateOneWithoutUserNestedInput
     tasks?: taskUncheckedUpdateManyWithoutUserNestedInput
     category?: categoryUncheckedUpdateManyWithoutUserNestedInput

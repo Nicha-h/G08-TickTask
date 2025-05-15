@@ -35,6 +35,8 @@ model User {
   profile profile?
   User_Email String @unique
   User_Password  String
+  resetToken     String?     
+  resetTokenExpiry DateTime? 
   tasks task[]
   category category[]
 
