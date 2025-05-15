@@ -9,4 +9,5 @@ UserRoutes.get('/profile', authMiddleware, UserController.fetchProfileController
 UserRoutes.post('/signup', UserController.createUserController); 
 UserRoutes.post('/login', UserController.loginUserController);
 UserRoutes.put('/profile', authMiddleware, UserController.updateProfileController);
+
 export default UserRoutes;

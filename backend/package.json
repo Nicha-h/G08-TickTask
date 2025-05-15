@@ -10,6 +10,7 @@
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.7",
+    "formidable": "^3.5.4",
     "hono": "^4.7.5",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.0",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.11.17",
     "prisma": "^6.7.0",

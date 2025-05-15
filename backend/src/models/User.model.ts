@@ -12,7 +12,7 @@ export async function createUserInDb(email: string, plainPassword: string) {
         create: {
           Username: email,
           User_profile_icon_type: 'preset',
-          User_profile_icon_path: 'default_icon.png'
+          User_profile_icon_path: '../../assets/ProfilePics/men1.svg'
         }
       },
       category: {

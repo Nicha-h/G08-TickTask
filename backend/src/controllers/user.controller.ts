@@ -5,6 +5,10 @@ import { createUserInDb, fetchProfile, updateProfile } from '../models/User.mode
 import  jwt  from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
+import { IncomingForm } from 'formidable';
+import fs from 'fs';
+import path from 'path';
+
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -109,6 +113,4 @@ export async function updateProfileController(c: Context) {
     return c.json({ error: 'Failed to update profile' }, 500);
   }
 }
-
-
 

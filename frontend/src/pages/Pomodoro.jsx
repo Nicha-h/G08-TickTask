@@ -23,10 +23,11 @@ function Pomodoro() {
   };
 
   const modes = {
-    'Pomodoro': 25 * 60,   
-    'Short - Break': 5 * 60, 
-    'Long - Break': 15 * 60, 
-  };
+  'Pomodoro': 25 * 60,
+  'Short - Break': activeTask?.Pomo_Task_Short ? activeTask.Pomo_Task_Short * 60 : 5 * 60,
+  'Long - Break': activeTask?.Pomo_Task_Long ? activeTask.Pomo_Task_Long * 60 : 15 * 60,
+};
+
 
   useEffect(() => {
     if (intervalId) {
