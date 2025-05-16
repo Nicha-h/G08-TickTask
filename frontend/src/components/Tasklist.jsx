@@ -24,7 +24,7 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
 
   const location = useLocation();
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
-  const simplifiedTasks = isHomePage ? tasks.slice(0, 4) : tasks;
+  
 
   const iconMap = {
     pet: iconPet,
@@ -76,7 +76,7 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
     const timeB = b.Task_Start_Time.split(':').map(Number);
     return timeA[0] - timeB[0] || timeA[1] - timeB[1];  
   });
-
+  const simplifiedTasks = isHomePage ? sortedTasks.slice(0, 4) : sortedTasks;
   if (loading) return <div className="flex justify-center py-4">Loading tasks...</div>;
   if (error) return <div className="text-red-500 text-center py-4">Error: {error}</div>;
 
@@ -94,7 +94,7 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
       </div>
 
       {simplifiedTasks.length > 0 ? (
-        sortedTasks.map((task, index) => (
+        simplifiedTasks.map((task, index) => (
           <div 
             key={task.id || index} 
             className={`border-2 rounded-[10px] p-4 w-full max-w-[708px] h-[70px] flex items-center 
