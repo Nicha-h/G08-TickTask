@@ -35,12 +35,18 @@ export async function fetchProfile(userid: number) {
   const profile = await db.profile.findUnique({
     where: {
       UserID: userid
+    },
+    include: {
+      user: {
+        select: {
+          User_Email: true
+        }
+      }
     }
   });
   
   return profile;
 }
-
 export async function updateProfile(userid: number, data: {
   name?: string;
   iconType?: string;

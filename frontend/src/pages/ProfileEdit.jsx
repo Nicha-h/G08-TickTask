@@ -2,22 +2,45 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Men1 from "../assets/ProfilePics/men1.svg";
 import { useNavigate } from "react-router-dom";
 import ProfilePic from "../components/modals/ProfilePic";
 import { useWindowSize } from "../hooks/useWindowSize";
 import ConfirmLogout from "../components/modals/ConfirmLogout";
 
+import Men1 from "../assets/ProfilePics/men1.svg";
+import Men2 from "../assets/ProfilePics/men 2.svg";
+import Men3 from "../assets/ProfilePics/men3.svg";
+import Men4 from "../assets/ProfilePics/men 4.svg";
+import Men5 from "../assets/ProfilePics/men 5.svg";
+import Men from "../assets/ProfilePics/men.svg";
+import Women1 from "../assets/ProfilePics/women 1.svg";
+import Women2 from "../assets/ProfilePics/women 2.svg";
+import Women3 from "../assets/ProfilePics/women 3.svg";
+import Women from "../assets/ProfilePics/women.svg";
+
 function ProfileEdit() {
   const [user, setUser] = useState(null);
-  const [profilePicture, setProfilePicture] = useState(Men1);
+  const [profilePicture, setProfilePicture] = useState("Men1");
   const [loading, setLoading] = useState(true);
   const [showProfilePicModal, setShowProfilePicModal] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const navigate = useNavigate();
   const { width } = useWindowSize();
   const isMobile = width <= 768;
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
+  
+  const presetMap = {
+    Men1,
+    Men2,
+    Men3,
+    Men4,
+    Men5,
+    Men,
+    Women1,
+    Women2,
+    Women3,
+    Women,
+  };
 
   const userSchema = z.object({
     username: z.string().min(1, "Username is required"),
@@ -32,78 +55,135 @@ function ProfileEdit() {
   } = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      name: "",
+      username: "",
       email: "",
     },
   });
 
-  useEffect(() => {
-  async function fetchUser() {
-    try {
-      const userData = await new Promise((resolve) =>
-        setTimeout(
-          () =>
-            resolve({
-              Username: "SigmaBoy",
-              User_Email: "admin@gmail.com",
-            }),
-          1000
-        )
-      );
-
-      setUser(userData);
-      setProfilePicture(userData.User_profile_icon_path || Men1);
-      reset({
-        username: userData.Username,
-        email: userData.User_Email,
-      });
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-    } finally {
-      setLoading(false);
+  // Helper function to get profile picture source
+  const getProfilePicSrc = (picturePath) => {
+    if (!picturePath) return Men1;
+    
+    if (picturePath.startsWith("data:image")) {
+      return picturePath;
     }
-  }
+    
+    // If it's a preset image name
+    if (presetMap[picturePath]) {
+      return presetMap[picturePath];
+    }
+    
+    return Men1;
+  };
 
-  fetchUser();
-}, [reset]);
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
 
+        const response = await fetch("http://localhost:3000/api/users/profile", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.removeItem("token");
+            navigate("/login");
+            return;
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const userData = await response.json();
+        console.log("Fetched user data:", userData);
+
+        setUser(userData);
+        setProfilePicture(userData.User_profile_icon_path || "Men1");
+
+        reset({
+          username: userData.Username || "",
+          email: userData.user?.User_Email || userData.User_Email || "",
+        });
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+        // You might want to show a user-friendly error message here
+        alert("Failed to load profile data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUser();
+  }, [reset, navigate]);
 
   const handleProfilePicSelect = (pic) => {
     console.log("User picked:", pic.name);
-    setProfilePicture(pic.src);
+    setProfilePicture(pic.name === "CustomUpload" ? pic.src : pic.name);
   };
 
   const onSubmit = async (data) => {
-  const payload = {
-    name: data.username,
-    iconType: "preset", 
-    iconPath: profilePicture, 
-  };
+    setIsUpdating(true);
+    
+    const payload = {
+      name: data.username,
+      iconType: profilePicture.startsWith("data:image") ? "custom" : "preset",
+      iconPath: profilePicture,
+    };
 
-  try {
-    const res = await fetch("http://localhost:3000/api/users/profile", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`, 
-      },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
 
-    const result = await res.json();
+      const res = await fetch("http://localhost:3000/api/users/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
-    if (!res.ok) {
-      throw new Error(result.error || "Update failed");
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Update failed");
+      }
+
+      // Fetch updated user data to reflect changes
+      const updatedResponse = await fetch("http://localhost:3000/api/users/profile", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (updatedResponse.ok) {
+        const updatedUser = await updatedResponse.json();
+        setUser(updatedUser);
+        setProfilePicture(updatedUser.User_profile_icon_path || "Men1");
+      }
+
+      alert("Profile updated successfully!");
+      navigate("/home");
+    } catch (err) {
+      console.error("Profile update failed:", err);
+      alert(`Failed to update profile: ${err.message}`);
+    } finally {
+      setIsUpdating(false);
     }
-
-    alert("Profile updated successfully!");
-    navigate("/home");
-  } catch (err) {
-    console.error("Profile update failed:", err);
-    alert("Failed to update profile");
-  }
-};
-
+  };
 
   if (loading) {
     return (
@@ -117,26 +197,25 @@ function ProfileEdit() {
   }
 
   return (
-    
     <div className="flex justify-center items-center min-h-screen w-full bg-white font-poppins">
       {isMobile && (
         <div className="absolute top-4 right-4">
-        <button
-          onClick={() => setShowLogoutModal(true)}
-          className="border-2 border-black bg-red-500 font-poppins text-white font-black py-1 px-2  rounded-lg hover:bg-red-600 hover:scale-105 transition duration-200"
-        >
-          Sign out
-        </button>
-      </div>
-          
-        )}
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="border-2 border-black bg-red-500 font-poppins text-white font-black py-1 px-2 rounded-lg hover:bg-red-600 hover:scale-105 transition duration-200"
+          >
+            Sign out
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col items-center max-h-screen w-full px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full -mt-30 mr-0 md:-mt-90 md:mr-50 lg:-mt-90 lg:mr-100">
           {/* Left side - Title and Profile Picture */}
           <div className="flex flex-col items-center md:items-end justify-center">
             <h1 className="text-2xl font-bold mb-8">Profile Editor</h1>
             <img
-              src={profilePicture}
+              src={getProfilePicSrc(profilePicture)}
               alt="Profile"
               className="w-[120px] h-[120px] rounded-full object-cover cursor-pointer hover:opacity-80 transition"
               onClick={() => setShowProfilePicModal(true)}
@@ -146,66 +225,61 @@ function ProfileEdit() {
           {/* Right side - Form */}
           <div className="flex flex-col">
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full gap-4">
-          {/* Username */}
-          <div className="flex flex-col w-full">
-            <label className="text-sm mb-1">Username</label>
-            <input
-              {...register("username")}
-              className="border-2 rounded-lg px-3 py-2 text-sm w-full"
-            />
-            {errors.username && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.username.message}
-              </p>
-            )}
-          </div>
+              {/* Username */}
+              <div className="flex flex-col w-full">
+                <label className="text-sm mb-1">Username</label>
+                <input
+                  {...register("username")}
+                  className="border-2 rounded-lg px-3 py-2 text-sm w-full"
+                  disabled={isUpdating}
+                />
+                {errors.username && (
+                  <p className="text-red-500 text-xs mt-1">{errors.username.message}</p>
+                )}
+              </div>
 
-          {/* Email (read-only) */}
-          <div className="flex flex-col w-full">
-            <div className="flex items-center gap-2">
-              <label className="text-sm mb-1">Email</label>
-              <span className="text-xs text-gray-400">(cannot edit)</span>
-            </div>
-            <input
-              {...register("email")}
-              readOnly
-              className="border-2 bg-gray-100 text-gray-500 rounded-lg px-3 py-2 text-sm w-full cursor-not-allowed"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
+              {/* Email (read-only) */}
+              <div className="flex flex-col w-full">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm mb-1">Email</label>
+                  <span className="text-xs text-gray-400">(cannot edit)</span>
+                </div>
+                <input
+                  {...register("email")}
+                  readOnly
+                  className="border-2 bg-gray-100 text-gray-500 rounded-lg px-3 py-2 text-sm w-full cursor-not-allowed"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+                )}
+              </div>
 
-          {/* Save Button */}
-          <div className="flex justify-center w-full mt-4">
-            <button
-              type="submit"
-              className="w-full bg-primary hover:bg-primary2 text-white font-semibold py-2 rounded-lg transition-all"
-            >
-              SAVE
-            </button>
-          </div>
-        </form>
-
+              {/* Save Button */}
+              <div className="flex justify-center w-full mt-4">
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="w-full bg-primary hover:bg-primary2 text-white font-semibold py-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUpdating ? "SAVING..." : "SAVE"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-        
-        {/* Modal */}
+
+        {/* Profile Picture Modal */}
         {showProfilePicModal && (
-          <ProfilePic
-            onClose={() => setShowProfilePicModal(false)}
-            onSelect={handleProfilePicSelect}
+          <ProfilePic 
+            onClose={() => setShowProfilePicModal(false)} 
+            onSelect={handleProfilePicSelect} 
           />
         )}
 
+        {/* Logout Modal */}
         {showLogoutModal && (
-          <ConfirmLogout
-            onClose={() => setShowLogoutModal(false)}
-          />
+          <ConfirmLogout onClose={() => setShowLogoutModal(false)} />
         )}
-
       </div>
     </div>
   );

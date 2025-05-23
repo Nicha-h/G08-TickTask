@@ -7,6 +7,7 @@ import edit from '@iconify-icons/mdi/pencil-outline'
 import signout from '@iconify-icons/mdi/sign-out-variant'
 import { Icon } from '@iconify/react/dist/iconify.js';
 import ConfirmLogout from './modals/ConfirmLogout';
+import axios from 'axios';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,6 +17,9 @@ function Navbar() {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [picture, setPicture] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleClick = (buttonName) => {
     setActiveButton(buttonName);
@@ -25,8 +29,12 @@ function Navbar() {
   const handleProfileClick = () => {
     setShowDropdown(prev => !prev); // toggle dropdown
   };
+  useEffect(() => {
+  fetchprofile();
+}, []);
 
   useEffect(() => {
+    
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
@@ -39,6 +47,23 @@ function Navbar() {
     };
   }, []);
 
+  const fetchprofile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`http://localhost:3000/api/users/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      console.log("Profile response:", response.data);
+      setPicture(response.data.User_profile_icon_path);
+    } catch (err) {
+      console.error("Error fetching username:", err);
+      setError("Failed to fetch user data");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex flex-col items-center w-full">
       
@@ -109,7 +134,7 @@ function Navbar() {
             <img
               onClick={handleProfileClick}
               className="hover:scale-105 transition-all duration-200 ease-in-out transform cursor-pointer"
-              src={Men1}
+              src={picture}
               alt="profile"
             />
             

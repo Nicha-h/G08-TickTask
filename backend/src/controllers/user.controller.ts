@@ -84,10 +84,10 @@ export async function loginUserController(c: Context) {
 }
 
 export async function fetchProfileController(c: Context) {
-    try {
-      const user = c.get('user'); 
-      const profile = await fetchProfile(user.id);
-      return c.json(profile);
+  try {
+    const user = c.get('user'); 
+    const profile = await fetchProfile(user.id);
+    return c.json(profile);
 
     } catch (err) {
       console.error(err);
