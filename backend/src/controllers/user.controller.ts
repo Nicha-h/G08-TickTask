@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-
+import cloudinary from '../utils/Cloudinary.js';
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -110,6 +110,32 @@ export async function updateProfileController(c: Context) {
   } catch (err) {
     console.error(err);
     return c.json({ error: 'Failed to update profile' }, 500);
+  }
+}
+
+export async function uploadProfilePicController(c: Context) {
+  const body = await c.req.parseBody(); 
+  const file = body.image as File;
+
+  if (!file) {
+    return c.json({ error: 'No file uploaded' }, 400);
+  }
+
+  const buffer = await file.arrayBuffer();
+  const base64 = Buffer.from(buffer).toString('base64');
+  const dataUri = `data:${file.type};base64,${base64}`;
+
+  try {
+    const result = await cloudinary.uploader.upload(dataUri, {
+      folder: 'ticktask/profiles',
+      transformation: [{ width: 200, height: 200, crop: 'fill' }],
+      
+    });
+
+    return c.json({ imageUrl: result.secure_url });
+  } catch (err) {
+    console.error(err);
+    return c.json({ error: 'Failed to upload image' }, 500);
   }
 }
 

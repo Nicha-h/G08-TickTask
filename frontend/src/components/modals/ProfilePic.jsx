@@ -28,6 +28,7 @@ const pictures = [
 
 function ProfilePic({ onClose, onSelect }) {
   const [isClosing, setIsClosing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef(null);
 
   const closeModal = () => {
@@ -47,15 +48,63 @@ function ProfilePic({ onClose, onSelect }) {
     fileInputRef.current.click(); 
   };
 
-  const handleFileChange = (e) => {
+  const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const res = await fetch("http://localhost:3000/api/users/profile/upload-profile-pic", {
+    method: "POST",
+    body: formData,
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error(result.error || "Upload failed");
+  }
+
+  return result.imageUrl; 
+};
+
+
+
+
+
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onSelect({ name: 'CustomUpload', src: reader.result });
-        closeModal();
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    // Validate file size (e.g., max 5MB)
+    const maxSize = 5 * 20 * 20; // 5MB in bytes
+    if (file.size > maxSize) {
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const imageUrl = await uploadToCloudinary(file);
+        onSelect({
+          name: 'custom',
+          src: imageUrl,
+          isCloudinary: true,
+        });
+
+
+      
+      closeModal();
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('Failed to upload image. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -82,23 +131,36 @@ function ProfilePic({ onClose, onSelect }) {
                 />
               </div>
             ))}
+            
             {/* Upload circle */}
             <div
-              onClick={handleUploadClick}
-              className="w-[80px] sm:w-[90px] h-[80px] sm:h-[90px] bg-gray-200 flex items-center justify-center rounded-full cursor-pointer hover:scale-105 transition"
+              onClick={!isUploading ? handleUploadClick : undefined}
+              className={`w-[80px] sm:w-[90px] h-[80px] sm:h-[90px] bg-gray-200 flex items-center justify-center rounded-full cursor-pointer hover:scale-105 transition ${
+                isUploading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
-              <Icon icon={Camera} alt="Upload" className="w-6 sm:w-8 md:w-10 h-6 sm:h-8 md:h-10 text-gray-500" />
+              {isUploading ? (
+                <div className="w-6 h-6 border-2 border-gray-400 border-t-blue-500 rounded-full animate-spin"></div>
+              ) : (
+                <Icon icon={Camera} alt="Upload" className="w-6 sm:w-8 md:w-10 h-6 sm:h-8 md:h-10 text-gray-500" />
+              )}
               <input
                 type="file"
                 accept="image/*"
                 ref={fileInputRef}
                 className="hidden"
                 onChange={handleFileChange}
+                disabled={isUploading}
               />
             </div>
           </div>
         </div>
 
+        {isUploading && (
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">Uploading image...</p>
+          </div>
+        )}
       </div>
     </div>
   );

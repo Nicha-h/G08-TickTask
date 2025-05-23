@@ -48,29 +48,33 @@ function Navbar() {
 
   // Helper function to get profile picture source
   const getProfilePicSrc = (picturePath) => {
-    if (!picturePath) return Men1;
-    
-    // If it's a base64 custom image
-    if (picturePath.startsWith("data:image")) {
-      return picturePath;
-    }
-    
-    // If it's a preset image name
-    if (presetMap[picturePath]) {
-      return presetMap[picturePath];
-    }
-    
-    // Default fallback
-    return Men1;
-  };
+  if (!picturePath) return Men1;
+
+  // If it's a base64 custom image
+  if (picturePath.startsWith("data:image")) {
+    return picturePath;
+  }
+
+  // If it's a full URL (including Cloudinary links)
+  if (picturePath.startsWith("http://") || picturePath.startsWith("https://")) {
+    return picturePath;
+  }
+
+  if (presetMap[picturePath]) {
+    return presetMap[picturePath];
+  }
+
+  return Men1;
+};
+
 
   const handleClick = (buttonName) => {
     setActiveButton(buttonName);
-    setShowDropdown(false); // hide dropdown when navigating
+    setShowDropdown(false); 
   };
 
   const handleProfileClick = () => {
-    setShowDropdown(prev => !prev); // toggle dropdown
+    setShowDropdown(prev => !prev);
   };
 
   useEffect(() => {
@@ -108,7 +112,6 @@ function Navbar() {
       } catch (err) {
         console.error("Failed to fetch user:", err);
         setError("Failed to load profile data");
-        // Don't show alert in navbar, just use fallback
       } finally {
         setLoading(false);
       }

@@ -45,7 +45,6 @@ function ProfileEdit() {
 
   const userSchema = z.object({
     username: z.string().min(1, "Username is required"),
-    email: z.string().email("Please enter a valid email"),
   });
 
   const {
@@ -61,21 +60,30 @@ function ProfileEdit() {
     },
   });
 
-  // Helper function to get profile picture source
   const getProfilePicSrc = (picturePath) => {
-    if (!picturePath) return Men1;
-    
-    if (picturePath.startsWith("data:image")) {
-      return picturePath;
-    }
-    
-    // If it's a preset image name
-    if (presetMap[picturePath]) {
-      return presetMap[picturePath];
-    }
-    
-    return Men1;
-  };
+  if (!picturePath) return Men1;
+
+  const src = typeof picturePath === 'string'
+    ? picturePath
+    : picturePath?.src;
+
+  if (typeof src !== 'string') return Men1; // Ensure it's a string
+
+  if (src.startsWith("data:image")) {
+    return src;
+  }
+
+  if (src.startsWith('http')) {
+    return src;
+  }
+
+  if (presetMap[src]) {
+    return presetMap[src];
+  }
+
+  return Men1; // fallback
+};
+
 
   useEffect(() => {
     async function fetchUser() {
@@ -115,7 +123,6 @@ function ProfileEdit() {
         });
       } catch (err) {
         console.error("Failed to fetch user:", err);
-        // You might want to show a user-friendly error message here
         alert("Failed to load profile data. Please try again.");
       } finally {
         setLoading(false);
@@ -126,65 +133,86 @@ function ProfileEdit() {
   }, [reset, navigate]);
 
   const handleProfilePicSelect = (pic) => {
-    console.log("User picked:", pic.name);
-    setProfilePicture(pic.name === "CustomUpload" ? pic.src : pic.name);
-  };
+  console.log("User picked:", pic.name);
+  if (pic.isCloudinary) {
+    setProfilePicture(pic.src);
+  } else if (pic.name === "CustomUpload") {
+    setProfilePicture(pic.src);
+  } else {
+    setProfilePicture(pic.name);
+  }
+};
 
   const onSubmit = async (data) => {
-    setIsUpdating(true);
-    
-    const payload = {
-      name: data.username,
-      iconType: profilePicture.startsWith("data:image") ? "custom" : "preset",
-      iconPath: profilePicture,
-    };
+  setIsUpdating(true);
 
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
+  const formName = data.username;
 
-      const res = await fetch("http://localhost:3000/api/users/profile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+  let selectedPic = { name: "preset", src: profilePicture };
 
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || "Update failed");
-      }
-
-      // Fetch updated user data to reflect changes
-      const updatedResponse = await fetch("http://localhost:3000/api/users/profile", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (updatedResponse.ok) {
-        const updatedUser = await updatedResponse.json();
-        setUser(updatedUser);
-        setProfilePicture(updatedUser.User_profile_icon_path || "Men1");
-      }
-
-      alert("Profile updated successfully!");
-      navigate("/home");
-    } catch (err) {
-      console.error("Profile update failed:", err);
-      alert(`Failed to update profile: ${err.message}`);
-    } finally {
-      setIsUpdating(false);
-    }
+  if (profilePicture.startsWith("data:image")) {
+    selectedPic = { name: "custom", src: profilePicture };
+  } else if (profilePicture.startsWith("https://res.cloudinary.com")) {
+    selectedPic = { name: "cloudinary", src: profilePicture };
+  } else {
+    selectedPic = { name: profilePicture, src: profilePicture };
+  }
+  const payload = {
+    name: formName,
+    iconType: selectedPic.name === "custom" ? "custom" : "preset",
+    iconPath: selectedPic.src,
   };
+
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const res = await fetch("http://localhost:3000/api/users/profile", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || "Profile update failed");
+    }
+
+    alert("Profile updated!");
+
+    const updatedResponse = await fetch("http://localhost:3000/api/users/profile", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (updatedResponse.ok) {
+      const updatedUser = await updatedResponse.json();
+      setUser(updatedUser);
+      setProfilePicture(updatedUser.User_profile_icon_path || "Men1");
+      reset({
+        username: updatedUser.Username || "",
+        email: updatedUser.user?.User_Email || updatedUser.User_Email || "",
+      });
+    }
+
+    navigate("/home");
+  } catch (error) {
+    console.error("Profile update failed:", error);
+    alert("Failed to update profile");
+  } finally {
+    setIsUpdating(false);
+  }
+};
+
 
   if (loading) {
     return (
@@ -221,6 +249,7 @@ function ProfileEdit() {
               className="w-[120px] h-[120px] rounded-full object-cover cursor-pointer hover:opacity-80 transition"
               onClick={() => setShowProfilePicModal(true)}
             />
+
           </div>
 
           {/* Right side - Form */}
