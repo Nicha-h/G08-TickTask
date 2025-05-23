@@ -1,25 +1,67 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Logo from '../assets/Logo.svg';
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import Men1 from '../assets/ProfilePics/men1.svg';
 import SearchIcon from '../assets/Search.svg';
 import edit from '@iconify-icons/mdi/pencil-outline'
 import signout from '@iconify-icons/mdi/sign-out-variant'
 import { Icon } from '@iconify/react/dist/iconify.js';
 import ConfirmLogout from './modals/ConfirmLogout';
-import axios from 'axios';
+
+import Men1 from "../assets/ProfilePics/men1.svg";
+import Men2 from "../assets/ProfilePics/men 2.svg";
+import Men3 from "../assets/ProfilePics/men3.svg";
+import Men4 from "../assets/ProfilePics/men 4.svg";
+import Men5 from "../assets/ProfilePics/men 5.svg";
+import Men from "../assets/ProfilePics/men.svg";
+import Women1 from "../assets/ProfilePics/women 1.svg";
+import Women2 from "../assets/ProfilePics/women 2.svg";
+import Women3 from "../assets/ProfilePics/women 3.svg";
+import Women from "../assets/ProfilePics/women.svg";
+
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 function Navbar() {
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [activeButton, setActiveButton] = useState('Home');
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [picture, setPicture] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [profilePicture, setProfilePicture] = useState("Men1");
+
+  const presetMap = {
+    Men1,
+    Men2,
+    Men3,
+    Men4,
+    Men5,
+    Men,
+    Women1,
+    Women2,
+    Women3,
+    Women,
+  };
+
+  // Helper function to get profile picture source
+  const getProfilePicSrc = (picturePath) => {
+    if (!picturePath) return Men1;
+    
+    // If it's a base64 custom image
+    if (picturePath.startsWith("data:image")) {
+      return picturePath;
+    }
+    
+    // If it's a preset image name
+    if (presetMap[picturePath]) {
+      return presetMap[picturePath];
+    }
+    
+    // Default fallback
+    return Men1;
+  };
 
   const handleClick = (buttonName) => {
     setActiveButton(buttonName);
@@ -29,12 +71,52 @@ function Navbar() {
   const handleProfileClick = () => {
     setShowDropdown(prev => !prev); // toggle dropdown
   };
-  useEffect(() => {
-  fetchprofile();
-}, []);
 
   useEffect(() => {
-    
+    async function fetchUser() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
+        const response = await fetch("http://localhost:3000/api/users/profile", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            localStorage.removeItem("token");
+            navigate("/login");
+            return;
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const userData = await response.json();
+        console.log("Fetched user data in navbar:", userData);
+
+        setUser(userData);
+        setProfilePicture(userData.User_profile_icon_path || "Men1");
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+        setError("Failed to load profile data");
+        // Don't show alert in navbar, just use fallback
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUser();
+  }, [navigate]);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
@@ -47,26 +129,43 @@ function Navbar() {
     };
   }, []);
 
-  const fetchprofile = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/api/users/profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      console.log("Profile response:", response.data);
-      setPicture(response.data.User_profile_icon_path);
-    } catch (err) {
-      console.error("Error fetching username:", err);
-      setError("Failed to fetch user data");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Show loading state if still fetching
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center w-full">
+        <div className="fixed top-0 w-full bg-white shadow-[0px_4px_8px_0px_rgba(0,0,0,0.25)] z-10 border-2">
+          <div className="flex justify-between items-center max-w-7xl mx-auto p-2 relative">
+            <img className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20" src={Logo} alt="Logo" />
+            <div className="flex justify-center items-center gap-[38px] font-poppins font-semibold">
+              {/* Navigation buttons - you can keep these static during loading */}
+              <NavLink to="/home" className="rounded-xl w-[100px] h-[38px] md:w-[100px] md:h-[38px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black">
+                Home
+              </NavLink>
+              <NavLink to="/pomodoro" className="rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black">
+                Pomodoro
+              </NavLink>
+              <NavLink to="/calendar" className="rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black">
+                Calendar
+              </NavLink>
+              <NavLink to="/overview" className="rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black">
+                Overview
+              </NavLink>
+            </div>
+            <div className="flex flex-row gap-[10px] relative">
+              <img src={SearchIcon} alt="search" />
+              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+        <div className="mt-32 w-full max-w-7xl mx-auto p-4">
+          <Outlet />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center w-full">
-      
       <div className="fixed top-0 w-full bg-white shadow-[0px_4px_8px_0px_rgba(0,0,0,0.25)] z-10 border-2">
         <div className="flex justify-between items-center max-w-7xl mx-auto p-2 relative">
           {/* Logo */}
@@ -133,8 +232,8 @@ function Navbar() {
             />
             <img
               onClick={handleProfileClick}
-              className="hover:scale-105 transition-all duration-200 ease-in-out transform cursor-pointer"
-              src={picture}
+              className="w-15 h-15 rounded-full object-cover hover:scale-105 transition-all duration-200 ease-in-out transform cursor-pointer"
+              src={getProfilePicSrc(profilePicture)}
               alt="profile"
             />
             
@@ -151,13 +250,17 @@ function Navbar() {
                   {/* Top section: Profile info */}
                   <div className="flex items-center gap-3 px-4 mb-2">
                     <img
-                      className="w-12 h-12 rounded-full"
-                      src={Men1}
+                      className="w-13 h-13 rounded-full object-cover"
+                      src={getProfilePicSrc(profilePicture)}
                       alt="profile"
                     />
                     <div className="flex flex-col">
-                      <span className="font-semibold text-black text-sm">SigmaBoy</span>
-                      <span className="text-gray-500 text-xs">admin@gmail.com</span>
+                      <span className="font-semibold text-black text-sm">
+                        {user?.Username || 'Loading...'}
+                      </span>
+                      <span className="text-gray-500 text-xs">
+                        {user?.user?.User_Email || user?.User_Email || 'Loading...'}
+                      </span>
                     </div>
                   </div>
 
@@ -182,7 +285,6 @@ function Navbar() {
                       setShowLogoutModal(true);
                       setShowDropdown(false);
                     }}
-                    
                     className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition rounded-md text-red-500 font-medium"
                   >
                     <Icon icon={signout} className='w-6 h-6'/>
