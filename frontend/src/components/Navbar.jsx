@@ -303,7 +303,7 @@ function Navbar() {
       </div>
               
       {/* Page Content */}
-      <div className="mt-32 w-full max-w-7xl mx-auto p-4">
+      <div className="mt-32 w-full max-w-7xl mx-auto">
         <Outlet />
       </div>
       {showLogoutModal && (
