@@ -32,7 +32,7 @@ function ProfileEdit() {
   } = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
-      username: "",
+      name: "",
       email: "",
     },
   });
@@ -52,7 +52,7 @@ function ProfileEdit() {
       );
 
       setUser(userData);
-
+      setProfilePicture(userData.User_profile_icon_path || Men1);
       reset({
         username: userData.Username,
         email: userData.User_Email,
@@ -73,10 +73,37 @@ function ProfileEdit() {
     setProfilePicture(pic.src);
   };
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", { ...data, profilePicture });
-    navigate("/home");
+  const onSubmit = async (data) => {
+  const payload = {
+    name: data.username,
+    iconType: "preset", 
+    iconPath: profilePicture, 
   };
+
+  try {
+    const res = await fetch("http://localhost:3000/api/users/profile", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`, 
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result.error || "Update failed");
+    }
+
+    alert("Profile updated successfully!");
+    navigate("/home");
+  } catch (err) {
+    console.error("Profile update failed:", err);
+    alert("Failed to update profile");
+  }
+};
+
 
   if (loading) {
     return (
