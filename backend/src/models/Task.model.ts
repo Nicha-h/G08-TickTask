@@ -84,7 +84,8 @@ export async function createTask(taskData: {
   const allCategory = await prisma.category.findFirst({
     where: {
       userId: taskData.UserID,
-      Category_Name: 'All'
+      Category_Name: 'All',
+      Category_icon: 'iconAll'
     }
   });
 

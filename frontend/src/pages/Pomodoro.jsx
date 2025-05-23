@@ -217,7 +217,7 @@ function Pomodoro() {
   };
 
   return (
-    <div className='flex flex-col justify-center items-center w-full min-h-screen px-4'>
+    <div className='-mt-32 flex flex-col justify-center items-center w-full min-h-screen px-4'>
       <div className="w-full max-w-2xl border-2 flex flex-col items-center font-fredoka rounded-lg shadow-md">
         {/* Header */}
         <div className="w-full py-4 flex justify-center items-center border-b-2">
@@ -244,8 +244,8 @@ function Pomodoro() {
           </div>
 
           {/* Timer */}
-          <div className="border rounded-md mt-6 px-6 py-4 md:px-12 md:py-8 lg:px-16 lg:py-10">
-            <p className="text-4xl md:text-6xl lg:text-8xl font-bold">{formatTime(timer)}</p>
+          <div className="border rounded-md mt-6 px-10 py-5 md:px-12 md:py-8 lg:px-16 lg:py-10">
+            <p className="text-6xl md:text-6xl lg:text-8xl font-bold">{formatTime(timer)}</p>
           </div>
 
           {/* Active Task Info */}

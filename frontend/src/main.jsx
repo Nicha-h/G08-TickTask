@@ -16,9 +16,10 @@ import AllTaskList from "./pages/AllTaskList.jsx";
 import Category from "./pages/Category.jsx";
 import ProfileEdit from "./pages/ProfileEdit.jsx";
 import AddTask from "./pages/AddTask.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 const router = createBrowserRouter([
   {
-    path: "*", 
+    path: "/",
     element: <App />,
     children: [
       { path: "home", element: <Home /> },
@@ -26,16 +27,19 @@ const router = createBrowserRouter([
       { path: "calendar", element: <Calendar /> },
       { path: "overview", element: <Overview /> },
       { path: "taskList", element: <AllTaskList /> },
-      { path: "category", element: <Category/> },
-      { path: "profile", element: <ProfileEdit/> },
-      { path: "add", element: <AddTask/> },
+      { path: "category", element: <Category /> },
+      { path: "profile", element: <ProfileEdit /> },
+      { path: "add", element: <AddTask /> },
     ],
   },
+
   { path: "/signup", element: <Signup /> },
   { path: "/login", element: <Login /> },
   { path: "/findYourAccount", element: <FindYourAccount /> },
   { path: "/reset-Password", element: <ResetPassword /> },
+  { path: "*", element: <NotFoundPage /> },
 ]);
+
 
 
 createRoot(document.getElementById("root")).render(

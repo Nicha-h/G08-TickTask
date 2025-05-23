@@ -19,7 +19,6 @@ import Women2 from "../assets/ProfilePics/women 2.svg";
 import Women3 from "../assets/ProfilePics/women 3.svg";
 import Women from "../assets/ProfilePics/women.svg";
 
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 function Navbar() {
@@ -104,8 +103,6 @@ function Navbar() {
         }
 
         const userData = await response.json();
-        console.log("Fetched user data in navbar:", userData);
-
         setUser(userData);
         setProfilePicture(userData.User_profile_icon_path || "Men1");
         setError(null);

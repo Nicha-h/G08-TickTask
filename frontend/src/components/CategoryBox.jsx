@@ -1,50 +1,16 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import iconPet from '../assets/iconPet.svg';
-import iconComputer from '../assets/iconComputer.svg';
-import iconArt from '../assets/iconArt.svg';
-import iconSmile from '../assets/iconSmile.svg';
-import iconWorkout from '../assets/iconWorkout.svg';
-import iconStar from '../assets/iconStar.svg';
-import iconHeart from '../assets/iconHeart.svg';
-import iconGame from '../assets/iconGame.svg';
-import iconScience from '../assets/iconScience.svg';
-import iconCode from '../assets/iconCode.svg';
-import iconBook from '../assets/iconBook.svg';
-import iconHeartbeat from '../assets/iconHeartbeat.svg';
-import iconUmbrella from '../assets/iconUmbrella.svg';
-import iconAll from '../assets/iconAll.svg';
-import iconStudy from '../assets/iconStudy.svg';
-import iconWork from '../assets/iconWork.svg';
+import { iconComponents } from './modals/icon';
 
 
 function CategoryBox() {
 
   const [userID, setUserID] = useState('');
   const [category, setCategory] = useState([]);
-  const [taskCounts, setTaskCounts] = useState({}); // New state to hold task counts for categories
+  const [taskCounts, setTaskCounts] = useState({}); 
   const [loading, setLoading] = useState(true);
   const [, setError] = useState(null);
-
-  const iconMap = {
-    pet: iconPet,
-    computer: iconComputer,
-    art: iconArt,
-    smile: iconSmile,
-    workout: iconWorkout,
-    star: iconStar,
-    heart: iconHeart,
-    game: iconGame,
-    science: iconScience,
-    code: iconCode,
-    book: iconBook,
-    heartbeat: iconHeartbeat,
-    umbrella: iconUmbrella,
-    all: iconAll,
-    study: iconStudy,
-    work: iconWork
-  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -162,7 +128,7 @@ function CategoryBox() {
             style={{ backgroundColor: category.Category_Color }}
           >
 
-            <img src={iconMap[category.Category_icon]} alt={category.Category_Name} className="w-7 h-7 md:w-10 md:h-10" />
+            <img src={iconComponents[category.Category_icon]} alt={category.Category_Name} className="w-7 h-7 md:w-10 md:h-10" />
             <div className="mt-4 ml-1">
               <p className="text-lg sm:text-xl">{category.Category_Name}</p>
               <p className="mt-1 sm:mt-2 text-sm sm:text-base">

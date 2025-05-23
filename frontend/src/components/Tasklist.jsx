@@ -1,21 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import iconPet from '../assets/iconPet.svg';
-import iconComputer from '../assets/iconComputer.svg';
-import iconArt from '../assets/iconArt.svg';
-import iconSmile from '../assets/iconSmile.svg';
-import iconWorkout from '../assets/iconWorkout.svg';
-import iconStar from '../assets/iconStar.svg';
-import iconHeart from '../assets/iconHeart.svg';
-import iconGame from '../assets/iconGame.svg';
-import iconScience from '../assets/iconScience.svg';
-import iconCode from '../assets/iconCode.svg';
-import iconBook from '../assets/iconBook.svg';
-import iconHeartbeat from '../assets/iconHeartbeat.svg';
-import iconUmbrella from '../assets/iconUmbrella.svg';
-import iconAll from '../assets/iconAll.svg';
-import iconStudy from '../assets/iconStudy.svg';
-import iconWork from '../assets/iconWork.svg';
+import { useState, useEffect } from 'react';
 import { useLocation, NavLink } from 'react-router-dom';
+import { iconComponents } from './modals/icon';
 
 const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
   const [tasks, setTasks] = useState(initialTasks || []);
@@ -25,26 +10,6 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
   const location = useLocation();
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
   
-
-  const iconMap = {
-    pet: iconPet,
-    computer: iconComputer,
-    art: iconArt,
-    smile: iconSmile,
-    workout: iconWorkout,
-    star: iconStar,
-    heart: iconHeart,
-    game: iconGame,
-    science: iconScience,
-    code: iconCode,
-    book: iconBook,
-    heartbeat: iconHeartbeat,
-    umbrella: iconUmbrella,
-    all: iconAll,
-    study: iconStudy,
-    work: iconWork
-  };
-
   useEffect(() => {
     if (!initialTasks && selectedDate) {
       fetchTasks(selectedDate);
@@ -104,7 +69,7 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
             <div className="w-full flex items-center justify-between">
               <div className="flex justify-center items-center">
                 <div className="ml-4 flex flex-row justify-start items-start w-[600px] h-auto">
-                  <img src={iconMap[task.Task_Icon]} alt={task.Task_Title} className='w-10 h-10'/>
+                  <img src={iconComponents[task.Task_Icon]} alt={task.Task_Title} className='w-10 h-10'/>
                   <div className='ml-4 flex flex-col justify-start items-start w-[600px] h-auto'>
                     <h3 className="text-base font-bold">{task.Task_Title}</h3>
                     <p className="text-xs text-gray-700">{task.Task_Description}</p>

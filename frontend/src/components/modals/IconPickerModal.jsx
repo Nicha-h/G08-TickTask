@@ -3,12 +3,13 @@ import close from '../../assets/close.svg';
 import { iconComponents, iconOptions } from '../modals/icon.jsx';
 
 const IconPickerModal = ({ selectedIcon, onSelect, onClose }) => {
+
   const isIconSelected = (iconKey) => {
-    return selectedIcon === iconComponents[iconKey];
+    return selectedIcon === iconKey; 
   };
 
   const handleIconSelect = (iconKey) => {
-    onSelect(iconComponents[iconKey]);
+    onSelect(iconKey); 
     onClose();
   };
 
@@ -32,7 +33,7 @@ const IconPickerModal = ({ selectedIcon, onSelect, onClose }) => {
             <button
               key={option.id}
               onClick={() => handleIconSelect(option.iconKey)}
-              className={`w-auto h-auto aspect-square flex rounded-full flex items-center justify-center transition-colors ${
+              className={`w-auto h-auto aspect-square rounded-full flex items-center justify-center transition-colors ${
                 isIconSelected(option.iconKey)
                   ? 'bg-gray-400'
                   : 'bg-gray-200 hover:bg-gray-300'
