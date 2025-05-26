@@ -10,7 +10,8 @@ TaskRoute.use('*', authMiddleware);
 TaskRoute.get('/',Validator.validateStatusParam, TaskController.getAllTasks); 
 TaskRoute.get('/by-date',Validator.validateDateParam, TaskController.getTasksByDate); 
 TaskRoute.post('/',Validator.validateCreateTask, TaskController.createTaskController); 
-TaskRoute.put('/:id',Validator.validateUpdateTask, TaskController.updateTaskController); 
-TaskRoute.delete('/:id',Validator.validateTaskId, TaskController.deleteTaskController); 
+TaskRoute.put('/:id',Validator.validateUpdateTask, TaskController.updateTaskController);
+TaskRoute.patch('/:id',TaskController.patchTaskController);
+TaskRoute.delete('/:id', TaskController.deleteTaskController); 
 
 export default TaskRoute;

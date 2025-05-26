@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import ColorPickerModal from "./ColorPickerModal.jsx";
 import IconPickerModal from "./IconPickerModal.jsx";
 import DatePickerModal from "./DatePickerModal.jsx";
@@ -7,6 +7,8 @@ import close from "../../assets/close.svg";
 import AddToCate from "../../assets/AddToCate.svg";
 import CustomColor from "../../assets/CustomColor.svg";
 import iconSmile from "../../assets/iconSmile.svg";
+import axios from "axios";
+import DeleteTask from "./DeleteTask.jsx";
 
 const TaskSettingModal = ({ task, onSave, onClose }) => {
   const [title, setTitle] = useState(task.title || "");
@@ -16,7 +18,7 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
   const [endTime, setEndTime] = useState(task.endTime || "");
   const [color, setColor] = useState(task.color || null);
   const [description, setDescription] = useState(task.description || "");
-  const [category, setCategory] = useState(task.category || "");
+  const [category, setCategory] = useState([]); 
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState(task.icon || iconSmile);
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -25,7 +27,12 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
-  const [createdDate] = useState(new Date().toISOString().split("T")[0]);
+  // const [createdDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [selectedCategoryName, setSelectedCategoryName] = useState("");
+  const [categoryColor, setCategoryColor] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const token = localStorage.getItem("token");
   const colorOptions = [
     null,
     "#F24726",
@@ -37,8 +44,16 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
     "#8948E1",
   ];
 
-  const categories = ["Study", "Pet", "Work", "Workout", "Personal"];
-
+  useEffect(() => {
+  axios.get("http://localhost:3000/api/category", {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then(res => {
+    setCategory(res.data); 
+  }).catch(err => {
+    console.error("Failed to fetch categories", err);
+  });
+}, []);
+   
   const formatTimeDisplay = (time) => {
     if (!time) return "HH:MM";
     const [hours, minutes] = time.split(":");
@@ -46,32 +61,139 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
     const formattedHours = parseInt(hours) % 12 || 12;
     return `${formattedHours}:${minutes} ${period}`;
   };
-  const formatToDisplay = (dateStr) => {
-    if (!dateStr) return "No date";
-    const [year, month, day] = dateStr.split("-");
-    return `${day}/${month}/${year}`;
+  // const formatToDisplay = (dateStr) => {
+  //   if (!dateStr) return "No date";
+  //   const [year, month, day] = dateStr.split("-");
+  //   return `${day}/${month}/${year}`;
+  // };
+
+  // const parseToStorage = (dateStr) => {
+  //   if (!dateStr || dateStr === "No date") return null;
+  //   const [day, month, year] = dateStr.split("/");
+  //   return `${year}-${month}-${day}`;
+  // };
+  const formatDate = (dateStr) => {
+    if (!dateStr) return null;
+    
+    // Handle different date formats
+    if (dateStr.includes('/')) {
+      const [dd, mm, yyyy] = dateStr.split('/');
+      if (!dd || !mm || !yyyy) return null;
+      return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+    }
+    
+    // If already in YYYY-MM-DD format, return as is
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      return dateStr;
+    }
+    
+    return null;
   };
 
-  const parseToStorage = (dateStr) => {
-    if (!dateStr || dateStr === "No date") return null;
-    const [day, month, year] = dateStr.split("/");
-    return `${year}-${month}-${day}`;
+  const handleSubmit = async () => {
+    if (!task.id) {
+      alert("Task ID is missing");
+      return;
+    }
+
+    try {
+      const taskId = task.id;
+      
+      const taskData = {
+        Task_Title: title,
+        Task_Description: description,
+        Task_Start_Date: formatDate(startDate),
+        Task_End_Date: formatDate(endDate),
+        Task_Start_Time: startTime,
+        Task_End_Time: endTime,
+        Task_Color: color,
+        Task_Icon: selectedIcon,
+      };
+
+      const response = await axios.put(
+        `http://localhost:3000/api/tasks/${taskId}`, 
+        taskData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      console.log("Task updated successfully:", response.data);
+
+      if (selectedCategoryId) {
+        try {
+          await axios.put(
+            `http://localhost:3000/api/category/${taskId}/assign`,
+            { CategoryId: selectedCategoryId },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+          console.log("Category assigned successfully");
+        } catch (categoryError) {
+          console.error("Error assigning category:", categoryError);
+        
+        }
+      }
+
+      setShowIconPicker(false);
+      setShowColorPickerModal(false);
+      
+      if (onSave) {
+        const updatedTask = {
+          ...task,
+          title,
+          description,
+          startDate: formatDate(startDate),
+          endDate: formatDate(endDate),
+          startTime,
+          endTime,
+          color,
+          icon: selectedIcon,
+        };
+        onSave(updatedTask);
+      }
+      
+      if (onClose) {
+        onClose();
+      }
+
+
+    } catch (error) {
+      console.error("Error saving task:", error);
+      
+      if (error.response) {
+        console.error("Error response:", error.response.data);
+        alert(`Failed to save task: ${error.response.data.message || 'Unknown error'}`);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        alert("Failed to save task: No response from server");
+      } else {
+        console.error("Error setting up request:", error.message);
+        alert(`Failed to save task: ${error.message}`);
+      }
+    }
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const updatedTask = {
-      ...task,
-      title,
-      startDate: startDate || null,
-      endDate: endDate || null,
-      startTime,
-      endTime,
-      color,
-      description,
-      category,
-      icon: selectedIcon,
-    };
-    onSave(updatedTask);
+
+   const handleDelete = async () => {
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    
+    if (onSave) {
+      onSave(null); 
+    }
+    
+    if (onClose) {
+      onClose();
+    }
   };
 
   const handleColorSelect = (selectedColor) => {
@@ -82,10 +204,12 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
     setShowCategoryDropdown(!showCategoryDropdown);
   };
 
-  const selectCategory = (selectedCategory) => {
-    setCategory(selectedCategory);
-    setShowCategoryDropdown(false);
-  };
+const selectCategory = (selectedCategory) => {
+  setSelectedCategoryId(selectedCategory.CategoryId); 
+  setSelectedCategoryName(selectedCategory.Category_Name); 
+  setCategoryColor(selectedCategory.Category_Color); 
+  setShowCategoryDropdown(false);
+};
 
   const parseDateFromPicker = (dateStr) => {
     if (!dateStr) return "";
@@ -236,13 +360,13 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
 
               {showCategoryDropdown && (
                 <div className="absolute top-full right-0 mt-2 bg-white border rounded shadow-lg z-10">
-                  {categories.map((cat) => (
+                  {category.map((cat) => (
                     <div
-                      key={cat}
+                      key={cat.CategoryId}
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       onClick={() => selectCategory(cat)}
                     >
-                      {cat}
+                      {cat.Category_Name} 
                     </div>
                   ))}
                 </div>
@@ -250,14 +374,21 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
             </div>
           </div>
 
-          {category && (
+          {selectedCategoryName && (
             <div className="flex items-center mb-2">
-              <span className="bg-gray-200 px-2 py-1 rounded mr-2">
-                {category}
+              <span 
+                className="px-2 py-1 rounded mr-2"
+                style={{ backgroundColor: categoryColor || "#E5E7EB" }}
+              >
+                {selectedCategoryName}
               </span>
               <button
                 type="button"
-                onClick={() => setCategory("")}
+                onClick={() => {
+                  setSelectedCategoryId(null);
+                  setSelectedCategoryName("");
+                  setCategoryColor("");
+                }}
                 className="text-sm text-red-500"
               >
                 Remove
@@ -277,17 +408,25 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
         <div className="flex">
           <button
             type="button"
+            onClick={handleDelete}
+            className="flex justify-start px-4 py-2 bg-[#ff6868] rounded-lg border border-black font-bold hover:bg-red-400 ml-4"
+          >
+            Delete
+          </button>
+          <button
+            type="button"
             onClick={onClose}
             className="px-4 py-2 bg-gray-100 rounded-lg border border-black font-bold hover:bg-gray-200 ml-auto"
           >
             CANCEL
           </button>
           <button
-            type="submit"
+            onClick={handleSubmit}
             className="px-4 py-2 bg-[#E7FFAE] rounded-lg border border-black font-bold hover:bg-lime-200 ml-4"
           >
             SAVE
           </button>
+          
         </div>
       </form>
 
@@ -339,6 +478,14 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
           initialTime={endTime}
           onSelect={(time) => setEndTime(time)}
           onClose={() => setShowEndTimePicker(false)}
+        />
+      )}
+
+      {showDeleteModal && (
+        <DeleteTask
+          onClose={() => setShowDeleteModal(false)}
+          task={task}
+          onDelete={handleDeleteConfirm}
         />
       )}
     </div>

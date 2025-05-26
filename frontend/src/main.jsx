@@ -30,14 +30,14 @@ const router = createBrowserRouter([
       { path: "category", element: <Category /> },
       { path: "profile", element: <ProfileEdit /> },
       { path: "add", element: <AddTask /> },
+      { path: "*", element: <NotFoundPage /> }, // catch-all for nested routes
     ],
   },
-
   { path: "/signup", element: <Signup /> },
   { path: "/login", element: <Login /> },
   { path: "/findYourAccount", element: <FindYourAccount /> },
   { path: "/reset-Password", element: <ResetPassword /> },
-  { path: "*", element: <NotFoundPage /> },
+  { path: "*", element: <NotFoundPage /> }, // catch-all for top-level
 ]);
 
 

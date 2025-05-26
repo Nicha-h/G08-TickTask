@@ -1,85 +1,16 @@
 import { useState, useEffect } from "react";
 import addcate from "../assets/addcate.svg";
 import iconAll from "../assets/iconAll.svg";
-import iconPet from "../assets/iconPet.svg";
-import iconStudy from "../assets/iconStudy.svg";
-import iconWork from "../assets/iconWork.svg";
-import iconWorkout from "../assets/iconWorkout.svg";
 import edit from "../assets/edit.svg";
 import iconFilter from "../assets/iconFilter.svg";
 import iconTickWH from "../assets/iconTickWH.svg";
-import iconComputer from "../assets/iconComputer.svg";
-import iconArt from "../assets/iconArt.svg";
-import iconSmile from "../assets/iconSmile.svg";
-import iconStar from "../assets/iconStar.svg";
-import iconHeart from "../assets/iconHeart.svg";
-import iconGame from "../assets/iconGame.svg";
-import iconScience from "../assets/iconScience.svg";
-import iconCode from "../assets/iconCode.svg";
-import iconBook from "../assets/iconBook.svg";
-import iconHeartbeat from "../assets/iconHeartbeat.svg";
-import iconUmbrella from "../assets/iconUmbrella.svg";
 import { useMediaQuery } from "react-responsive";
 import DeleteCategoryModal from "../components/modals/DeleteCategoryModal.jsx";
 import AddCategoryModal from "../components/modals/AddCategoryModal.jsx";
 import EditCategoryModal from "../components/modals/EditCategoryModal.jsx";
 import TaskSettingModal from "../components/modals/TaskSettingModal.jsx";
-const initialCategories = [
-  {
-    name: "All",
-    color: "#D4B4FF",
-    progress: 40,
-    icon: iconAll,
-    tasksCount: 9,
-  },
-  {
-    name: "Pet",
-    color: "#FFBEBE",
-    progress: 70,
-    icon: iconPet,
-    tasksCount: 5,
-  },
-  {
-    name: "Study",
-    color: "#FFECB4",
-    progress: 88,
-    icon: iconStudy,
-    tasksCount: 3,
-  },
-  {
-    name: "Work",
-    color: "#D1F4FF",
-    progress: 20,
-    icon: iconWork,
-    tasksCount: 2,
-  },
-  {
-    name: "Workout",
-    color: "#FFC6F0",
-    progress: 60,
-    icon: iconWorkout,
-    tasksCount: 1,
-  },
-];
-
-const iconOptions = [
-  { id: "iconAll", src: iconAll, alt: "All icon" },
-  { id: "iconWork", src: iconWork, alt: "Work icon" },
-  { id: "iconPet", src: iconPet, alt: "Pet icon" },
-  { id: "iconStudy", src: iconStudy, alt: "Study icon" },
-  { id: "iconWorkout", src: iconWorkout, alt: "Workout icon" },
-  { id: "iconComputer", src: iconComputer, alt: "Computer icon" },
-  { id: "iconArt", src: iconArt, alt: "Art icon" },
-  { id: "iconSmile", src: iconSmile, alt: "Smile icon" },
-  { id: "iconStar", src: iconStar, alt: "Star icon" },
-  { id: "iconHeart", src: iconHeart, alt: "Heart icon" },
-  { id: "iconGame", src: iconGame, alt: "Game icon" },
-  { id: "iconScience", src: iconScience, alt: "Science icon" },
-  { id: "iconCode", src: iconCode, alt: "Code icon" },
-  { id: "iconBook", src: iconBook, alt: "Book icon" },
-  { id: "iconHeartbeat", src: iconHeartbeat, alt: "Heartbeat icon" },
-  { id: "iconUmbrella", src: iconUmbrella, alt: "Umbrella icon" },
-];
+import axios from "axios";
+import { iconOptions, iconComponents, defaultIcon } from "../components/modals/icon.jsx";
 
 const colorOptions = [
   null,
@@ -92,217 +23,11 @@ const colorOptions = [
   "#8948E1",
 ];
 
-const initialTasks = [
-  // All Tasks
-  {
-    id: 1,
-    title: "TASK 1",
-    description: "Description of task 1",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#D4B4FF",
-    icon: iconSmile,
-    category: "All",
-    completed: false,
-  },
-  {
-    id: 2,
-    title: "TASK 2",
-    description: "Description",
-    startTime: "00:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#D4B4FF",
-    icon: iconSmile,
-    category: "All",
-    completed: false,
-  },
-  {
-    id: 3,
-    title: "TASK 3",
-    description: "Description",
-    startTime: "00:00",
-    endTime: "00:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#D4B4FF",
-    icon: iconSmile,
-    category: "All",
-    completed: false,
-  },
-  {
-    id: 4,
-    title: "TASK 4",
-    description: "Description",
-    startTime: "08:00",
-    endTime: "12:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#D4B4FF",
-    icon: iconSmile,
-    category: "All",
-    completed: false,
-  },
-  {
-    id: 5,
-    title: "TASK 5",
-    description: "Description",
-    startTime: "07:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#D4B4FF",
-    icon: iconSmile,
-    category: "All",
-    completed: false,
-  },
-  {
-    id: 6,
-    title: "TASK 6",
-    description: "Description",
-    startTime: "18:00",
-    endTime: "19:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#D4B4FF",
-    icon: iconSmile,
-    category: "All",
-    completed: false,
-  },
-  // Pet Tasks
-  {
-    id: 7,
-    title: "PET TASK 1",
-    description: "Pet care",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#FFBEBE",
-    icon: iconPet,
-    category: "Pet",
-    completed: false,
-  },
-  {
-    id: 8,
-    title: "PET TASK 2",
-    description: "Feeding",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#FFBEBE",
-    icon: iconPet,
-    category: "Pet",
-    completed: false,
-  },
-  {
-    id: 9,
-    title: "PET TASK 3",
-    description: "Grooming",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#FFBEBE",
-    icon: iconPet,
-    category: "Pet",
-    completed: false,
-  },
-
-  // Study Tasks
-  {
-    id: 10,
-    title: "STUDY TASK 1",
-    description: "Math homework",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#FFECB4",
-    icon: iconStudy,
-    category: "Study",
-    completed: false,
-  },
-  {
-    id: 11,
-    title: "STUDY TASK 2",
-    description: "Reading",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#FFECB4",
-    icon: iconStudy,
-    category: "Study",
-    completed: false,
-  },
-  {
-    id: 12,
-    title: "STUDY TASK 3",
-    description: "Research",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#FFECB4",
-    icon: iconStudy,
-    category: "Study",
-    completed: true,
-  },
-
-  // Work Tasks
-  {
-    id: 13,
-    title: "WORK TASK 1",
-    description: "Meeting",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#D1F4FF",
-    icon: iconWork,
-    category: "Work",
-    completed: false,
-  },
-  {
-    id: 14,
-    title: "WORK TASK 2",
-    description: "Report",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#D1F4FF",
-    icon: iconWork,
-    category: "Work",
-    completed: true,
-  },
-
-  // Workout Tasks
-  {
-    id: 15,
-    title: "WORKOUT TASK 1",
-    description: "Morning run",
-    startTime: "08:00",
-    endTime: "09:00",
-    startDate: "2025-05-01",
-    endDate: "2025-05-01",
-    color: "#FFC6F0",
-    icon: iconWorkout,
-    category: "Workout",
-    completed: false,
-  },
-];
-
 export default function Category() {
-  const [categories, setCategories] = useState(initialCategories);
-  const [tasks, setTasks] = useState(initialTasks);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [filterType, setFilterType] = useState("all");
+  const [categories, setCategories] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(1);
+  const [filterType, setFilterType] = useState("All");
   const [filterOpen, setFilterOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -311,7 +36,10 @@ export default function Category() {
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingTask, setEditingTask] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
-  
+  const [categoryFetchError, setCategoryFetchError] = useState(null);
+  const [categoryTaskCounts, setCategoryTaskCounts] = useState({});
+  const [categoryProgress, setCategoryProgress] = useState({});
+  const token = localStorage.getItem("token");
   // Mobile state
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const [showCategorySelection, setShowCategorySelection] = useState(isMobile);
@@ -330,17 +58,156 @@ export default function Category() {
     };
   }, [filterOpen]);
 
-  // Handle mobile/desktop layout changes
   useEffect(() => {
     if (isMobile) {
       setShowCategorySelection(true);
       setShowTasks(false);
     } else {
-      // Desktop - show both
       setShowCategorySelection(true);
       setShowTasks(true);
     }
   }, [isMobile]);
+
+  useEffect(() => {
+  axios.get("http://localhost:3000/api/tasks", {
+    headers: { Authorization: `Bearer ${token}` },
+    
+  }).then(res => {
+    // Normalize tasks to have a categories array (of CategoryId)
+    console.log("Raw tasks data:", res.data); 
+    const normalizedTasks = res.data.map(task => ({
+      TaskID: task.id || task.TaskID || task._id,
+      Task_Title: task.title || task.Task_Title,
+      Task_Description: task.description || task.Task_Description,
+      Task_Status: task.status || task.Task_Status,
+      categories: task.categories
+        ? task.categories.map(cat => cat.CategoryId || cat.id || cat._id)
+        : (task.task_category
+            ? task.task_category.map(tc => tc.CategoryId || tc.categoryId || tc.category_id)
+            : []),
+      ...task
+    }));
+    console.log("Normalized tasks:", normalizedTasks);
+    setTasks(normalizedTasks);
+  }).catch(err => {
+    console.error("Failed to fetch tasks", err);
+  });
+}, [token]); 
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setCategoryFetchError("No authentication token found");
+          return;
+        }
+
+        const response = await axios.get("http://localhost:3000/api/category", {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        });
+        
+        if (response.data && Array.isArray(response.data)) {
+          const normalized = response.data.map(cat => ({
+            Category_Name: cat.name || cat.category_name || cat.title || '',
+            Category_Color: cat.color || cat.colour || '#D4B4FF',
+            Category_icon: cat.icon || cat.iconUrl || cat.icon_url || '',
+            CategoryId: cat.CategoryId || cat.id || cat._id || cat.category_id || Math.random().toString(36),
+            ...cat 
+          }));
+          console.log("Normalized categories:", normalized);
+          setCategories(normalized);
+          setCategoryFetchError(null);
+        } else {
+          setCategoryFetchError("Invalid response format");
+          console.error("Invalid response format", response.data);
+        }
+      } catch (error) {
+        let msg = "Error fetching categories: ";
+        if (error.response) {
+          if (error.response.status === 401) {
+            msg += "Unauthorized - please login again";
+          } else if (error.response.status === 404) {
+            msg += "Endpoint not found - check API URL";
+          } else {
+            msg += error.response.data?.message || error.response.statusText;
+          }
+        } else if (error.request) {
+          msg += "No response received from server.";
+        } else {
+          msg += error.message;
+        }
+        setCategoryFetchError(msg);
+        console.error(msg, error);
+      }
+    };
+
+    fetchCategories();
+  }, []); 
+
+  useEffect(() => {
+    const fetchTasksByCategory = async () => {
+      if (!selectedCategoryId || selectedCategoryId === "All") {
+        return;
+      }
+      try {
+        const token = localStorage.getItem("token");
+        await axios.get(
+          `http://localhost:3000/api/category/${selectedCategoryId}/tasks`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        // No longer need to use response
+      } catch {
+        // No longer need to use response
+      }
+    };
+    fetchTasksByCategory();
+  }, [selectedCategoryId]);
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (!categories.length) return;
+      const counts = {};
+      for (const cat of categories) {
+        try {
+          const res = await axios.get(`http://localhost:3000/api/category/${cat.CategoryId}/count`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          counts[cat.CategoryId] = res.data.taskCount;
+        } catch {
+          counts[cat.CategoryId] = 0;
+        }
+      }
+      setCategoryTaskCounts(counts);
+    };
+    fetchCounts();
+  }, [categories, token]);
+
+  // Fetch progress 
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!categories.length) return;
+      const progressObj = {};
+      for (const cat of categories) {
+        try {
+          const res = await axios.get(`http://localhost:3000/api/category/${cat.CategoryId}/progress `, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          progressObj[cat.CategoryId] = res.data.progress ?? 0;
+        } catch {
+          progressObj[cat.CategoryId] = 0;
+        }
+      }
+      setCategoryProgress(progressObj);
+    };
+    fetchProgress();
+  }, [categories, token]);
 
   const toggleMenu = (categoryName, e) => {
     e.stopPropagation();
@@ -351,7 +218,6 @@ export default function Category() {
     setMenuOpen(null);
   };
 
-  // Handler Functions
   const handleAddCategory = () => {
     setAddModalOpen(true);
   };
@@ -359,29 +225,78 @@ export default function Category() {
   const confirmDeleteCategory = () => {
     if (categoryToDelete) {
       setCategories(categories.filter((cat) => cat.name !== categoryToDelete));
-      if (selectedCategory === categoryToDelete) {
-        setSelectedCategory("All");
+      if (selectedCategoryId === categoryToDelete) {
+        setSelectedCategoryId(null); // Deselect if deleted
       }
     }
     setDeleteModalOpen(false);
   };
 
-  const calculateProgress = (categoryName) => {
+  // Helper function to check if task is completed
+  const isTaskCompleted = (task) => {
+    return task.Task_Status === "Complete" || task.Task_Status === "Completed" || task.completed === true;
+  };
+
+  const calculateProgress = (categoryId) => {
     const categoryTasks = tasks.filter(
-      (task) => task.category === categoryName
+      (task) => Array.isArray(task.categories) && task.categories.includes(categoryId)
     );
     if (categoryTasks.length === 0) return 0;
-    const completedTasks = categoryTasks.filter((task) => task.completed);
+    const completedTasks = categoryTasks.filter((task) => isTaskCompleted(task));
     return Math.round((completedTasks.length / categoryTasks.length) * 100);
   };
 
-  const toggleTaskCompletion = (taskId) => {
-    setTasks(
-      tasks.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
+  const toggleTaskCompletion = async (taskId) => {
+  try {
+ 
+    const taskToUpdate = tasks.find(t => t.TaskID === taskId || t.id === taskId);
+    if (!taskToUpdate) {
+      console.error("Task not found:", taskId);
+      return;
+    }
+
+
+    const actualTaskId = taskToUpdate.TaskID || taskToUpdate.id;
+    if (!actualTaskId) {
+      console.error("No valid ID found for task:", taskToUpdate);
+      return;
+    }
+
+    const newStatus = isTaskCompleted(taskToUpdate) ? "Incomplete" : "Completed";
+    const updatePayload = {
+      Task_Status: newStatus,
+    };
+
+    // Remove unused response variable
+    await axios.patch(
+      `http://localhost:3000/api/tasks/${actualTaskId}`,
+      updatePayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    setTasks(prevTasks => 
+      prevTasks.map(task => 
+        (task.TaskID === actualTaskId || task.id === actualTaskId)
+          ? { 
+              ...task, 
+              Task_Status: newStatus, 
+              completed: newStatus === "Completed" 
+            }
+          : task
       )
     );
-  };
+
+  } catch (error) {
+    console.error("Error updating task:", error);
+    
+    alert(`Failed to update task: ${error.response?.data?.message || error.message}`);
+  }
+};
 
   const openEditModal = (category) => {
     setEditingCategory(category);
@@ -391,17 +306,19 @@ export default function Category() {
   const handleSaveTask = (updatedTask) => {
     setTasks(
       tasks.map((t) =>
-        t.id === updatedTask.id
+        t.TaskID === updatedTask.TaskID
           ? {
               ...t,
-              title: updatedTask.title,
-              description: updatedTask.description,
-              startTime: updatedTask.startTime,
-              endTime: updatedTask.endTime,
-              startDate: updatedTask.startDate,
-              endDate: updatedTask.endDate,
+              Task_Title: updatedTask.Task_Title,
+              Task_Description: updatedTask.Task_Description,
+              Task_Start_Time: updatedTask.Task_Start_Time,
+              Task_End_Time: updatedTask.Task_End_Time,
+              Task_Start_Date: updatedTask.Task_Start_Date,
+              Task_End_Date: updatedTask.Task_End_Date,
               category: updatedTask.category,
               icon: updatedTask.icon,
+              Task_Status: updatedTask.Task_Status,
+              completed: updatedTask.Task_Status === "Complete" || updatedTask.Task_Status === "Completed"
             }
           : t
       )
@@ -415,14 +332,15 @@ export default function Category() {
     setDeleteModalOpen(true);
   };
 
-  // Mobile-specific handlers
-  const handleCategorySelect = (categoryName) => {
-    setSelectedCategory(categoryName);
-    if (isMobile) {
-      setShowCategorySelection(false);
-      setShowTasks(true);
-    }
-  };
+  const handleCategorySelect = (categoryId) => {
+  console.log("Selecting category:", categoryId);
+  setSelectedCategoryId(categoryId === "1" ? null : categoryId);
+  if (isMobile) {
+    setShowCategorySelection(false);
+    setShowTasks(true);
+  }
+};
+
 
   const handleBackToCategories = () => {
     if (isMobile) {
@@ -431,23 +349,35 @@ export default function Category() {
     }
   };
 
-  // Filtered Tasks
   const filteredTasks = tasks
-    .filter((task) => selectedCategory === "All" || task.category === selectedCategory)
-    .filter((task) => {
-      if (filterType === "all") return true;
-      if (filterType === "incomplete") return !task.completed;
-      if (filterType === "complete") return task.completed;
-      return true;
-    })
-    .sort((a, b) => (a.completed === b.completed ? 0 : a.completed ? 1 : -1));
+  .filter((task) => {
+    console.log("Task categories:", task.categories); // Add this
+    console.log("Selected category:", selectedCategoryId); // Add this
+    
+    if (!selectedCategoryId || selectedCategoryId === "All") return true;
+    console.log("All category IDs:", categories.map(c => c.CategoryId));
+    console.log("First task's categories:", tasks[0]?.categories);
+    return Array.isArray(task.categories) && 
+           task.categories.some(catId => 
+             catId.toString() === selectedCategoryId.toString()
+           );
+           
+  })
+  .filter((task) => {
+    if (filterType === "all") return true;
+    if (filterType === "incomplete") return !isTaskCompleted(task);
+    if (filterType === "complete") return isTaskCompleted(task);
+    return true;
+  })
+  .sort((a, b) => {
+    const aCompleted = isTaskCompleted(a);
+    const bCompleted = isTaskCompleted(b);
+    return aCompleted === bCompleted ? 0 : aCompleted ? 1 : -1;
+  });
+  console.log("Filtered tasks:", filteredTasks);
+  const selected = categories.find((cat) => cat.CategoryId === selectedCategoryId);
 
-  const selected = categories.find((cat) => cat.name === selectedCategory);
-  const otherCategories = categories.filter(
-    (cat) => cat.name !== selectedCategory
-  );
-
-  return (
+return (
     <div className="flex h-screen overflow-hidden bg-white font-sans">
       {/* Sidebar - shown on desktop or when category selection is active on mobile */}
       {(showCategorySelection || !isMobile) && (
@@ -479,18 +409,18 @@ export default function Category() {
             <div className="mb-8 w-full">
               {/* Selected Category Card Ontop */}
               <div
-                onClick={() => handleCategorySelect(selected.name)}
-                style={{ backgroundColor: selected.color }}
+                onClick={() => handleCategorySelect(selected.CategoryId)}
+                style={{ backgroundColor: selected.Category_Color }}
                 className="relative rounded-lg p-6 aspect-square w-54 h-54 shadow-sm border border-black cursor-pointer 
                           transition-transform duration-200 hover:scale-105 hover:shadow-md translate-x-4"
               >
                 <button
-                  onClick={(e) => toggleMenu(selected.name, e)}
+                  onClick={(e) => toggleMenu(selected.CategoryId, e)}
                   className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100/50"
                 >
                   <img src={edit} alt="Menu" className="w-5 h-5" />
                 </button>
-                {menuOpen === selected.name && (
+                {menuOpen === selected.CategoryId && (
                   <div className="absolute top-10 right-2 bg-white border border-black rounded-md shadow-lg z-10 w-24">
                     <button
                       onClick={(e) => {
@@ -498,32 +428,32 @@ export default function Category() {
                         openEditModal(selected);
                         closeMenu();
                       }}
-                      className="flex items-center px-3 py-2 hover:bg-gray-100 w-full text-sm"
+                      className="flex items-center px-3 py-2 hover:bg-gray-100 w-full "
                     >
-                      <span className="w-full text-left">Edit</span>
+                      <span className="w-16 h-7 font-bold text-lg  px-4 hover:bg-gray-200 ">Edit</span>
                     </button>
                   </div>
                 )}
                 <img
-                  src={selected.icon}
-                  alt={`${selected.name} icon`}
+                  src={iconComponents[selected.Category_icon] || iconComponents[defaultIcon]}
+                  alt={`${selected.Category_Name} icon`}
                   className="w-12 h-12 mb-4"
                 />
                 <div className="mt-4">
-                  <div className="font-bold text-xl">{selected.name}</div>
+                  <div className="font-bold text-xl">{selected.Category_Name}</div>
                   <div className="text-sm text-black/70">
-                    {tasks.filter((t) => t.category === selected.name).length}{" "}
+                    {tasks.filter((t) => Array.isArray(t.categories) && t.categories.includes(selected.CategoryId)).length}{" "}
                     Tasks
                   </div>
                 </div>
                 <div className="mt-6 h-2 bg-white rounded-full overflow-hidden border border-black">
                   <div
                     className="h-2 bg-black rounded-full"
-                    style={{ width: `${calculateProgress(selected.name)}%` }}
+                    style={{ width: `${calculateProgress(selected.CategoryId)}%` }}
                   />
                 </div>
                 <div className="text-sm text-right mt-1 text-black/60">
-                  {calculateProgress(selected.name)}%
+                  {calculateProgress(selected.CategoryId)}%
                 </div>
               </div>
             </div>
@@ -542,7 +472,7 @@ export default function Category() {
                           transition-transform duration-200 hover:scale-105 hover:shadow-md"
               >
                 <img
-                  src={iconAll}
+                  src={iconComponents.iconAll}
                   alt="All icon"
                   className="absolute top-3 left-3 w-7 h-7"
                 />
@@ -562,67 +492,66 @@ export default function Category() {
             )}
 
             {categories
-              .filter(cat => isMobile ? cat.name !== "All" : true)
-              .filter(cat => !isMobile ? cat.name !== selected?.name : true)
+              .filter(cat => isMobile ? cat.Category_Name !== "All" : true)
+              .filter(cat => !isMobile ? cat.CategoryId !== selected?.CategoryId : true)
               .map((cat) => (
                 <div
-                  key={cat.name}
-                  onClick={() => handleCategorySelect(cat.name)}
-                  style={{ backgroundColor: cat.color }}
+                  key={cat.CategoryId}
+                  onClick={() => handleCategorySelect(cat.CategoryId)}
+                  style={{ backgroundColor: cat.Category_Color }}
                   className="relative rounded-lg p-3 h-[120px] shadow-sm border border-black cursor-pointer
                             transition-transform duration-200 hover:scale-105 hover:shadow-md"
                 >
                   <button
-                    onClick={(e) => toggleMenu(cat.name, e)}
+                    onClick={(e) => toggleMenu(cat.CategoryId, e)}
                     className="absolute top-1 right-1 p-1 rounded-full hover:bg-gray-100/50"
                   >
                     <img src={edit} alt="Menu" className="w-4 h-4" />
                   </button>
-                  {menuOpen === cat.name && (
-                    <div className="absolute top-8 right-1 bg-white border border-black rounded-lg shadow-lg z-10 w-24">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openEditModal(cat);
-                          closeMenu();
-                        }}
-                        className="font-bold w-full px-2 py-1 hover:bg-gray-200 "
-                      >
-                        Edit
-                      </button>
-                      {cat.name !== "All" && (
-                        <>
-                          <div className="border-t border-gray-300"></div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteCategory(cat.name);
-                              closeMenu();
-                            }}
-                            className="font-bold w-full px-2 py-1 hover:bg-gray-200"
-                          >
-                            Delete
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
-
+                  {menuOpen === cat.CategoryId && (
+  <div className="absolute top-8 right-1 bg-white border border-black rounded-lg shadow-lg z-10 w-24">
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        openEditModal(cat);
+        closeMenu();
+      }}
+      className="font-bold w-full px-2 py-1 hover:bg-gray-200 "
+    >
+      Edit
+    </button>
+    {cat.CategoryId !== "All" && (
+      <>
+        <div className="border-t border-gray-300"></div>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteCategory(cat.CategoryId);
+            closeMenu();
+          }}
+          className="font-bold w-full px-2 py-1 hover:bg-gray-200"
+        >
+          Delete
+        </button>
+      </>
+    )}
+  </div>
+)}
                   <img
-                    src={cat.icon}
-                    alt={`${cat.name} icon`}
+                    src={iconComponents[cat.Category_icon] || iconComponents[defaultIcon]}
+                    alt={`${cat.Category_Name} icon`}
                     className="absolute top-3 left-3 w-7 h-7"
                   />
                   <div className="mt-7">
-                    <div className="font-semibold text-sm">{cat.name}</div>
+                    <div className="font-semibold text-sm">{cat.Category_Name}</div>
                     <div className="text-xs text-black/70">
-                      {tasks.filter((t) => t.category === cat.name).length} Tasks
+                      {tasks.filter((t) => Array.isArray(t.categories) && t.categories.includes(cat.CategoryId)).length} Tasks
                     </div>
                   </div>
                   <div className="mt-2 h-2 bg-white rounded-full overflow-hidden border border-black">
                     <div
                       className="h-2 bg-black rounded-full"
-                      style={{ width: `${calculateProgress(cat.name)}%` }}
+                      style={{ width: `${calculateProgress(cat.CategoryId)}%` }}
                     />
                   </div>
                 </div>
@@ -643,10 +572,14 @@ export default function Category() {
       )}
 
       {/* Task List - shown on desktop or when tasks are active on mobile */}
-      {(showTasks || !isMobile) && (
+      {(showTasks && !isMobile) && (
         <div className={`${isMobile ? 'w-full' : 'flex-1'} px-6 md:px-12 py-4 overflow-y-auto border-l border-gray`}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">{selectedCategory}</h2>
+            <h2 className="text-xl font-bold">
+              {selectedCategoryId ? 
+                (categories.find(c => c.CategoryId === selectedCategoryId)?.Category_Name || "Tasks")
+                : "All Tasks"}
+            </h2>
             <div className="relative filter-container">
               <button
                 className="flex items-center"
@@ -664,6 +597,7 @@ export default function Category() {
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-800 rounded-md shadow-lg z-10">
                   <div className="py-1">
                     <button
+                      key="filter-all"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
                       onClick={() => {
                         setFilterType("all");
@@ -717,16 +651,17 @@ export default function Category() {
           <div className="space-y-4">
             {filteredTasks.length > 0 ? (
               filteredTasks.map((task) => (
-                <div key={task.id} className="flex items-center gap-2 group">
+                
+                <div key={task.TaskID} className="flex items-center gap-2 group">
                   <div
-                    onClick={() => toggleTaskCompletion(task.id)}
+                    onClick={() => toggleTaskCompletion(task.TaskID)}
                     className="flex-shrink-0"
                   >
                     <div
                       className={`w-6 h-6 rounded border border-black flex items-center justify-center cursor-pointer 
                                 group-hover:border-2 ${task.completed ? "bg-black" : "bg-white"}`}
                     >
-                      {task.completed && (
+                      {isTaskCompleted(task) && (
                         <img src={iconTickWH} alt="Completed" className="w-4 h-4" />
                       )}
                     </div>
@@ -736,36 +671,49 @@ export default function Category() {
                     onClick={() => setEditingTask(task)}
                     style={{
                       backgroundColor:
-                        categories.find((c) => c.name === task.category)?.color ||
-                        "#D4B4FF", filter: task.completed ? "grayscale(100%)" : "none"
+                        categories.find((c) => Array.isArray(task.categories) && task.categories.includes(c.CategoryId))?.Category_Color ||
+                        "#D4B4FF"
                     }}
-                    className={`relative rounded-lg px-4 md:px-6 py-4 flex justify-between items-center shadow-sm border border-black cursor-pointer flex-grow  transition-all duration-200 hover:brightness-90 ${
-                      categories.find((c) => c.name === task.category)?.color ||
-                      selected?.color
-                    }`}
+                    className="relative rounded-lg px-4 md:px-6 py-4 flex justify-between items-center shadow-sm border border-black cursor-pointer flex-grow  transition-all duration-200 hover:brightness-90"
                   >
                     <div className="flex items-start gap-2">
-                      <img src={task.icon} alt="icon" className="w-6 h-6 md:w-7 md:h-7 mt-1" />
+                      {/* Show all category icons for this task */}
+                      {Array.isArray(task.categories) && task.categories.length > 0 && (
+                        <div className="flex gap-1 mr-2">
+                          {task.categories.map(cid => {
+                            const cat = categories.find(c => c.CategoryId === cid);
+                            return cat ? (
+                              <img
+                                key={cid}
+                                src={iconComponents[cat.Category_icon] || iconComponents[defaultIcon]}
+                                alt={cat.Category_Name}
+                                className="w-5 h-5"
+                              />
+                            ) : null;
+                          })}
+                        </div>
+                      )}
                       <div>
                         <div
                           className={`font-bold text-sm uppercase ${
-                            task.completed ? "line-through" : ""
+                            isTaskCompleted(task) ? "line-through text-gray-500" : ""
                           }`}
                         >
-                          {task.title}
+                          {task.Task_Title}
                         </div>
                         <div
-                          className={`text-xs text-black/80 ${
-                            task.completed ? "line-through" : ""
+                          className={`text-xs ${
+                            isTaskCompleted(task) ? "line-through text-gray-400" : "text-black/80"
                           }`}
                         >
-                          {task.description}
+                          {task.Task_Description}
                         </div>
                       </div>
                     </div>
-                    <div className="text-xs font-semibold text-right leading-tight">
-                      {task.time ||
-                        `${task.startTime || "00:00"}-${task.endTime || "00:00"}`}
+                    <div className={`text-xs font-semibold text-right leading-tight ${
+                      isTaskCompleted(task) ? "text-gray-400" : ""
+                    }`}>
+                      {task.Task_Start_Time || "00:00"}-{task.Task_End_Time || "00:00"}
                     </div>
                   </div>
                 </div>
@@ -773,12 +721,14 @@ export default function Category() {
             ) : (
               <div className="text-center py-8 text-gray-500">
                 No tasks found in this category
+                <div className="text-xs mt-2 text-gray-400">
+                  Selected: "{selectedCategoryId}" | Total tasks: {categoryTaskCounts[selectedCategoryId] || 0}
+                </div>
               </div>
             )}
           </div>
         </div>
       )}
-
       {/* Modals */}
       <DeleteCategoryModal
         deleteModalOpen={deleteModalOpen}
@@ -792,7 +742,10 @@ export default function Category() {
         colorOptions={colorOptions}
         iconOptions={iconOptions}
         saveNewCategory={(newCategory) => {
-          setCategories([...categories, newCategory]);
+          setCategories([...categories, {
+            ...newCategory,
+            CategoryId: newCategory.CategoryId || Math.random().toString(36),
+          }]);
           setAddModalOpen(false);
         }}
         existingCategories={categories}
@@ -805,27 +758,21 @@ export default function Category() {
         colorOptions={colorOptions}
         iconOptions={iconOptions}
         saveCategory={(updatedCategory) => {
-          const oldName = editingCategory?.name;
-          const newName = updatedCategory.name;
-
+          const oldId = editingCategory?.CategoryId;
+          const newId = updatedCategory.CategoryId;
           // Update categories
           const updatedCategories = categories.map((cat) =>
-            cat.name === oldName ? updatedCategory : cat
+            cat.CategoryId === oldId ? updatedCategory : cat
           );
-
           // Update tasks that use the old category
           const updatedTasks = tasks.map((task) =>
-            task.category === oldName ? { ...task, category: newName } : task
+            task.CategoryId === oldId ? { ...task, CategoryId: newId } : task
           );
-
           setCategories(updatedCategories);
           setTasks(updatedTasks);
-
-          // If the edited category is the currently selected one
-          if (selectedCategory === oldName) {
-            setSelectedCategory(newName);
+          if (selectedCategoryId === oldId) {
+            setSelectedCategoryId(newId);
           }
-
           setEditModalOpen(false);
         }}
       />
@@ -838,7 +785,7 @@ export default function Category() {
               task={editingTask}
               onSave={handleSaveTask}
               onClose={() => setEditingTask(null)}
-              categories={categories.map((cat) => cat.name)}
+              categories={categories.map((cat) => cat.Category_Name)}
             />
           </div>
         </div>

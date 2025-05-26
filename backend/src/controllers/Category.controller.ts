@@ -4,6 +4,7 @@ import { categorySchema } from '../schemas/Schemas.js';
 import {z} from 'zod';
 import * as categoryModel from '../models/Category.model.js';
 import { Category } from '../middlewares/Category.validators.js';
+import { getTasksByCategoryId } from '../models/Category.model.js';
 
 const patchSchema = z.object({
   Category_Name: z.string().min(1).optional(),
@@ -22,6 +23,25 @@ export const getAllCategory = async (c: Context) => {
     return c.json({ error: 'Failed to fetch categories' }, 500);
   }
 };
+
+
+export const handleGetTasksByCategoryId = async (c: Context) => {
+  const categoryId = Number(c.req.param('id')); // ← updated
+
+  if (isNaN(categoryId)) {
+    return c.json({ error: 'Invalid Category ID' }, 400);
+  }
+
+  try {
+    const taskCategories = await getTasksByCategoryId(categoryId);
+    const tasks = taskCategories.map(tc => tc.task);
+    return c.json(tasks, 200);
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    return c.json({ error: 'Internal Server Error' }, 500);
+  }
+};
+
 
 export const createCategoryController = async (c: Context) => {
   try {
@@ -81,10 +101,6 @@ export const deleteCategoryController = async (c: Context) => {
     console.error('Error deleting category:', error);
     return c.json({ error: 'Failed to delete category' }, 500);
   }
-};
-
-export const getCategoryWithProgressController = async (c: Context) => {
-
 };
 
 export const patchCategoryController = async (c: Context) => {

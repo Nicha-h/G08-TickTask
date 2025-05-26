@@ -185,6 +185,14 @@ export const deleteTask = async (c: Context) => {
   const user = c.get('user') as { id: number };
 
   try {
+    // Delete related task_category records first
+    await prisma.task_category.deleteMany({
+      where: {
+        TaskID: id
+      }
+    });
+
+    // Now delete the task
     await prisma.task.deleteMany({
       where: {
         TaskID: id,

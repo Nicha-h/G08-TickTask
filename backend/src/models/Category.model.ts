@@ -14,6 +14,17 @@ export async function getUserCategories(userId: number) {
   });
 }
 
+export const getTasksByCategoryId = async (categoryId: number) => {
+  return await prisma.task_category.findMany({
+    where: {
+      CategoryId: categoryId,
+    },
+    include: {
+      task: true, 
+    },
+  });
+};
+
 export async function createCategory(userId: number, name: string, color: string, icon: string, isCustom = false): Promise<category> {
   const category = await prisma.category.create({
     data: {
