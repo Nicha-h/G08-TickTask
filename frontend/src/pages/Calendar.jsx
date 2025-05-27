@@ -11,6 +11,9 @@ import TaskSettingModal from "../components/modals/TaskSettingModal.jsx";
 import iconSmile from "../assets/iconSmile.svg";
 import axios from "axios";
 
+
+
+
 dayjs.extend(weekday);
 dayjs.extend(isoWeek);
 
@@ -29,17 +32,31 @@ useEffect(() => {
   const fetchTasks = async () => {
     setIsLoading(true);
     try {
-      const date = currentDate.format('YYYY-MM-DD');
-      const response = await axios.get(`http://localhost:3000/api/tasks/by-date?date=${date}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+ const response = await axios.get(`http://localhost:3000/api/tasks`, { 
+      params: {  
+        date: currentDate.format('YYYY-MM-DD')
+      },
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+     const processedTasks = response.data.map(task => {
+        const taskDate = dayjs(task.Task_Start_Date);
+        return {
+          ...task,
+          day: shortDaysOfWeek[taskDate.day()], 
+          date: taskDate.date(), 
+          fullDate: taskDate 
+        };
       });
 
       // Sort tasks by start time
-      const sortedTasks = response.data.sort((a, b) => {
-        const timeA = a.Task_Start_Time.split(':').map(Number);
-        const timeB = b.Task_Start_Time.split(':').map(Number);
+       const sortedTasks = processedTasks.sort((a, b) => {
+        const dateCompare = a.fullDate - b.fullDate;
+        if (dateCompare !== 0) return dateCompare;
+        
+        const timeA = (a.Task_Start_Time || '00:00').split(':').map(Number);
+        const timeB = (b.Task_Start_Time || '00:00').split(':').map(Number);
         return timeA[0] - timeB[0] || timeA[1] - timeB[1];
       });
 
@@ -151,30 +168,41 @@ useEffect(() => {
 
   // Render calendar cells with events
   const renderCalendarCell = (date, currentMonth) => {
+  if (!currentMonth) {
+    return (
+      <td
+        key={`${date}-${currentMonth}`}
+        className="border-2 border-gray-400 align-top h-20 sm:h-24 p-0.5 sm:p-1 text-[10px] sm:text-xs text-gray-400"
+      >
+        <div className="ml-0.5 sm:ml-1 font-semibold inline-block px-1 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-sm">
+          {date}
+        </div>
+      </td>
+    );
+  }
+
   const fullDate = currentDate.date(date).format("YYYY-MM-DD");
   const tasksForDate = tasks.filter(task => 
-    dayjs(task.startDate).isSame(fullDate, 'day')
+    dayjs(task.Task_Start_Date).isSame(fullDate, 'day')
   );
 
   return (
     <td
       key={`${date}-${currentMonth}`}
-      className={`border-2 border-gray-400 align-top h-20 sm:h-24 p-0.5 sm:p-1 text-[10px] sm:text-xs relative cursor-pointer ${
-        !currentMonth ? "text-gray-400" : ""
-      }`}
-      onClick={() => currentMonth && setSelectedDate(date)}
+      className="border-2 border-gray-400 align-top h-20 sm:h-24 p-0.5 sm:p-1 text-[10px] sm:text-xs relative cursor-pointer"
+      onClick={() => setSelectedDate(date)}
     >
       <div
         className={`ml-0.5 sm:ml-1 font-semibold inline-block px-1 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-sm ${
-          date === selectedDate && currentMonth ? "bg-green-100" : ""
+          date === selectedDate ? "bg-green-100" : ""
         }`}
       >
         {date}
       </div>
       {tasksForDate.map(task => (
         <div
-          key={task.id}
-          className="text-[8px] font-semibold h-6 w-full sm:text-xs p-1 text-center truncate mb-1"
+          key={task.Task_Title}
+          className="text-[8px] font-poppins font-bold h-6 w-full sm:text-xs p-1 text-center truncate mb-1"
           style={{ backgroundColor: task.Task_Color || "#FEF445" }}
         >
           {task.Task_Title || task.title}
@@ -190,7 +218,7 @@ useEffect(() => {
         <button onClick={handlePrevMonth}>
           <img src={prev1} alt="prev" />
         </button>
-        <h2 className="text-2xl font-bold uppercase tracking-wide">
+        <h2 className="text-2xl font-bold font-poppins uppercase tracking-wide">
           {currentDate.format("MMMM YYYY")}
         </h2>
         <button onClick={handleNextMonth}>
@@ -205,7 +233,7 @@ useEffect(() => {
               {daysOfWeek.map((day) => (
                 <th
                   key={day}
-                  className="bg-[#e7f1a8] text-[10px] sm:text-sm md:text-base font-medium text-black border-2 border-gray p-1 sm:p-2 w-[14.28%]"
+                  className="bg-[#e7f1a8] text-[10px] sm:text-sm md:text-base font-poppins font-medium text-black border-2 border-gray p-1 sm:p-2 w-[14.28%]"
                 >
                   {day}
                 </th>
@@ -230,41 +258,38 @@ useEffect(() => {
         </table>
       </div>
 
-      <div className="mt-5">
-  <h3 className="text-lg font-semibold mb-3">Upcoming Tasks</h3>
-  <div className="space-y-3">
-    {tasks
-      .filter(task => dayjs(task.startDate).isAfter(dayjs().subtract(1, 'day')))
-      .sort((a, b) => dayjs(a.startDate) - dayjs(b.startDate))
-      .map((task) => (
-        <div
-          key={task.Task_Title}
-          className="border border-black w-full rounded-lg px-4 py-3 flex justify-between items-center cursor-pointer hover:brightness-95 transition"
-          style={{ backgroundColor: task.Task_Color || "#FEF445" }}
-          onClick={() => handleSettingClick(task)}
-        >
-              <div className="text-center mr-4">
-                <div className="text-xs font-bold">{task.day}</div>
-                <div className="text-lg font-bold">{task.date}</div>
+    <div className="mt-5">
+      <h3 className="text-lg font-poppins font-bold mb-3">Upcoming Tasks</h3>
+      <div className="space-y-3">
+        {tasks
+          .filter(task => dayjs(task.Task_Start_Date).isAfter(dayjs().subtract(1, 'day')))
+          .map((task) => (
+            <div
+              key={task.TaskID}
+              className="border border-black w-full rounded-lg px-4 py-3 flex justify-between items-center cursor-pointer hover:brightness-95 transition"
+              style={{ backgroundColor: task.Task_Color || "#FEF445" }}
+              onClick={() => handleSettingClick(task)}
+            >
+              <div className="text-center mr-4 min-w-[50px]">
+                <div className="text-xs font-poppins uppercase font-bold">{task.day}</div>
+                <div className="text-lg font-poppins font-bold">{task.date}</div>
               </div>
 
-              <div className="flex-1 text-sm font-bold underline">
+              <div className="flex-1 font-poppins text-sm font-bold underline">
                 {task.Task_Title}
               </div>
 
-              <div className="flex items-center gap-2">
-                {task.Task_Start_Time && task.Task_End_Time && (
-                  <div className="text-[12px] font-semibold whitespace-nowrap">
-                    {task.Task_Start_Time} - {task.Task_End_Time}
-                  </div>
-                )}
-              </div>
+              {task.Task_Start_Time && task.Task_End_Time && (
+                <div className="text-[13px] font-poppins font-bold whitespace-nowrap">
+                  {task.Task_Start_Time} - {task.Task_End_Time}
+                </div>
+              )}
             </div>
           ))}
-        </div>
       </div>
-    </>
-  );
+    </div>
+  </>
+);
 
   // Mobile View
   const renderMobileCalendar = () => (
@@ -309,7 +334,7 @@ useEffect(() => {
                       .date(date)
                       .format("YYYY-MM-DD");
                     const taskForDate = tasks.find(
-                      (task) => task.startDate === fullDate
+                      (task) => task.Task_Start_Date === fullDate
                     );
 
                     return (
@@ -348,46 +373,39 @@ useEffect(() => {
         </table>
       </div>
 
-      <div className="mt-5">
-        <h3 className="text-lg font-semibold mb-3">Upcoming Tasks</h3>
-        <div className="space-y-3">
-          {tasks.map((task) => (
+     
+    <div className="mt-5">
+      <h3 className="text-lg font-poppins font-bold mb-3">Upcoming Tasks</h3>
+      <div className="space-y-3">
+        {tasks
+          .filter(task => dayjs(task.Task_Start_Date).isAfter(dayjs().subtract(1, 'day')))
+          .map((task) => (
             <div
-              key={`mobile-${task.id}`}
-              className="border border-black rounded-lg p-3 flex items-center cursor-pointer"
+              key={`mobile-${task.TaskID}`}
+              className="border border-black font-poppins rounded-lg p-3 flex items-center cursor-pointer"
               style={{ backgroundColor: task.Task_Color || "#FEF445" }}
+              onClick={() => handleSettingClick(task)}
             >
               <div className="text-center mr-3 min-w-14">
-                <div className="text-xs font-bold">{task.day}</div>
-                <div className="text-lg font-bold">{task.date}</div>
+                <div className="text-sm font-poppins uppercase font-bold">{task.day}</div>
+                <div className="text-sm font-poppins font-bold">{task.date}</div>
               </div>
 
               <div className="flex-1 font-bold underline text-sm">
                 {task.Task_Title}
               </div>
 
-              <div className="flex items-center">
-                {task.Task_Start_Time && task.Task_End_Time && (
-                  <div className="text-xs font-medium mr-2 hidden sm:block">
-                    {task.Task_Start_Time} - {task.Task_End_Time}
-                  </div>
-                )}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSettingClick(task);
-                  }}
-                  className="p-1"
-                >
-                <img src={setting} alt="settings" className="w-5 h-5" />
-                </button>
-              </div>
+              {task.Task_Start_Time && task.Task_End_Time && (
+                <div className="text-xs font-poppins font-bold mr-2">
+                  {task.Task_Start_Time} - {task.Task_End_Time}
+                </div>
+              )}
             </div>
           ))}
-        </div>
       </div>
-    </>
-  );
+    </div>
+  </>
+);
 
   return (
     <div className="p-4 max-w-5xl mx-auto font-poppins relative">
@@ -402,7 +420,7 @@ useEffect(() => {
       {/* Add Task Button */}
       <button
         onClick={() => navigate("/add")}
-        className="fixed bottom-[60px] right-[76px] w-[87px] h-[87px] rounded-full border-2 bg-primary flex items-center justify-center shadow-lg hover:scale-105 transition-transform cursor-pointer"
+        className="fixed bottom-6 right-6 sm:bottom-12 sm:right-16 bg-[#D7D9FF] border border-black rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-lg flex items-center justify-center hover:bg-[#c0c2ff] transition-all duration-200 ease-in-out transform hover:scale-105"
       >
         <img src={plus} alt="add" className="w-6 h-6" />
       </button>
