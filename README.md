@@ -1,27 +1,59 @@
-Features:
+# ✅ TickTask
 
-Create:
+> A beautifully customizable **To-Do List App** with built-in **Pomodoro Timer** to help you stay productive and focused.
 
-Our application allows user to create a new task, with icon and colour customisation based on their preferences.
+---
 
-Task can be assigned to different categories, all of which can e created by th user themselves.
+## ✨ Features
 
-User can create a pomodoro session, which help aids user who wishes to study or focus on a specific task.
+### 📝 Create
+- Create tasks with **icon** and **color customization**.
+- Assign tasks to **custom categories** created by the user.
+- Start **Pomodoro sessions** to focus on individual tasks.
 
-Read:
+### 📖 Read
+- View a **daily summary** of tasks directly on the homepage.
+- Navigate through a **weekly calendar** to check upcoming tasks.
+- Access a comprehensive **overview page** showing progress by **day**, **month**, and **year**.
 
-Our home page display a brief summary of task due on that specific day. User can navigate through the weekly calendar if they wishes to see task for other days.
+### 🔄 Update
+- Edit and customize **tasks**, **categories**, and **user profile** (picture & username).
 
-Our application provides an overviews page, which display the summary of the task user accomplished in a day, month, and year
+### 🗑️ Delete
+- Delete tasks, categories, and profile.
+- *Note:* Deleting a category won't delete the tasks within it.
 
-Update:
+---
 
-All of the task and category can be edited and customize. User can update their profile pictures and username, up to their preferences.
+## 💻 Tech Stack
 
-Delete:
+- ⚛️ React + TailwindCSS (Frontend)
+- 🔥 Hono + Prisma + MySQL (Backend)
+- 🔐 JWT for Authentication
+- ☁️ Cloudinary for Profile Images
 
-All of the tasks and category can be deleted, as well as the profile. If category is deleted, the tasks inside won't be deleted.
+---
 
-How to run: First you have to run the backend file Then you have to run the frontend separately both using
+## 🚀 Getting Started
 
+### 1️⃣ Run the Backend
+
+```bash
+cd backend
+npm install
 npm run dev
+```
+
+### 2️⃣ Run the Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## ❤️ Made with care by Team TickTask
+
+![Made with love](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red)
