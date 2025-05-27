@@ -36,7 +36,10 @@ const AddCategoryModal = ({
     }
 
     const isDuplicate = existingCategories.some(
-      (cat) => cat.name.trim().toLowerCase() === categoryName.trim().toLowerCase()
+      (cat) => {
+        const catName = cat.name || cat.Category_Name || cat.category_name || '';
+        return catName.trim().toLowerCase() === categoryName.trim().toLowerCase();
+      }
     );
     if (isDuplicate) {
       alert("This category name already exists. Please choose another name.");
@@ -44,10 +47,10 @@ const AddCategoryModal = ({
     }
 
     saveNewCategory({
-      id: Date.now(),
-      name: categoryName,
-      color: selectedColor === null ? "#D3D3D3" : selectedColor,
-      icon: selectedIcon || iconSmile,
+      CategoryId: Date.now().toString(),
+      Category_Name: categoryName,
+      Category_Color: selectedColor === null ? "#D3D3D3" : selectedColor,
+      Category_icon: selectedIcon || iconSmile,
     });
 
     resetForm();

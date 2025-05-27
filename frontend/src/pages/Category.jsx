@@ -75,18 +75,21 @@ export default function Category() {
   }).then(res => {
     // Normalize tasks to have a categories array (of CategoryId)
     console.log("Raw tasks data:", res.data); 
-    const normalizedTasks = res.data.map(task => ({
-      TaskID: task.id || task.TaskID || task._id,
-      Task_Title: task.title || task.Task_Title,
-      Task_Description: task.description || task.Task_Description,
-      Task_Status: task.status || task.Task_Status,
-      categories: task.categories
-        ? task.categories.map(cat => cat.CategoryId || cat.id || cat._id)
-        : (task.task_category
-            ? task.task_category.map(tc => tc.CategoryId || tc.categoryId || tc.category_id)
-            : []),
-      ...task
-    }));
+    const normalizedTasks = res.data.map(task => {
+      const taskStatus = task.status || task.Task_Status;
+      
+      return {
+        TaskID: task.id || task.TaskID || task._id,
+        Task_Title: task.title || task.Task_Title,
+        Task_Description: task.description || task.Task_Description,
+        Task_Status: taskStatus,
+        completed: taskStatus === "Complete" || taskStatus === "Completed",
+        categories: task.categories || 
+                 (task.task_category ? task.task_category.map(tc => tc.CategoryId || tc.categoryId) : []) || 
+                 (task.CategoryId ? [task.CategoryId] : []) ||
+                 [1] 
+      };
+    });
     console.log("Normalized tasks:", normalizedTasks);
     setTasks(normalizedTasks);
   }).catch(err => {
@@ -150,12 +153,40 @@ export default function Category() {
 
   useEffect(() => {
     const fetchTasksByCategory = async () => {
-      if (!selectedCategoryId || selectedCategoryId === "All") {
-        return;
-      }
       try {
         const token = localStorage.getItem("token");
-        await axios.get(
+        
+        if (!selectedCategoryId) {
+          // Fetch all tasks /ᐠ｡ꞈ｡ᐟ\
+          const response = await axios.get(
+            `http://localhost:3000/api/tasks`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          
+          if (response.data) {
+            // format
+            const normalizedTasks = response.data.map(task => ({
+              TaskID: task.id || task.TaskID || task._id,
+              Task_Title: task.title || task.Task_Title,
+              Task_Description: task.description || task.Task_Description,
+              Task_Status: task.status || task.Task_Status,
+              categories: task.categories || 
+                       (task.task_category ? task.task_category.map(tc => tc.CategoryId || tc.categoryId) : []) || 
+                       (task.CategoryId ? [task.CategoryId] : []) ||
+                       [1],
+              ...task
+            }));
+            setTasks(normalizedTasks);
+          }
+          return;
+        }
+        
+        // Fetch tasks for specific category (. ❛ ᴗ ❛.)
+        const response = await axios.get(
           `http://localhost:3000/api/category/${selectedCategoryId}/tasks`,
           {
             headers: {
@@ -163,11 +194,23 @@ export default function Category() {
             },
           }
         );
-        // No longer need to use response
-      } catch {
-        // No longer need to use response
+        
+        if (response.data) {
+          const normalizedTasks = response.data.map(task => ({
+            TaskID: task.id || task.TaskID || task._id,
+            Task_Title: task.title || task.Task_Title,
+            Task_Description: task.description || task.Task_Description,
+            Task_Status: task.status || task.Task_Status,
+            categories: [selectedCategoryId],
+            ...task
+          }));
+          setTasks(normalizedTasks);
+        }
+      } catch (error) {
+        console.error("Oops error fetching tasks for category (*>_<*):", error);
       }
     };
+    
     fetchTasksByCategory();
   }, [selectedCategoryId]);
   useEffect(() => {
@@ -196,7 +239,8 @@ export default function Category() {
       const progressObj = {};
       for (const cat of categories) {
         try {
-          const res = await axios.get(`http://localhost:3000/api/category/${cat.CategoryId}/progress `, {
+          // Remove the space after "progress"
+          const res = await axios.get(`http://localhost:3000/api/category/${cat.CategoryId}/progress`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           progressObj[cat.CategoryId] = res.data.progress ?? 0;
@@ -222,15 +266,33 @@ export default function Category() {
     setAddModalOpen(true);
   };
 
-  const confirmDeleteCategory = () => {
-    if (categoryToDelete) {
-      setCategories(categories.filter((cat) => cat.name !== categoryToDelete));
-      if (selectedCategoryId === categoryToDelete) {
-        setSelectedCategoryId(null); // Deselect if deleted
-      }
-    }
+  const confirmDeleteCategory = async () => {
+  if (!categoryToDelete) {
     setDeleteModalOpen(false);
-  };
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    await axios.delete(`http://localhost:3000/api/category/${categoryToDelete}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    setCategories(categories.filter((cat) => cat.CategoryId !== categoryToDelete));
+    
+    
+    if (selectedCategoryId === categoryToDelete) {
+      setSelectedCategoryId(null); // Deselect if deleted
+    }
+    
+    setDeleteModalOpen(false);
+  } catch (error) {
+    console.error("Error deleting category @v@: ", error);
+    alert(`Failed to delete category: ${error.response?.data?.message || error.message}`);
+  }
+};
 
   // Helper function to check if task is completed
   const isTaskCompleted = (task) => {
@@ -353,15 +415,26 @@ export default function Category() {
   .filter((task) => {
     console.log("Task categories:", task.categories); // Add this
     console.log("Selected category:", selectedCategoryId); // Add this
-    
+    // For "All" category or no selection, show all tasks -w-
     if (!selectedCategoryId || selectedCategoryId === "All") return true;
     console.log("All category IDs:", categories.map(c => c.CategoryId));
     console.log("First task's categories:", tasks[0]?.categories);
-    return Array.isArray(task.categories) && 
-           task.categories.some(catId => 
-             catId.toString() === selectedCategoryId.toString()
-           );
-           
+    
+    if (Array.isArray(task.categories) && task.categories.length > 0) {
+      return task.categories.some(catId => String(catId) === String(selectedCategoryId));
+    }
+    
+    if (task.CategoryId) {
+      return String(task.CategoryId) === String(selectedCategoryId);
+    }
+    
+    if (Array.isArray(task.task_category) && task.task_category.length > 0) {
+      return task.task_category.some(tc => 
+        String(tc.CategoryId || tc.categoryId) === String(selectedCategoryId)
+      );
+    }
+    
+    return selectedCategoryId === "1" || selectedCategoryId === 1;
   })
   .filter((task) => {
     if (filterType === "all") return true;
@@ -485,7 +558,7 @@ return (
                 <div className="mt-2 h-2 bg-white rounded-full overflow-hidden border border-black">
                   <div
                     className="h-2 bg-black rounded-full"
-                    style={{ width: `${calculateProgress("All")}%` }}
+                    style={{ width: `${categoryProgress["All"]}%` }}
                   />
                 </div>
               </div>
@@ -545,13 +618,13 @@ return (
                   <div className="mt-7">
                     <div className="font-semibold text-sm">{cat.Category_Name}</div>
                     <div className="text-xs text-black/70">
-                      {tasks.filter((t) => Array.isArray(t.categories) && t.categories.includes(cat.CategoryId)).length} Tasks
+                      {categoryTaskCounts[cat.CategoryId] || 0} Tasks
                     </div>
                   </div>
                   <div className="mt-2 h-2 bg-white rounded-full overflow-hidden border border-black">
                     <div
                       className="h-2 bg-black rounded-full"
-                      style={{ width: `${calculateProgress(cat.CategoryId)}%` }}
+                      style={{ width: `${categoryProgress[cat.CategoryId] || 0}%` }}
                     />
                   </div>
                 </div>
@@ -659,7 +732,7 @@ return (
                   >
                     <div
                       className={`w-6 h-6 rounded border border-black flex items-center justify-center cursor-pointer 
-                                group-hover:border-2 ${task.completed ? "bg-black" : "bg-white"}`}
+      group-hover:border-2 ${isTaskCompleted(task) ? "bg-black" : "bg-white"}`}
                     >
                       {isTaskCompleted(task) && (
                         <img src={iconTickWH} alt="Completed" className="w-4 h-4" />

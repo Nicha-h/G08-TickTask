@@ -3,6 +3,7 @@ import close from "../../assets/close.svg";
 import IconPickerModal from "../modals/IconPickerModal";
 import ColorPickerModal from "../modals/ColorPickerModal";
 import CustomColor from "../../assets/CustomColor.svg"; // อย่าลืม import ไอคอน CustomColor
+import axios from "axios";
 
 const EditCategoryModal = ({
   editModalOpen,
@@ -32,13 +33,50 @@ const EditCategoryModal = ({
 
   if (!editModalOpen || !editingCategory) return null;
 
-  const handleSave = () => {
-    saveCategory({
-      ...editingCategory,
-      name: categoryName,
-      color: color === null ? "#D3D3D3" : color,
-      icon: selectedIcon
-    });
+  const handleSave = async () => {
+    if (!categoryName) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const updatedCategory = {
+        Category_Name: categoryName,
+        Category_Color: color || "#D3D3D3",
+        Category_icon: selectedIcon || "smile", // :)
+        Category_is_Primary: false
+      };
+      // making sure it is primative type `(*>﹏<*)′
+      const categoryId = editingCategory.CategoryId?.toString ? 
+                          editingCategory.CategoryId.toString() : 
+                          (editingCategory.id || editingCategory._id);
+
+      if (!categoryId) {
+        throw new Error("Erm whaat the sigma invalid category ID");
+      }
+
+      await axios.patch(
+        `http://localhost:3000/api/category/${categoryId}`,
+        updatedCategory,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      saveCategory({
+        ...editingCategory,
+        ...updatedCategory,
+        CategoryId: categoryId 
+      });
+      
+      setEditModalOpen(false);
+    } catch (error) {
+      console.error("oops error updating category:", error);
+      alert(`You FAILED (ﾟДﾟ*)ﾉ to update category: ${error.response?.data?.message || error.message}`);
+    }
   };
 
   const handleColorSelect = (selectedColor) => {
