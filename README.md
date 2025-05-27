@@ -28,7 +28,7 @@
 ## 💻 Tech Stack
 
 - ⚛️ React + TailwindCSS (Frontend)
-- 🔥 Hono + Prisma + MySQL (Backend)
+- 🔥 Hono + Prisma + SQLite (Backend)
 - 🔐 JWT for Authentication
 - ☁️ Cloudinary for Profile Images
 
