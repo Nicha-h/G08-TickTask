@@ -2,6 +2,7 @@
 
 > A beautifully customizable **To-Do List App** with built-in **Pomodoro Timer** to help you stay productive and focused.
 
+
 ---
 
 ## ✨ Features
@@ -23,12 +24,15 @@
 - Delete tasks, categories, and profile.
 - *Note:* Deleting a category won't delete the tasks within it.
 
+### 🔐 Account Management
+- **Reset your password** securely via email using a reset link.
+
 ---
 
 ## 💻 Tech Stack
 
 - ⚛️ React + TailwindCSS (Frontend)
-- 🔥 Hono + Prisma + SQLite (Backend)
+- 🔥 Hono + Prisma + MySQL (Backend)
 - 🔐 JWT for Authentication
 - ☁️ Cloudinary for Profile Images
 
@@ -52,7 +56,6 @@ npm install
 npm run dev
 ```
 
----
 
 ## ❤️ Made with care by Team TickTask
 
