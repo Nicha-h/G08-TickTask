@@ -361,7 +361,7 @@ useEffect(() => {
                             {date}
                           </div>
                           {taskForDate && currentMonth && (
-                            <div className="w-2 h-2 bg-black rounded-full mt-0.5"></div>
+                            <div className="w-2 h-2 bg-[#ff5eb5] border-1 rounded-full mt-0.5"></div>
                           )}
                         </div>
                       </td>
@@ -420,7 +420,7 @@ useEffect(() => {
       {/* Add Task Button */}
       <button
         onClick={() => navigate("/add")}
-        className="fixed bottom-6 right-6 sm:bottom-12 sm:right-16 bg-[#D7D9FF] border border-black rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-lg flex items-center justify-center hover:bg-[#c0c2ff] transition-all duration-200 ease-in-out transform hover:scale-105"
+        className="fixed bottom-[60px] right-[76px] w-[87px] h-[87px] rounded-full border-2 bg-primary flex items-center justify-center shadow-lg hover:scale-105 transition-transform cursor-pointer"
       >
         <img src={plus} alt="add" className="w-6 h-6" />
       </button>

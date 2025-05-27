@@ -13,5 +13,5 @@ TaskRoute.post('/',Validator.validateCreateTask, TaskController.createTaskContro
 TaskRoute.put('/:id',Validator.validateUpdateTask, TaskController.updateTaskController);
 TaskRoute.patch('/:id',TaskController.patchTaskController);
 TaskRoute.delete('/:id', TaskController.deleteTaskController); 
-
+TaskRoute.get('/overview', TaskController.getTasksOverview); 
 export default TaskRoute;

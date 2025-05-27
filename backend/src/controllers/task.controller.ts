@@ -93,3 +93,107 @@ export const deleteTaskController = async (c: Context) => {
     return c.json({ success: false, message: 'Error deleting task' }, 500);
   }
 };
+
+export const getTasksOverview = async (c: Context) => {
+  try {
+    const user = c.get('user') as { id: number };
+    
+    // Get current date information
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    
+    const yearStart = new Date(now.getFullYear(), 0, 1);
+    const yearEnd = new Date(now.getFullYear() + 1, 0, 1);
+
+    // Get counts for today
+    const todayTotal = await prisma.task.count({
+      where: {
+        UserID: user.id,
+        OR: [
+          { Task_Start_Date: { gte: todayStart.toISOString(), lt: todayEnd.toISOString() } },
+          { Task_End_Date: { gte: todayStart.toISOString(), lt: todayEnd.toISOString() } }
+        ]
+      }
+    });
+
+    const todayCompleted = await prisma.task.count({
+      where: {
+        UserID: user.id,
+        Task_Status: 'Completed',
+        OR: [
+          { Task_Start_Date: { gte: todayStart.toISOString(), lt: todayEnd.toISOString() } },
+          { Task_End_Date: { gte: todayStart.toISOString(), lt: todayEnd.toISOString() } }
+        ]
+      }
+    });
+
+    // Get counts for this month
+    const monthTotal = await prisma.task.count({
+      where: {
+        UserID: user.id,
+        OR: [
+          { Task_Start_Date: { gte: monthStart.toISOString(), lt: monthEnd.toISOString() } },
+          { Task_End_Date: { gte: monthStart.toISOString(), lt: monthEnd.toISOString() } }
+        ]
+      }
+    });
+
+    const monthCompleted = await prisma.task.count({
+      where: {
+        UserID: user.id,
+        Task_Status: 'Completed',
+        OR: [
+          { Task_Start_Date: { gte: monthStart.toISOString(), lt: monthEnd.toISOString() } },
+          { Task_End_Date: { gte: monthStart.toISOString(), lt: monthEnd.toISOString() } }
+        ]
+      }
+    });
+
+    // Get counts for this year
+    const yearTotal = await prisma.task.count({
+      where: {
+        UserID: user.id,
+        OR: [
+          { Task_Start_Date: { gte: yearStart.toISOString(), lt: yearEnd.toISOString() } },
+          { Task_End_Date: { gte: yearStart.toISOString(), lt: yearEnd.toISOString() } }
+        ]
+      }
+    });
+
+    const yearCompleted = await prisma.task.count({
+      where: {
+        UserID: user.id,
+        Task_Status: 'Completed',
+        OR: [
+          { Task_Start_Date: { gte: yearStart.toISOString(), lt: yearEnd.toISOString() } },
+          { Task_End_Date: { gte: yearStart.toISOString(), lt: yearEnd.toISOString() } }
+        ]
+      }
+    });
+
+    return c.json({
+      today: {
+        total: todayTotal,
+        completed: todayCompleted,
+        inComplete: todayTotal - todayCompleted
+      },
+      month: {
+        total: monthTotal,
+        completed: monthCompleted,
+        inComplete: monthTotal - monthCompleted
+      },
+      year: {
+        total: yearTotal,
+        completed: yearCompleted,
+        inComplete: yearTotal - yearCompleted
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching task overview:', error);
+    return c.json({ error: 'Failed to fetch task overview' }, 500);
+  }
+};
