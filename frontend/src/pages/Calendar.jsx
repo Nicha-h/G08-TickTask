@@ -9,6 +9,7 @@ import plus from "../assets/plus.svg";
 import { useNavigate } from "react-router-dom";
 import TaskSettingModal from "../components/modals/TaskSettingModal.jsx";
 import iconSmile from "../assets/iconSmile.svg";
+import axios from "axios";
 
 dayjs.extend(weekday);
 dayjs.extend(isoWeek);
@@ -18,69 +19,41 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState(dayjs().date());
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      day: "FRI",
-      date: "07",
-      name: "CSC122 Quiz#2",
-      title: "CSC122 Quiz#2",
-      startTime: "09:00",
-      endTime: "10:30",
-      color: "#FFECB4",
-      category: "Study",
-      description: "Prepare for chapter 5-8",
-      startDate: "2025-05-08",
-      endDate: "2025-05-07",
-      icon: iconSmile,
-    },
-    {
-      id: 2,
-      day: "TUE",
-      date: "11",
-      name: "Midterm #209",
-      title: "Midterm #209",
-      startTime: "13:00",
-      endTime: "15:00",
-      color: "#FFECB4",
-      category: "Study",
-      description: "Midterm exam for Computer Science",
-      startDate: "2025-03-11",
-      endDate: "2025-03-11",
-      icon: iconSmile,
-    },
-    {
-      id: 3,
-      day: "THU",
-      date: "13",
-      name: "Frog-Catching",
-      title: "Frog-Catching",
-      startTime: "07:00",
-      endTime: "13:00",
-      color: "#D1F4FF",
-      category: "Personal",
-      description: "Annual frog-catching competition",
-      startDate: "2025-03-13",
-      endDate: "2025-03-13",
-      icon: iconSmile,
-    },
-    {
-      id: 4,
-      day: "SUN",
-      date: "23",
-      name: "Run for Life",
-      title: "Run for Life",
-      startTime: "09:00",
-      endTime: "12:00",
-      color: "#FFC6F0",
-      category: "Workout",
-      description: "Charity marathon 10km",
-      startDate: "2025-03-23",
-      endDate: "2025-03-23",
-      icon: iconSmile,
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+const [error, setError] = useState(null);
 
+const token = localStorage.getItem("token");
+  
+useEffect(() => {
+  const fetchTasks = async () => {
+    setIsLoading(true);
+    try {
+      const date = currentDate.format('YYYY-MM-DD');
+      const response = await axios.get(`http://localhost:3000/api/tasks/by-date?date=${date}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      // Sort tasks by start time
+      const sortedTasks = response.data.sort((a, b) => {
+        const timeA = a.Task_Start_Time.split(':').map(Number);
+        const timeB = b.Task_Start_Time.split(':').map(Number);
+        return timeA[0] - timeB[0] || timeA[1] - timeB[1];
+      });
+
+      setTasks(sortedTasks);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching tasks:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchTasks();
+}, [currentDate, token]); // Refetch when month changes
   const daysOfWeek = [
     "Sunday",
     "Monday",
@@ -146,68 +119,70 @@ const Calendar = () => {
     setSelectedTask(task);
   };
 
-  const handleTaskUpdate = (updatedTask) => {
-    const updatedDate = dayjs(updatedTask.startDate);
-    const updatedDay = updatedDate.format("ddd").toUpperCase();
-    const updatedDateNum = updatedDate.format("DD");
+ const handleTaskSave = (updatedTask) => {
+    console.log("Saving task. Original tasks:", tasks);
+    console.log("Updated task:", updatedTask);
 
-    setTasks(
-      tasks.map((task) =>
-        task.id === updatedTask.id
-          ? {
-              ...updatedTask,
-              name: updatedTask.title,
-              day: updatedDay,
-              date: updatedDateNum,
-            }
-          : task
-      )
-    );
+    if (updatedTask === null) {
+      // Handle delete case
+      console.log("Deleting task with TaskID:", selectedTask?.TaskID);
+      setTasks(prev => prev.filter(t => t.TaskID !== selectedTask?.TaskID));
+    } else {
+      // Handle update case - using TaskID instead of id
+      console.log("Updating task with TaskID:", updatedTask.TaskID);
+      setTasks(prev => {
+        const newTasks = prev.map(t => {
+          const shouldUpdate = t.TaskID === updatedTask.TaskID;
+          console.log(`Task ${t.TaskID}:, shouldUpdate = ${shouldUpdate}`);
+          return shouldUpdate ? updatedTask : t;
+        });
+        console.log("New tasks array:", newTasks);
+        return newTasks;
+      });
+    }
     setSelectedTask(null);
   };
 
-  const handleTaskDelete = (taskToDelete) => {
-    setTasks(tasks.filter((task) => task.id !== taskToDelete.id));
-    setSelectedTask(null);
-  };
-  
 
   const closeModal = () => {
     setSelectedTask(null);
   };
+  
 
   // Render calendar cells with events
   const renderCalendarCell = (date, currentMonth) => {
-    const fullDate = currentDate.date(date).format("YYYY-MM-DD");
-    const taskForDate = tasks.find((task) => task.startDate === fullDate);
+  const fullDate = currentDate.date(date).format("YYYY-MM-DD");
+  const tasksForDate = tasks.filter(task => 
+    dayjs(task.startDate).isSame(fullDate, 'day')
+  );
 
-    return (
-      <td
-        key={`${date}-${currentMonth}`}
-        className={`border-2 border-gray-400 align-top h-20 sm:h-24 p-0.5 sm:p-1 text-[10px] sm:text-xs relative cursor-pointer ${
-          !currentMonth ? "text-gray-400" : ""
+  return (
+    <td
+      key={`${date}-${currentMonth}`}
+      className={`border-2 border-gray-400 align-top h-20 sm:h-24 p-0.5 sm:p-1 text-[10px] sm:text-xs relative cursor-pointer ${
+        !currentMonth ? "text-gray-400" : ""
+      }`}
+      onClick={() => currentMonth && setSelectedDate(date)}
+    >
+      <div
+        className={`ml-0.5 sm:ml-1 font-semibold inline-block px-1 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-sm ${
+          date === selectedDate && currentMonth ? "bg-green-100" : ""
         }`}
-        onClick={() => currentMonth && setSelectedDate(date)}
       >
+        {date}
+      </div>
+      {tasksForDate.map(task => (
         <div
-          className={`ml-0.5 sm:ml-1 font-semibold inline-block px-1 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-sm ${
-            date === selectedDate && currentMonth ? "bg-green-100" : ""
-          }`}
+          key={task.id}
+          className="text-[8px] font-semibold h-6 w-full sm:text-xs p-1 text-center truncate mb-1"
+          style={{ backgroundColor: task.Task_Color || "#FEF445" }}
         >
-          {date}
+          {task.Task_Title || task.title}
         </div>
-        {taskForDate && currentMonth && (
-          <div
-            className="text-[8px] font-semibold h-6 w-full sm:text-xs p-1 text-center truncate"
-            style={{ backgroundColor: taskForDate.color || "#FEF445" }}
-          >
-            {taskForDate.name}
-          </div>
-        )}
-      </td>
-    );
-  };
-
+      ))}
+    </td>
+  );
+};
   // Desktop View
   const renderDesktopCalendar = () => (
     <>
@@ -256,28 +231,31 @@ const Calendar = () => {
       </div>
 
       <div className="mt-5">
-        <h3 className="text-lg font-semibold mb-3">Upcoming Tasks</h3>
-        <div className="space-y-3">
-          {tasks.map((task) => (
-            <div
-              key={task.id}
-              className="border border-black w-full rounded-lg px-4 py-3 flex justify-between items-center cursor-pointer hover:brightness-95 transition"
-              style={{ backgroundColor: task.color || "#FEF445" }}
-              onClick={() => handleSettingClick(task)}
-            >
+  <h3 className="text-lg font-semibold mb-3">Upcoming Tasks</h3>
+  <div className="space-y-3">
+    {tasks
+      .filter(task => dayjs(task.startDate).isAfter(dayjs().subtract(1, 'day')))
+      .sort((a, b) => dayjs(a.startDate) - dayjs(b.startDate))
+      .map((task) => (
+        <div
+          key={task.Task_Title}
+          className="border border-black w-full rounded-lg px-4 py-3 flex justify-between items-center cursor-pointer hover:brightness-95 transition"
+          style={{ backgroundColor: task.Task_Color || "#FEF445" }}
+          onClick={() => handleSettingClick(task)}
+        >
               <div className="text-center mr-4">
                 <div className="text-xs font-bold">{task.day}</div>
                 <div className="text-lg font-bold">{task.date}</div>
               </div>
 
               <div className="flex-1 text-sm font-bold underline">
-                {task.name}
+                {task.Task_Title}
               </div>
 
               <div className="flex items-center gap-2">
-                {task.startTime && task.endTime && (
+                {task.Task_Start_Time && task.Task_End_Time && (
                   <div className="text-[12px] font-semibold whitespace-nowrap">
-                    {task.startTime} - {task.endTime}
+                    {task.Task_Start_Time} - {task.Task_End_Time}
                   </div>
                 )}
               </div>
@@ -377,7 +355,7 @@ const Calendar = () => {
             <div
               key={`mobile-${task.id}`}
               className="border border-black rounded-lg p-3 flex items-center cursor-pointer"
-              style={{ backgroundColor: task.color || "#FEF445" }}
+              style={{ backgroundColor: task.Task_Color || "#FEF445" }}
             >
               <div className="text-center mr-3 min-w-14">
                 <div className="text-xs font-bold">{task.day}</div>
@@ -385,13 +363,13 @@ const Calendar = () => {
               </div>
 
               <div className="flex-1 font-bold underline text-sm">
-                {task.name}
+                {task.Task_Title}
               </div>
 
               <div className="flex items-center">
-                {task.startTime && task.endTime && (
+                {task.Task_Start_Time && task.Task_End_Time && (
                   <div className="text-xs font-medium mr-2 hidden sm:block">
-                    {task.startTime} - {task.endTime}
+                    {task.Task_Start_Time} - {task.Task_End_Time}
                   </div>
                 )}
                 <button
@@ -401,7 +379,7 @@ const Calendar = () => {
                   }}
                   className="p-1"
                 >
-                  <img src={setting} alt="settings" className="w-5 h-5" />
+                <img src={setting} alt="settings" className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -413,25 +391,29 @@ const Calendar = () => {
 
   return (
     <div className="p-4 max-w-5xl mx-auto font-poppins relative">
+          {error && (
+      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+        {error}
+      </div>
+    )}
       {/* Desktop or Mobile View */}
       {isMobileView ? renderMobileCalendar() : renderDesktopCalendar()}
 
       {/* Add Task Button */}
       <button
-        onClick={() => navigate("/addtask")}
-        className="fixed bottom-6 right-6 sm:bottom-12 sm:right-16 bg-[#D7D9FF] border border-black rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-lg flex items-center justify-center hover:bg-[#c0c2ff] transition-all duration-200 ease-in-out transform hover:scale-105"
+        onClick={() => navigate("/add")}
+        className="fixed bottom-[60px] right-[76px] w-[87px] h-[87px] rounded-full border-2 bg-primary flex items-center justify-center shadow-lg hover:scale-105 transition-transform cursor-pointer"
       >
         <img src={plus} alt="add" className="w-6 h-6" />
       </button>
 
-      {selectedTask && (
+{selectedTask && (
         <div className="fixed inset-0 bg-gray-800/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-xl max-h-[85vh] h-auto overflow-y-auto shadow-2xl p-6">
-            <TaskSettingModal
+            <TaskSettingModal 
               task={selectedTask}
-              onSave={handleTaskUpdate}
-              onDelete={handleTaskDelete}
-              onClose={closeModal}
+              onSave={handleTaskSave}
+              onClose={() => setSelectedTask(null)}
             />
           </div>
         </div>

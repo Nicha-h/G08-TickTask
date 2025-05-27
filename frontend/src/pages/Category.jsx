@@ -168,18 +168,20 @@ export default function Category() {
           );
           
           if (response.data) {
-            // format
-            const normalizedTasks = response.data.map(task => ({
-              TaskID: task.id || task.TaskID || task._id,
-              Task_Title: task.title || task.Task_Title,
-              Task_Description: task.description || task.Task_Description,
-              Task_Status: task.status || task.Task_Status,
-              categories: task.categories || 
-                       (task.task_category ? task.task_category.map(tc => tc.CategoryId || tc.categoryId) : []) || 
-                       (task.CategoryId ? [task.CategoryId] : []) ||
-                       [1],
-              ...task
-            }));
+            // Filter out null/undefined values and format
+            const normalizedTasks = response.data
+              .filter(task => task != null) // Remove null/undefined tasks
+              .map(task => ({
+                TaskID: task.id || task.TaskID || task._id,
+                Task_Title: task.title || task.Task_Title,
+                Task_Description: task.description || task.Task_Description,
+                Task_Status: task.status || task.Task_Status,
+                categories: task.categories || 
+                         (task.task_category ? task.task_category.map(tc => tc.CategoryId || tc.categoryId) : []) || 
+                         (task.CategoryId ? [task.CategoryId] : []) ||
+                         [1],
+                ...task
+              }));
             setTasks(normalizedTasks);
           }
           return;
@@ -196,14 +198,16 @@ export default function Category() {
         );
         
         if (response.data) {
-          const normalizedTasks = response.data.map(task => ({
-            TaskID: task.id || task.TaskID || task._id,
-            Task_Title: task.title || task.Task_Title,
-            Task_Description: task.description || task.Task_Description,
-            Task_Status: task.status || task.Task_Status,
-            categories: [selectedCategoryId],
-            ...task
-          }));
+          const normalizedTasks = response.data
+            .filter(task => task != null) // Remove null/undefined tasks
+            .map(task => ({
+              TaskID: task.id || task.TaskID || task._id,
+              Task_Title: task.title || task.Task_Title,
+              Task_Description: task.description || task.Task_Description,
+              Task_Status: task.status || task.Task_Status,
+              categories: [selectedCategoryId],
+              ...task
+            }));
           setTasks(normalizedTasks);
         }
       } catch (error) {
@@ -213,6 +217,7 @@ export default function Category() {
     
     fetchTasksByCategory();
   }, [selectedCategoryId]);
+  
   useEffect(() => {
     const fetchCounts = async () => {
       if (!categories.length) return;

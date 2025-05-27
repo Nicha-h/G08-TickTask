@@ -15,15 +15,19 @@ export async function getUserCategories(userId: number) {
 }
 
 export const getTasksByCategoryId = async (categoryId: number) => {
-  return await prisma.task_category.findMany({
+  const results = await prisma.task_category.findMany({
     where: {
       CategoryId: categoryId,
+
     },
     include: {
-      task: true, 
+      task: true,
     },
   });
+
+  return results;
 };
+
 
 export async function createCategory(userId: number, name: string, color: string, icon: string, isCustom = false): Promise<category> {
   const category = await prisma.category.create({

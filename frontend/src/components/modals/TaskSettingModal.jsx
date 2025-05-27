@@ -9,30 +9,34 @@ import CustomColor from "../../assets/CustomColor.svg";
 import iconSmile from "../../assets/iconSmile.svg";
 import axios from "axios";
 import DeleteTask from "./DeleteTask.jsx";
+import { iconComponents } from "./icon.jsx"; 
 
 const TaskSettingModal = ({ task, onSave, onClose }) => {
-  const [title, setTitle] = useState(task.title || "");
-  const [startDate, setStartDate] = useState(task.startDate || "");
-  const [endDate, setEndDate] = useState(task.endDate || "");
-  const [startTime, setStartTime] = useState(task.startTime || "");
-  const [endTime, setEndTime] = useState(task.endTime || "");
-  const [color, setColor] = useState(task.color || null);
-  const [description, setDescription] = useState(task.description || "");
+  const [title, setTitle] = useState(task?.Task_Title || "");
+  const [startDate, setStartDate] = useState(task?.Task_Start_Date || "");
+  const [endDate, setEndDate] = useState(task?.Task_End_Date || "");
+  const [startTime, setStartTime] = useState(task?.Task_Start_Time || "");
+  const [endTime, setEndTime] = useState(task?.Task_End_Time || "");
+  const [color, setColor] = useState(task?.Task_Color || null);
+  const [description, setDescription] = useState(task?.Task_Description || "");
   const [category, setCategory] = useState([]); 
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState(task.icon || iconSmile);
+  const [selectedIcon, setSelectedIcon] = useState(task?.Task_Icon || iconSmile);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [showColorPickerModal, setShowColorPickerModal] = useState(false);
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
-  // const [createdDate] = useState(new Date().toISOString().split("T")[0]);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [selectedCategoryName, setSelectedCategoryName] = useState("");
   const [categoryColor, setCategoryColor] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const token = localStorage.getItem("token");
+  
   const colorOptions = [
     null,
     "#F24726",
@@ -44,15 +48,36 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
     "#8948E1",
   ];
 
+  // Load categories on component mount
   useEffect(() => {
-  axios.get("http://localhost:3000/api/category", {
-    headers: { Authorization: `Bearer ${token}` },
-  }).then(res => {
-    setCategory(res.data); 
-  }).catch(err => {
-    console.error("Failed to fetch categories", err);
-  });
-}, []);
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/category", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setCategory(response.data || []); 
+      } catch (err) {
+        console.error("Failed to fetch categories", err);
+        setError("Failed to load categories");
+      }
+    };
+
+    if (token) {
+      fetchCategories();
+    }
+  }, [token]);
+
+  // Initialize existing category if task has one
+  useEffect(() => {
+    if (task?.CategoryId && category.length > 0) {
+      const existingCategory = category.find(cat => cat.CategoryId === task.CategoryId);
+      if (existingCategory) {
+        setSelectedCategoryId(existingCategory.CategoryId);
+        setSelectedCategoryName(existingCategory.Category_Name);
+        setCategoryColor(existingCategory.Category_Color);
+      }
+    }
+  }, [task, category]);
    
   const formatTimeDisplay = (time) => {
     if (!time) return "HH:MM";
@@ -61,28 +86,16 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
     const formattedHours = parseInt(hours) % 12 || 12;
     return `${formattedHours}:${minutes} ${period}`;
   };
-  // const formatToDisplay = (dateStr) => {
-  //   if (!dateStr) return "No date";
-  //   const [year, month, day] = dateStr.split("-");
-  //   return `${day}/${month}/${year}`;
-  // };
 
-  // const parseToStorage = (dateStr) => {
-  //   if (!dateStr || dateStr === "No date") return null;
-  //   const [day, month, year] = dateStr.split("/");
-  //   return `${year}-${month}-${day}`;
-  // };
   const formatDate = (dateStr) => {
     if (!dateStr) return null;
     
-    // Handle different date formats
     if (dateStr.includes('/')) {
       const [dd, mm, yyyy] = dateStr.split('/');
       if (!dd || !mm || !yyyy) return null;
       return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
     }
     
-    // If already in YYYY-MM-DD format, return as is
     if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
       return dateStr;
     }
@@ -90,22 +103,44 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
     return null;
   };
 
-  const handleSubmit = async () => {
-    if (!task.id) {
-      alert("Task ID is missing");
+  const handleSubmit = async (e) => {
+    e.preventDefault(); 
+    
+    if (!title.trim()) {
+      setError("Task title is required");
       return;
     }
 
+    setLoading(true);
+    setError("");
+
     try {
-      const taskId = task.id;
+
+      console.log("Full task object:", task);
+      console.log("Available task properties:", Object.keys(task || {}));
+    
+      const taskId = task?.TaskID ||  
+                    task?.taskId || 
+                    task?.Task_ID || 
+                    task?.id || 
+                    task?.ID || 
+                    task?.TaskId ||
+                    task?.task_id;
+      
+      console.log("Extracted Task ID:", taskId);
+      
+      if (!taskId) {
+        console.error("Task ID not found. Task object:", task);
+        throw new Error(`Task ID is missing. Available properties: ${Object.keys(task || {}).join(', ')}`);
+      }
       
       const taskData = {
-        Task_Title: title,
-        Task_Description: description,
+        Task_Title: title.trim(),
+        Task_Description: description.trim(),
         Task_Start_Date: formatDate(startDate),
         Task_End_Date: formatDate(endDate),
-        Task_Start_Time: startTime,
-        Task_End_Time: endTime,
+        Task_Start_Time: startTime || null,
+        Task_End_Time: endTime || null,
         Task_Color: color,
         Task_Icon: selectedIcon,
       };
@@ -122,7 +157,6 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
       );
 
       console.log("Task updated successfully:", response.data);
-
       if (selectedCategoryId) {
         try {
           await axios.put(
@@ -142,20 +176,23 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
         }
       }
 
+ 
       setShowIconPicker(false);
       setShowColorPickerModal(false);
       
-      if (onSave) {
+       if (onSave) {
         const updatedTask = {
-          ...task,
-          title,
-          description,
-          startDate: formatDate(startDate),
-          endDate: formatDate(endDate),
-          startTime,
-          endTime,
-          color,
-          icon: selectedIcon,
+          ...task, 
+          TaskID: taskId,
+          Task_Title: title.trim(),
+          Task_Description: description.trim(),
+          Task_Start_Date: formatDate(startDate),
+          Task_End_Date: formatDate(endDate),
+          Task_Start_Time: startTime,
+          Task_End_Time: endTime,
+          Task_Color: color,
+          Task_Icon: selectedIcon,
+          CategoryID: selectedCategoryId,
         };
         onSave(updatedTask);
       }
@@ -163,38 +200,82 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
       if (onClose) {
         onClose();
       }
-
+    
+      if (onClose) {
+        onClose();
+      }
 
     } catch (error) {
       console.error("Error saving task:", error);
       
-      if (error.response) {
-        console.error("Error response:", error.response.data);
-        alert(`Failed to save task: ${error.response.data.message || 'Unknown error'}`);
-      } else if (error.request) {
-        console.error("No response received:", error.request);
-        alert("Failed to save task: No response from server");
-      } else {
-        console.error("Error setting up request:", error.message);
-        alert(`Failed to save task: ${error.message}`);
+      let errorMessage = "Failed to save task";
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
-   const handleDelete = async () => {
+  const handleDelete = () => {
     setShowDeleteModal(true);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
+  setLoading(true);
+  setError("");
+
+  try {
+    const taskId = task?.TaskID ||  
+                  task?.taskId || 
+                  task?.Task_ID || 
+                  task?.id || 
+                  task?.ID || 
+                  task?.TaskId ||
+                  task?.task_id;
     
-    if (onSave) {
-      onSave(null); 
+    if (!taskId) {
+      throw new Error(`Task ID is missing. Available properties: ${Object.keys(task || {}).join(', ')}`);
     }
-    
+
+    await axios.delete(`http://localhost:3000/api/tasks/${taskId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Task deleted successfully");
+
+    if (onSave) {
+      onSave(null);
+    }
+
     if (onClose) {
       onClose();
     }
-  };
+    setShowDeleteModal(false);
+
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    
+    let errorMessage = "Failed to delete task";
+    
+    if (error.response?.data?.message) {
+      errorMessage = error.response.data.message;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
+    setError(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleColorSelect = (selectedColor) => {
     setColor(selectedColor);
@@ -204,12 +285,12 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
     setShowCategoryDropdown(!showCategoryDropdown);
   };
 
-const selectCategory = (selectedCategory) => {
-  setSelectedCategoryId(selectedCategory.CategoryId); 
-  setSelectedCategoryName(selectedCategory.Category_Name); 
-  setCategoryColor(selectedCategory.Category_Color); 
-  setShowCategoryDropdown(false);
-};
+  const selectCategory = (selectedCategory) => {
+    setSelectedCategoryId(selectedCategory.CategoryId); 
+    setSelectedCategoryName(selectedCategory.Category_Name); 
+    setCategoryColor(selectedCategory.Category_Color); 
+    setShowCategoryDropdown(false);
+  };
 
   const parseDateFromPicker = (dateStr) => {
     if (!dateStr) return "";
@@ -217,10 +298,15 @@ const selectCategory = (selectedCategory) => {
     return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   };
 
+  // Don't render if task is not provided
+  if (!task) {
+    return null;
+  }
+
   return (
     <div className="text-black-900 p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-[20px] font-poppins font-bold"></h1>
+        <h1 className="text-[20px] font-poppins font-bold">Edit Task</h1>
         <img
           className="w-5 h-5 sm:w-7 sm:h-7 object-contain cursor-pointer"
           src={close}
@@ -228,6 +314,12 @@ const selectCategory = (selectedCategory) => {
           onClick={onClose}
         />
       </div>
+
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="w-full">
         {/* Icon */}
@@ -241,7 +333,7 @@ const selectCategory = (selectedCategory) => {
             onClick={() => setShowIconPicker(true)}
           >
             <img
-              src={selectedIcon}
+              src={iconComponents?.[selectedIcon] || selectedIcon}
               alt="Task Icon"
               className="w-16 h-16 object-contain"
             />
@@ -251,13 +343,14 @@ const selectCategory = (selectedCategory) => {
         {/* Title */}
         <div className="mb-4">
           <p className="flex text-[15px] sm:text-[16px] font-poppins font-bold">
-            TITLE
+            TITLE *
           </p>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full p-3 rounded-lg text-[14px] border-[1.5px] border-black"
+            required
           />
         </div>
 
@@ -359,16 +452,20 @@ const selectCategory = (selectedCategory) => {
               />
 
               {showCategoryDropdown && (
-                <div className="absolute top-full right-0 mt-2 bg-white border rounded shadow-lg z-10">
-                  {category.map((cat) => (
-                    <div
-                      key={cat.CategoryId}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => selectCategory(cat)}
-                    >
-                      {cat.Category_Name} 
-                    </div>
-                  ))}
+                <div className="absolute top-full right-0 mt-2 bg-white border rounded shadow-lg z-10 max-h-40 overflow-y-auto">
+                  {category.length > 0 ? (
+                    category.map((cat) => (
+                      <div
+                        key={cat.CategoryId}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => selectCategory(cat)}
+                      >
+                        {cat.Category_Name} 
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-gray-500">No categories available</div>
+                  )}
                 </div>
               )}
             </div>
@@ -377,7 +474,7 @@ const selectCategory = (selectedCategory) => {
           {selectedCategoryName && (
             <div className="flex items-center mb-2">
               <span 
-                className="px-2 py-1 rounded mr-2"
+                className="px-2 py-1 rounded mr-2 text-sm"
                 style={{ backgroundColor: categoryColor || "#E5E7EB" }}
               >
                 {selectedCategoryName}
@@ -389,7 +486,7 @@ const selectCategory = (selectedCategory) => {
                   setSelectedCategoryName("");
                   setCategoryColor("");
                 }}
-                className="text-sm text-red-500"
+                className="text-sm text-red-500 hover:text-red-700"
               >
                 Remove
               </button>
@@ -410,6 +507,7 @@ const selectCategory = (selectedCategory) => {
             type="button"
             onClick={handleDelete}
             className="flex justify-start px-4 py-2 bg-[#ff6868] rounded-lg border border-black font-bold hover:bg-red-400 ml-4"
+            disabled={loading}
           >
             Delete
           </button>
@@ -417,16 +515,17 @@ const selectCategory = (selectedCategory) => {
             type="button"
             onClick={onClose}
             className="px-4 py-2 bg-gray-100 rounded-lg border border-black font-bold hover:bg-gray-200 ml-auto"
+            disabled={loading}
           >
             CANCEL
           </button>
           <button
-            onClick={handleSubmit}
-            className="px-4 py-2 bg-[#E7FFAE] rounded-lg border border-black font-bold hover:bg-lime-200 ml-4"
+            type="submit"
+            className="px-4 py-2 bg-[#E7FFAE] rounded-lg border border-black font-bold hover:bg-lime-200 ml-4 disabled:opacity-50"
+            disabled={loading}
           >
-            SAVE
+            {loading ? "SAVING..." : "SAVE"}
           </button>
-          
         </div>
       </form>
 

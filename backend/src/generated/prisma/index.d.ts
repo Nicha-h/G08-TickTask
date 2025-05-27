@@ -356,8 +356,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact
 
   /**
-   * Prisma Client JS version: 6.7.0
-   * Query Engine version: 3cff47a7f5d65c3ea74883f1d736e41d68ce91ed
+   * Prisma Client JS version: 6.8.1
+   * Query Engine version: 2060c79ba17c6bb9f5823312b6f6b7f4a845738e
    */
   export type PrismaVersion = {
     client: string
@@ -6386,21 +6386,21 @@ export namespace Prisma {
   export type task_categorySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     TaskID?: boolean
     CategoryId?: boolean
-    task?: boolean | taskDefaultArgs<ExtArgs>
+    task?: boolean | task_category$taskArgs<ExtArgs>
     category?: boolean | categoryDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["task_category"]>
 
   export type task_categorySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     TaskID?: boolean
     CategoryId?: boolean
-    task?: boolean | taskDefaultArgs<ExtArgs>
+    task?: boolean | task_category$taskArgs<ExtArgs>
     category?: boolean | categoryDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["task_category"]>
 
   export type task_categorySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     TaskID?: boolean
     CategoryId?: boolean
-    task?: boolean | taskDefaultArgs<ExtArgs>
+    task?: boolean | task_category$taskArgs<ExtArgs>
     category?: boolean | categoryDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["task_category"]>
 
@@ -6411,22 +6411,22 @@ export namespace Prisma {
 
   export type task_categoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"TaskID" | "CategoryId", ExtArgs["result"]["task_category"]>
   export type task_categoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    task?: boolean | taskDefaultArgs<ExtArgs>
+    task?: boolean | task_category$taskArgs<ExtArgs>
     category?: boolean | categoryDefaultArgs<ExtArgs>
   }
   export type task_categoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    task?: boolean | taskDefaultArgs<ExtArgs>
+    task?: boolean | task_category$taskArgs<ExtArgs>
     category?: boolean | categoryDefaultArgs<ExtArgs>
   }
   export type task_categoryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    task?: boolean | taskDefaultArgs<ExtArgs>
+    task?: boolean | task_category$taskArgs<ExtArgs>
     category?: boolean | categoryDefaultArgs<ExtArgs>
   }
 
   export type $task_categoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "task_category"
     objects: {
-      task: Prisma.$taskPayload<ExtArgs>
+      task: Prisma.$taskPayload<ExtArgs> | null
       category: Prisma.$categoryPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -6826,7 +6826,7 @@ export namespace Prisma {
    */
   export interface Prisma__task_categoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    task<T extends taskDefaultArgs<ExtArgs> = {}>(args?: Subset<T, taskDefaultArgs<ExtArgs>>): Prisma__taskClient<$Result.GetResult<Prisma.$taskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    task<T extends task_category$taskArgs<ExtArgs> = {}>(args?: Subset<T, task_category$taskArgs<ExtArgs>>): Prisma__taskClient<$Result.GetResult<Prisma.$taskPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     category<T extends categoryDefaultArgs<ExtArgs> = {}>(args?: Subset<T, categoryDefaultArgs<ExtArgs>>): Prisma__categoryClient<$Result.GetResult<Prisma.$categoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -7250,6 +7250,25 @@ export namespace Prisma {
      * Limit how many task_categories to delete.
      */
     limit?: number
+  }
+
+  /**
+   * task_category.task
+   */
+  export type task_category$taskArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the task
+     */
+    select?: taskSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the task
+     */
+    omit?: taskOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: taskInclude<ExtArgs> | null
+    where?: taskWhereInput
   }
 
   /**
@@ -10082,7 +10101,7 @@ export namespace Prisma {
     NOT?: task_categoryWhereInput | task_categoryWhereInput[]
     TaskID?: IntFilter<"task_category"> | number
     CategoryId?: IntFilter<"task_category"> | number
-    task?: XOR<TaskScalarRelationFilter, taskWhereInput>
+    task?: XOR<TaskNullableScalarRelationFilter, taskWhereInput> | null
     category?: XOR<CategoryScalarRelationFilter, categoryWhereInput>
   }
 
@@ -10100,7 +10119,7 @@ export namespace Prisma {
     NOT?: task_categoryWhereInput | task_categoryWhereInput[]
     TaskID?: IntFilter<"task_category"> | number
     CategoryId?: IntFilter<"task_category"> | number
-    task?: XOR<TaskScalarRelationFilter, taskWhereInput>
+    task?: XOR<TaskNullableScalarRelationFilter, taskWhereInput> | null
     category?: XOR<CategoryScalarRelationFilter, categoryWhereInput>
   }, "TaskID_CategoryId">
 
@@ -10558,7 +10577,7 @@ export namespace Prisma {
   }
 
   export type task_categoryCreateInput = {
-    task: taskCreateNestedOneWithoutTask_categoryInput
+    task?: taskCreateNestedOneWithoutTask_categoryInput
     category: categoryCreateNestedOneWithoutTask_categoryInput
   }
 
@@ -10568,7 +10587,7 @@ export namespace Prisma {
   }
 
   export type task_categoryUpdateInput = {
-    task?: taskUpdateOneRequiredWithoutTask_categoryNestedInput
+    task?: taskUpdateOneWithoutTask_categoryNestedInput
     category?: categoryUpdateOneRequiredWithoutTask_categoryNestedInput
   }
 
@@ -11121,9 +11140,9 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
-  export type TaskScalarRelationFilter = {
-    is?: taskWhereInput
-    isNot?: taskWhereInput
+  export type TaskNullableScalarRelationFilter = {
+    is?: taskWhereInput | null
+    isNot?: taskWhereInput | null
   }
 
   export type CategoryScalarRelationFilter = {
@@ -11667,10 +11686,12 @@ export namespace Prisma {
     connect?: categoryWhereUniqueInput
   }
 
-  export type taskUpdateOneRequiredWithoutTask_categoryNestedInput = {
+  export type taskUpdateOneWithoutTask_categoryNestedInput = {
     create?: XOR<taskCreateWithoutTask_categoryInput, taskUncheckedCreateWithoutTask_categoryInput>
     connectOrCreate?: taskCreateOrConnectWithoutTask_categoryInput
     upsert?: taskUpsertWithoutTask_categoryInput
+    disconnect?: taskWhereInput | boolean
+    delete?: taskWhereInput | boolean
     connect?: taskWhereUniqueInput
     update?: XOR<XOR<taskUpdateToOneWithWhereWithoutTask_categoryInput, taskUpdateWithoutTask_categoryInput>, taskUncheckedUpdateWithoutTask_categoryInput>
   }
@@ -12420,7 +12441,7 @@ export namespace Prisma {
   }
 
   export type task_categoryCreateWithoutCategoryInput = {
-    task: taskCreateNestedOneWithoutTask_categoryInput
+    task?: taskCreateNestedOneWithoutTask_categoryInput
   }
 
   export type task_categoryUncheckedCreateWithoutCategoryInput = {
@@ -12942,7 +12963,7 @@ export namespace Prisma {
   }
 
   export type task_categoryUpdateWithoutCategoryInput = {
-    task?: taskUpdateOneRequiredWithoutTask_categoryNestedInput
+    task?: taskUpdateOneWithoutTask_categoryNestedInput
   }
 
   export type task_categoryUncheckedUpdateWithoutCategoryInput = {

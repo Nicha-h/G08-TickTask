@@ -84,7 +84,7 @@ model task_category {
   TaskID     Int
   CategoryId Int
 
-  task     task     @relation(fields: [TaskID], references: [TaskID])
+  task     task?     @relation(fields: [TaskID], references: [TaskID])
   category category @relation(fields: [CategoryId], references: [CategoryId])
 
   @@id([TaskID, CategoryId]) 
