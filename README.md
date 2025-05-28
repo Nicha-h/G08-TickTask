@@ -63,7 +63,7 @@ DELETE     /api/items/:id     Delete an item by ID
 
 1. Navigate to the backend directory: bash cd backend
 2. Install dependencies: bash npm install
-3. Create a .env file and configure the following variables:
+3. Create a `.env` file and configure the following variables:
 ```env
 JWT_SECRET=amogussussybaka
 
@@ -76,6 +76,7 @@ CLOUDINARY_CLOUD_NAME=demkf5dzm
 CLOUDINARY_API_KEY=359364352434188
 CLOUDINARY_API_SECRET=u-8v2P8TwWGXItLRzVgfVy65xuQ
 CLOUDINARY_URL=cloudinary://359364352434188:u-8v2P8TwWGXItLRzVgfVy65xuQ@demkf5dzm
+
 
 4. Start the development server: bash npm run dev
 5. The server will be running on http://localhost:3000
