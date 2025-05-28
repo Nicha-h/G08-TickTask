@@ -4,7 +4,7 @@ This is a To-Do List App for
 
 
 ## :rocket: Getting Started
-1. Clone the repository: bash git clone https://github.com/CSC105-2024/G08-TickTask.git cd G08-TickTask
+1. Clone the repository: bash git clone https://github.com/CSC105-2024/G08-TickTask.git `cd G08-TickTask`
 
 
 ## :hammer: Frontend - React
@@ -27,10 +27,10 @@ This is a To-Do List App for
 - Vite
 
 ## :rocket: Getting Started - React Client
-1. Navigate to the frontend directory: bash cd frontend
-2. Install dependencies: bash npm install
-3. Start the development server: bash npm run dev
-4. The client will be running on http://localhost:5173/ 
+1. Navigate to the frontend directory: `bash cd frontend`
+2. Install dependencies: `bash npm install`
+3. Start the development server: `bash npm run dev`
+4. The client will be running on `http://localhost:5173/`
 
 ---
 ## :wrench: Backend - Node.js
@@ -61,8 +61,8 @@ DELETE     /api/items/:id     Delete an item by ID
 *Add, modify, or remove endpoints based on your project.*
 ## :rocket: Getting Started - Node.js Server
 
-1. Navigate to the backend directory: bash cd backend
-2. Install dependencies: bash npm install
+1. Navigate to the backend directory: `bash cd backend`
+2. Install dependencies: `bash npm install`
 3. Create a `.env` file and configure the following variables:
 ```env
 JWT_SECRET=amogussussybaka
@@ -75,8 +75,8 @@ EMAIL_PASSWORD=jqpluldihxbqltfr
 CLOUDINARY_CLOUD_NAME=demkf5dzm
 CLOUDINARY_API_KEY=359364352434188
 CLOUDINARY_API_SECRET=u-8v2P8TwWGXItLRzVgfVy65xuQ
-CLOUDINARY_URL=cloudinary://359364352434188:u-8v2P8TwWGXItLRzVgfVy65xuQ@demkf5dzm
+CLOUDINARY_URL=cloudinary://359364352434188:u-8v2P8TwWGXItLRzVgfVy65xuQ@demkf5dzm 
 
-
-4. Start the development server: bash npm run dev
-5. The server will be running on http://localhost:3000
+```
+4. Start the development server: `bash npm run dev`
+5. The server will be running on `http://localhost:3000`
