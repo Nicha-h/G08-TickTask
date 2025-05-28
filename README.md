@@ -1,62 +1,79 @@
-# ✅ TickTask
+## :pushpin: TickTask
 
-> A beautifully customizable **To-Do List App** with built-in **Pomodoro Timer** to help you stay productive and focused.
+This is a To-Do List App for 
 
 
----
+## :rocket: Getting Started
+1. Clone the repository: bash git clone https://github.com/CSC105-2024/G08-TickTask.git cd G08-TickTask
 
-## ✨ Features
 
-### 📝 Create
-- Create tasks with **icon** and **color customization**.
-- Assign tasks to **custom categories** created by the user.
-- Start **Pomodoro sessions** to focus on individual tasks.
+## :hammer: Frontend - React
+### :wrench: Tech Stack
+- React
+- Axios
+- React Router DOM
+- Tailwind CSS
+- React Hook Form
+- Zod
+- Day.js
+- date-fns
+- Framer Motion
+- Iconify
+- react-colorful
+- react-responsive
+- react-swipeable
+- jwt-decode
+- Cloudinary
+- Vite
 
-### 📖 Read
-- View a **daily summary** of tasks directly on the homepage.
-- Navigate through a **weekly calendar** to check upcoming tasks.
-- Access a comprehensive **overview page** showing progress by **day**, **month**, and **year**.
-
-### 🔄 Update
-- Edit and customize **tasks**, **categories**, and **user profile** (picture & username).
-
-### 🗑️ Delete
-- Delete tasks, categories, and profile.
-- *Note:* Deleting a category won't delete the tasks within it.
-
-### 🔐 Account Management
-- **Reset your password** securely via email using a reset link.
-
----
-
-## 💻 Tech Stack
-
-- ⚛️ React + TailwindCSS (Frontend)
-- 🔥 Hono + Prisma + MySQL (Backend)
-- 🔐 JWT for Authentication
-- ☁️ Cloudinary for Profile Images
+## :rocket: Getting Started - React Client
+1. Navigate to the frontend directory: bash cd frontend
+2. Install dependencies: bash npm install
+3. Start the development server: bash npm run dev
+4. The client will be running on http://localhost:5173/ 
 
 ---
+## :wrench: Backend - Node.js
+### :hammer_and_wrench: Tech Stack
 
-## 🚀 Getting Started
+- Node.js
+- Hono
+- MySQL
+- Prisma
+- Axios
+- bcrypt
+- Cloudinary
+- dotenv
+- formidable
+- jsonwebtoken
+- nodemailer
+- Zod
 
-### 1️⃣ Run the Backend
+## :electric_plug: API Endpoints
+Method	Endpoint	Description
+GET	/api/items	Fetch all items
+GET	/api/items/:id	Fetch a specific item by ID
+POST	/api/items	Create a new item
+PUT	/api/items/:id	Update an existing item by ID
+DELETE	/api/items/:id	Delete an item by ID
+Add, modify, or remove endpoints based on your project.
 
-```bash
-cd backend
-npm install
-npm run dev
-```
+## :rocket: Getting Started - Node.js Server
 
-### 2️⃣ Run the Frontend
+1. Navigate to the backend directory: bash cd backend
+2. Install dependencies: bash npm install
+3. Create a .env file and configure the following variables:
+JWT_SECRET=amogussussybaka
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+DATABASE_URL="file:./dev.db"
 
+EMAIL_USER=nichahongsri@gmail.com
+EMAIL_PASSWORD=jqpluldihxbqltfr
 
-## ❤️ Made with care by Team TickTask
+CLOUDINARY_CLOUD_NAME=demkf5dzm
+CLOUDINARY_API_KEY=359364352434188
+CLOUDINARY_API_SECRET=u-8v2P8TwWGXItLRzVgfVy65xuQ
+CLOUDINARY_URL=cloudinary://359364352434188:u-8v2P8TwWGXItLRzVgfVy65xuQ@demkf5dzm
 
-![Made with love](https://img.shields.io/badge/Made%20with-%E2%9D%A4-red)
+4. Start the development server: bash npm run dev
+5. The server will be running on http://localhost:3000
