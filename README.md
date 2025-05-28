@@ -1,6 +1,6 @@
 ## :pushpin: TickTask
 
-This is a To-Do List App for 
+  As a student, many times we have a problem with missing work or forgetting to submit assignments because of procrastination and burnout. Sometimes we forget that there is an upcoming deadline or something that needs to be done soon. This leads to our web application where users can create a to-do list that can be styled as desired. You can create categories to store tasks. Moreover, there is a Pomodoro that helps you focus better and be more efficient. This will help you manage your life schedule better.
 
 
 ## :rocket: Getting Started
