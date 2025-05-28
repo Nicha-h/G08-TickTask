@@ -49,9 +49,9 @@
 - nodemailer
 - Zod
 
+---
 ## :electric_plug: API Endpoints
 
----
 
 ### 📥 Create (POST / PUT)
 
@@ -124,6 +124,7 @@
 | DELETE | `/session/:id` | Delete a session |
 | DELETE | `/pomo-task/:id` | Delete a Pomo task |
 | DELETE | `/task/:id` | Delete a task |
+---
 
 ## :rocket: Getting Started - Node.js Server
 
