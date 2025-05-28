@@ -11,11 +11,12 @@ const now = new Date();
 const formattedDate = now.toISOString().split('T')[0];
 const currentTime = now.toTimeString().split(' ')[0];
 
-export async function getTasksByDate(date: string): Promise<task[]> {
-  const cleanedDate = date.trim(); // Ensure no extra spaces
+export async function getTasksByDate(date: string, userId: number): Promise<task[]> {
+  const cleanedDate = date.trim();
   const tasks = await prisma.task.findMany({
     where: {
-      Task_Start_Date: cleanedDate
+      Task_Start_Date: cleanedDate,
+      UserID: userId 
     },
     orderBy: {
       Task_Start_Time: 'asc'
@@ -29,7 +30,7 @@ export async function getTasksByUser(userId: number, date?: string): Promise<tas
   const whereClause: any = { UserID: userId };
 
   if (date) {
-    // Ensure the date is in ISO format and valid
+    
     const parsedDate = new Date(date);
     if (!isNaN(parsedDate.getTime())) {
       const isoDate = parsedDate.toISOString().split('T')[0];

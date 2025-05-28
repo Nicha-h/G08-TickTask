@@ -27,13 +27,13 @@ export const getAllCategory = async (c: Context) => {
 
 export const handleGetTasksByCategoryId = async (c: Context) => {
   const categoryId = Number(c.req.param('id')); // ← updated
-
+  const user = c.get('user') as { id: number };
   if (isNaN(categoryId)) {
     return c.json({ error: 'Invalid Category ID' }, 400);
   }
 
   try {
-    const taskCategories = await getTasksByCategoryId(categoryId);
+    const taskCategories = await getTasksByCategoryId(categoryId,user.id);
     const tasks = taskCategories.map(tc => tc.task);
     return c.json(tasks, 200);
   } catch (error) {

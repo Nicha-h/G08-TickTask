@@ -4,7 +4,7 @@ import IconPickerModal from "../modals/IconPickerModal";
 import CustomColor from "../../assets/CustomColor.svg";
 import ColorPickerModal from "../modals/ColorPickerModal";
 import iconSmile from "../../assets/iconSmile.svg";
-
+import { iconComponents } from "./icon";
 const AddCategoryModal = ({
   addModalOpen,
   setAddModalOpen,
@@ -103,13 +103,13 @@ const AddCategoryModal = ({
                 >
                   {selectedIcon ? (
                     <img
-                      src={selectedIcon}
+                      src={iconComponents[selectedIcon]}
                       alt="Category icon"
                       className="w-14 h-14 object-contain"
                     />
                   ) : (
                     <img 
-                      src={iconSmile} 
+                      src={iconComponents.iconSmile} 
                       alt="Select icon" 
                       className="w-10 h-10 object-contain" 
                     />

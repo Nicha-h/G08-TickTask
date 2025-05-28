@@ -18,7 +18,7 @@ export async function createUserInDb(email: string, plainPassword: string) {
       category: {
         create: {
           Category_Name: 'All',
-          Category_icon: 'all',
+          Category_icon: 'iconAll',
           Category_Color: '#D4B4FF',
         }
       }

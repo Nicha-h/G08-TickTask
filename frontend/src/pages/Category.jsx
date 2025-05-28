@@ -33,7 +33,7 @@ export default function Category() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategory, setEditingCategory] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
   const [categoryFetchError, setCategoryFetchError] = useState(null);
@@ -199,7 +199,7 @@ export default function Category() {
         
         if (response.data) {
           const normalizedTasks = response.data
-            .filter(task => task != null) // Remove null/undefined tasks
+            .filter(task => task != null)
             .map(task => ({
               TaskID: task.id || task.TaskID || task._id,
               Task_Title: task.title || task.Task_Title,
@@ -400,11 +400,11 @@ export default function Category() {
   };
 
   const handleCategorySelect = (categoryId) => {
-  console.log("Selecting category:", categoryId);
-  setSelectedCategoryId(categoryId === "1" ? null : categoryId);
-  if (isMobile) {
-    setShowCategorySelection(false);
-    setShowTasks(true);
+    console.log("Selecting category:", categoryId);
+    setSelectedCategoryId(categoryId === 1 ? 1 : categoryId);
+    if (isMobile) {
+      setShowCategorySelection(false);
+      setShowTasks(true);
   }
 };
 

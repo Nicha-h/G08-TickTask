@@ -120,6 +120,10 @@ export async function uploadProfilePicController(c: Context) {
   if (!file) {
     return c.json({ error: 'No file uploaded' }, 400);
   }
+  const MAX_SIZE = 20 * 1024 * 1024;
+  if (file.size > MAX_SIZE) {
+    return c.json({ error: 'File too large. Max size is 20MB.' }, 400);
+  }
 
   const buffer = await file.arrayBuffer();
   const base64 = Buffer.from(buffer).toString('base64');
@@ -129,7 +133,6 @@ export async function uploadProfilePicController(c: Context) {
     const result = await cloudinary.uploader.upload(dataUri, {
       folder: 'ticktask/profiles',
       transformation: [{ width: 200, height: 200, crop: 'fill' }],
-      
     });
 
     return c.json({ imageUrl: result.secure_url });

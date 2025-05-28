@@ -14,11 +14,13 @@ export async function getUserCategories(userId: number) {
   });
 }
 
-export const getTasksByCategoryId = async (categoryId: number) => {
+export const getTasksByCategoryId = async (userId:number, categoryId: number) => {
   const results = await prisma.task_category.findMany({
     where: {
       CategoryId: categoryId,
-
+      task: {
+        UserID: userId
+      }
     },
     include: {
       task: true,

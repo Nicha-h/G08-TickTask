@@ -4,6 +4,7 @@ import IconPickerModal from "../modals/IconPickerModal";
 import ColorPickerModal from "../modals/ColorPickerModal";
 import CustomColor from "../../assets/CustomColor.svg"; // อย่าลืม import ไอคอน CustomColor
 import axios from "axios";
+import { iconComponents } from "./icon";
 
 const EditCategoryModal = ({
   editModalOpen,
@@ -21,13 +22,16 @@ const EditCategoryModal = ({
   const [showColorPickerModal, setShowColorPickerModal] = useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [color, setColor] = useState(null);
-  const [selectedIcon, setSelectedIcon] = useState("");
+  const [selectedIcon, setSelectedIcon] = useState("iconSmile"); // Default icon
 
-  useEffect(() => {
+  useEffect(() => { 
     if (editingCategory) {
       setCategoryName(editingCategory.name);
       setColor(editingCategory.color === undefined ? null : editingCategory.color);
       setSelectedIcon(editingCategory.icon);
+      console.log("Selected Icon:", selectedIcon);
+      console.log("Resolved Image:", iconComponents[selectedIcon]);
+
     }
   }, [editingCategory]);
 
@@ -131,10 +135,11 @@ const EditCategoryModal = ({
                   }}
                 >
                   <img 
-                    src={selectedIcon} 
+                    src={iconComponents.selectedIcon} 
                     alt="Category icon" 
                     className="w-14 h-14 object-contain" 
                   />
+
                 </div>
               </div>
             </div>
@@ -183,7 +188,7 @@ const EditCategoryModal = ({
       {iconPickerOpen && (
         <IconPickerModal
           icons={iconOptions}
-          selectedIcon={selectedIcon}
+          selectedIcon={iconComponents[selectedIcon]}
           onSelect={(icon) => {
             setSelectedIcon(icon);
             setIconPickerOpen(false);

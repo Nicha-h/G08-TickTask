@@ -81,7 +81,7 @@ function ProfilePic({ onClose, onSelect }) {
     }
 
     // Validate file size (e.g., max 5MB)
-    const maxSize = 5 * 20 * 20; // 5MB in bytes
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (file.size > maxSize) {
       alert('File size must be less than 5MB');
       return;

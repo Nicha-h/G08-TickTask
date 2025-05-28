@@ -28,7 +28,7 @@ export const getTasksByDate = async (c: Context) => {
 
   try {
     const user = c.get('user') as { id: number };
-    const categories = await TaskModel.getTasksByDate(date);
+    const categories = await TaskModel.getTasksByDate(date, user.id);
     return c.json(categories);
   } catch (error) {
     console.error('Error fetching tasks:', error);
