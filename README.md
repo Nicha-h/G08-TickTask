@@ -50,14 +50,15 @@ This is a To-Do List App for
 - Zod
 
 ## :electric_plug: API Endpoints
-Method	Endpoint	Description
-GET	/api/items	Fetch all items
-GET	/api/items/:id	Fetch a specific item by ID
-POST	/api/items	Create a new item
-PUT	/api/items/:id	Update an existing item by ID
-DELETE	/api/items/:id	Delete an item by ID
-Add, modify, or remove endpoints based on your project.
 
+**Method**  **Endpoint**       **Description**  
+GET       /api/items        Fetch all items  
+GET       /api/items/:id     Fetch a specific item by ID  
+POST      /api/items        Create a new item  
+PUT       /api/items/:id     Update an existing item by ID  
+DELETE     /api/items/:id     Delete an item by ID  
+
+*Add, modify, or remove endpoints based on your project.*
 ## :rocket: Getting Started - Node.js Server
 
 1. Navigate to the backend directory: bash cd backend
