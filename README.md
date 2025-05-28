@@ -1,6 +1,6 @@
 ## :pushpin: TickTask
 
-  As a student, many times we have a problem with missing work or forgetting to submit assignments because of procrastination and burnout. Sometimes we forget that there is an upcoming deadline or something that needs to be done soon. This leads to our web application where users can create a to-do list that can be styled as desired. You can create categories to store tasks. Moreover, there is a Pomodoro that helps you focus better and be more efficient. This will help you manage your life schedule better.
+   As students, we often face the problem of forgetting to submit assignments due to procrastination and burnout. Sometimes we forget that there is an upcoming deadline or something that needs to be done soon. This brings us to our web application where users can create a to-do list that can be customized as desired. It can create categories to organize tasks. Moreover, there is a Pomodoro that helps to focus and increase efficiency. This helps to manage your life schedule better and know which tasks should be completed first.
 
 
 ## :rocket: Getting Started
