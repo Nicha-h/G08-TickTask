@@ -126,23 +126,7 @@
 | DELETE | `/task/:id` | Delete a task |
 ---
 
-## :rocket: Getting Started - Node.js Server
 
-1. Navigate to the backend directory: `bash cd backend`
-2. Install dependencies: `bash npm install`
-3. Create a `.env` file and configure the following variables:
-```env
-JWT_SECRET=amogussussybaka
-
-DATABASE_URL="file:./dev.db"
-
-EMAIL_USER=nichahongsri@gmail.com
-EMAIL_PASSWORD=jqpluldihxbqltfr
-
-CLOUDINARY_CLOUD_NAME=demkf5dzm
-CLOUDINARY_API_KEY=359364352434188
-CLOUDINARY_API_SECRET=u-8v2P8TwWGXItLRzVgfVy65xuQ
-CLOUDINARY_URL=cloudinary://359364352434188:u-8v2P8TwWGXItLRzVgfVy65xuQ@demkf5dzm 
 
 ```
 4. Start the development server: `bash npm run dev`
