@@ -1,29 +1,16 @@
 import type { Context } from 'hono';
-import { db } from '../../database/db.js';
-import { CategorySchemas } from '../schemas/category.schema.js';
-import {z} from 'zod';
-import * as categoryModel from '../models/Category.model.js';
-import { Category } from '../middlewares/Category.validators.js';
-import { getTasksByCategoryId } from '../models/Category.model.js';
-
-const patchSchema = z.object({
-  Category_Name: z.string().min(1).optional(),
-  Category_Color: z.string().optional(),
-  Category_icon: z.string().nullable().optional(),
-  Category_is_Primary: z.boolean().optional(),
-});
+import { CategoryServices } from '../services/index.js';
 
 export const getAllCategory = async (c: Context) => {
   try {
     const user = c.get('user') as { id: number };
-    const categories = await categoryModel.getUserCategories(user.id);
+    const categories = await CategoryServices.getAllCategory(user.id);
     return c.json(categories);
   } catch (error) {
     console.error('Error fetching categories:', error);
     return c.json({ error: 'Failed to fetch categories' }, 500);
   }
 };
-
 
 export const handleGetTasksByCategoryId = async (c: Context) => {
   const categoryId = Number(c.req.param('id')); // ← updated
@@ -33,8 +20,7 @@ export const handleGetTasksByCategoryId = async (c: Context) => {
   }
 
   try {
-    const taskCategories = await getTasksByCategoryId(categoryId,user.id);
-    const tasks = taskCategories.map(tc => tc.task);
+    const tasks = await CategoryServices.handleGetTasksByCategoryId(categoryId, user.id);
     return c.json(tasks, 200);
   } catch (error) {
     console.error('Error fetching tasks:', error);
@@ -47,17 +33,10 @@ export const createCategoryController = async (c: Context) => {
   try {
       const categoryData = c.get('categoryData');
       const user = c.get('user') as { id: number };
-      const { Category_Name, Category_Color, Category_Icon, Category_is_Primary } = categoryData;
 
-      const categoryId = await categoryModel.createCategory(
-        user.id,
-        Category_Name,
-        Category_Color ?? '#A7A7A7',
-        Category_Icon ?? '📁',         
-        !Category_is_Primary           
-      );
+      const category = await CategoryServices.createCategory(categoryData, user.id);
   
-      return c.json({ message: 'Category created successfully',categoryId }, 201);
+      return c.json({ message: 'Category created successfully', categoryId: category }, 201);
     } catch (error) {
       console.error('Error creating category:', error);
       return c.json({ error: 'Failed to create category' }, 500);
@@ -66,7 +45,7 @@ export const createCategoryController = async (c: Context) => {
 
 export const updateCategoryController = async (c: Context) => {
   try {
-    const categoryId = parseInt(c.req.param('id'));
+    const categoryId = parseInt(c.req.param('id') || '0');
     const user = c.get('user') as { id: number };
     const body = await c.req.json();
     
@@ -74,13 +53,12 @@ export const updateCategoryController = async (c: Context) => {
       return c.json({ error: 'Missing required fields' }, 400);
     }
     
-    await categoryModel.updateCategory(
-      categoryId,
-      user.id,
-      body.color,
-      body.icon,
-      body.is_primary
-    );
+    await CategoryServices.updateCategory(categoryId, {
+      CategoryId: categoryId,
+      Category_Color: body.color,
+      Category_icon: body.icon,
+      Category_is_Primary: body.is_primary
+    }, user.id);
     
     return c.json({ message: 'Category updated successfully' });
   } catch (error) {
@@ -91,10 +69,10 @@ export const updateCategoryController = async (c: Context) => {
 
 export const deleteCategoryController = async (c: Context) => {
   try {
-    const categoryId = parseInt(c.req.param('id'));
+    const categoryId = parseInt(c.req.param('id') || '0');
     const user = c.get('user') as { id: number };
     
-    await categoryModel.deleteCategory(categoryId, user.id);
+    await CategoryServices.deleteCategory(categoryId, user.id);
     
     return c.json({ message: 'Category deleted successfully' });
   } catch (error) {
@@ -105,10 +83,10 @@ export const deleteCategoryController = async (c: Context) => {
 
 export const getCategoryProgress = async (c: Context) => {
   try {
-    const categoryId = parseInt(c.req.param('id'));
+    const categoryId = parseInt(c.req.param('id') || '0');
     const user = c.get('user') as { id: number };
     
-    const progressData = await categoryModel.getCategoryProgress(categoryId, user.id);
+    const progressData = await CategoryServices.getCategoryProgress(categoryId, user.id);
     
     return c.json(progressData);
   } catch (err) {
@@ -119,6 +97,7 @@ export const getCategoryProgress = async (c: Context) => {
 
 export async function assignTaskToCategoryController(c: Context) {
   const taskID = Number(c.req.param('id'));
+  const user = c.get('user') as { id: number };
 
   try {
     const body = await c.req.json();
@@ -128,20 +107,20 @@ export async function assignTaskToCategoryController(c: Context) {
       return c.json({ success: false, message: 'Invalid CategoryId' }, 400);
     }
 
-   
-    const task = await categoryModel.assignTaskToCategories(taskID, CategoryId); 
+    await CategoryServices.assignTasktoCategory(CategoryId, taskID, user.id); 
 
-    return c.json({ success: true, data: task });
+    return c.json({ success: true, message: 'Task assigned to category successfully' });
   } catch (error) {
-    return c.json({ success: false, message: 'Failed to assign task to session', error: String(error) }, 500);
+    return c.json({ success: false, message: 'Failed to assign task to category', error: String(error) }, 500);
   }
 }
 
 export const getTaskCountController = async (c: Context) => {
   const categoryId = Number(c.req.param('id'));
+  const user = c.get('user') as { id: number };
 
   try {
-    const count = await categoryModel.getTaskCount(categoryId);
+    const count = await CategoryServices.getTaskCount(categoryId, user.id);
     return c.json({ taskCount: count });
   } catch (error) {
     return c.json({ success: false, message: 'Failed to fetch task count', error: String(error) }, 500);

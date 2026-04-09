@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import * as TaskController from '../controllers/PomoTask.controller.js';
-import { authMiddleware } from '../../middlewares/authenticator.js';
+import { authMiddleware } from '../middlewares/authenticator.js';
 
 const PomotaskRoutes = new Hono();
 

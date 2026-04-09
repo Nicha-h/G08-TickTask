@@ -1,14 +1,12 @@
 import type { Context } from 'hono';
-import * as TaskModel from '../models/PomoTask.model.js';
-import { PomoTaskStatus, type CreateTask, type UpdateTask } from '../types/index.js';
-import { createSession } from '../models/Pomodoro.model.js';
-import { TimerType } from '../types/index.js';
+import { PomoTaskServices } from '../services/index.js';
+import { findById } from '../models/PomoTask.model.js';
 
 export async function getAllTask(c: Context) {
   const user = c.get('user'); 
 
   try {
-    const tasks = await TaskModel.getAllPomoTask(user.id);
+    const tasks = await PomoTaskServices.getAllPomoTask(user.id);
     return c.json({ success: true, data: tasks });
   } catch (error) {
     return c.json({ success: false, message: 'Failed to fetch tasks', error: String(error) }, 500);
@@ -18,7 +16,7 @@ export async function getAllTask(c: Context) {
 export async function getTaskBySession(c: Context) {
     const sessionId = Number(c.req.param('sessionId'));
     try {
-        const tasks = await TaskModel.findBySession(sessionId);
+        const tasks = await PomoTaskServices.getPomoTaskBySessionId(sessionId);
         return c.json({ success: true, data: tasks });
     } catch (error) {
         return c.json({ success: false, message:'Failed to fetch tasks', error: String(error) }, 500);
@@ -28,7 +26,7 @@ export async function getTaskBySession(c: Context) {
 export async function getTaskById(c: Context) {
     const taskId  = Number(c.req.param('id'));
     try {
-        const tasks = await TaskModel.findById(taskId );
+        const tasks = await findById(taskId);
         return c.json({ success: true, data: tasks });
     } catch (error) {
         return c.json({ success: false, message:'Failed to fetch tasks', error: String(error) }, 500);
@@ -38,32 +36,22 @@ export async function getTaskById(c: Context) {
 export const CreatePomoTaskController = async (c: Context) => {
   const body = await c.req.json();
   const user = c.get("user"); 
-  try{
+  try {
+    const newTask = await PomoTaskServices.createPomoTaskWithSession(
+      user.id,
+      {
+        title: body.Pomo_Task_Title,
+        shortBreak: body.Pomo_Task_Short,
+        longBreak: body.Pomo_Task_Long,
+        targetCount: body.Pomo_Target_Count,
+      }
+    );
 
-  // Step 1: Create new session for this task
-  const newSession = await createSession({
-    UserID: user.id, 
-    duration_seconds: 1500,
-    timer_type: TimerType.WORK,
-  });
-
-  // Step 2: Create new task linked to that session
-  const newTask = await TaskModel.CreatePomoTask({
-    Pomo_Task_Title: body.title,
-    Pomo_Task_Short: body.shortBreak,
-    Pomo_Task_Long: body.longBreak,
-    Pomo_Task_Status: false,
-    Pomo_Completed_Count: 0,
-    Pomo_Target_Count: body.targetCount,
-    session: { connect: { SessionId: newSession.SessionId } },
-  });
-
-  return c.json({ success: true, data: newTask }, 201);
+    return c.json({ success: true, data: newTask }, 201);
   } catch (error) {
     console.error('CreatePomoTask error:', error);
     return c.json({ success: false, message: 'Failed to create task', error: String(error) }, 500);
   }
-
 };
 
 export async function updatePomoTaskController(c: Context) {
@@ -72,18 +60,16 @@ export async function updatePomoTaskController(c: Context) {
   try {
     const body = await c.req.json();
     
+    const updateData: any = {};
+    if (body.Pomo_Task_Title !== undefined) updateData.Pomo_Task_Title = body.Pomo_Task_Title;
+    if (body.Pomo_Task_Short !== undefined) updateData.Pomo_Task_Short = body.Pomo_Task_Short;
+    if (body.Pomo_Task_Long !== undefined) updateData.Pomo_Task_Long = body.Pomo_Task_Long;
+    if (body.Pomo_Task_Status !== undefined) updateData.Pomo_Task_Status = body.Pomo_Task_Status;
+    if (body.Pomo_Completed_Count !== undefined) updateData.Pomo_Completed_Count = body.Pomo_Completed_Count;
+    if (body.Pomo_Target_Count !== undefined) updateData.Pomo_Target_Count = body.Pomo_Target_Count;
+    if (body.SessionId !== undefined) updateData.SessionId = body.SessionId;
     
-    const taskData = {
-      Pomo_Task_Title: body.title,
-      Pomo_Task_Short: body.shortBreak,
-      Pomo_Task_Long: body.longBreak,
-      Pomo_Task_Status: body.status,
-      Pomo_Completed_Count: body.completedCount,
-      Pomo_Target_Count: body.targetCount,
-      session: body.sessionId ? { connect: { SessionId: body.sessionId } } : undefined,
-    };
-    
-    const updatedTask = await TaskModel.updatePomoTask(taskId, taskData);
+    const updatedTask = await PomoTaskServices.updatePomoTask(taskId, updateData);
     
     if (!updatedTask) {
       return c.json({ success: false, message: 'Task not found or no changes made' }, 404);
@@ -100,12 +86,7 @@ export async function deletePomoTaskController(c: Context) {
     const taskId = Number(c.req.param('id'));
     
     try {
-      const deleted = await TaskModel.deletePomoTask(taskId);
-      
-      if (!deleted) {
-        return c.json({ success: false, message: 'Task not found' }, 404);
-      }
-      
+      await PomoTaskServices.deletePomoTask(taskId);
       return c.json({ success: true, message: 'Task deleted successfully' });
     } catch (error) {
       return c.json({ success: false, message: 'Failed to delete task', error: String(error) }, 500);
@@ -123,7 +104,7 @@ export async function assignTaskToSession(c: Context) {
         return c.json({ success: false, message: 'Invalid session ID' }, 400);
       }
       
-      const task = await TaskModel.assignToSession(taskId, sessionId);
+      const task = await PomoTaskServices.assignTaskToSession(taskId, sessionId);
       
       if (!task) {
         return c.json({ success: false, message: 'Task not found' }, 404);
@@ -140,7 +121,7 @@ export async function completePomoTask(c: Context): Promise<Response> {
   const { Pomo_Task_Status } = await c.req.json(); 
 
   try {
-    const task = await TaskModel.updatePomoTask(taskId, { Pomo_Task_Status });
+    const task = await PomoTaskServices.completePomoTask(taskId, Pomo_Task_Status);
 
     if (!task) {
       return c.json({ success: false, message: 'Task not found' }, 404);
@@ -152,18 +133,11 @@ export async function completePomoTask(c: Context): Promise<Response> {
   }
 }
 
-
-// New controller functions for pomodoro counter features
-
-/**
- * Increment the pomodoro counter for a task
- * Will mark task as completed if target is reached
- */
 export async function incrementPomoCounter(c: Context): Promise<Response> {
     const taskId = Number(c.req.param('id'));
     
     try {
-      const task = await TaskModel.incrementPomoCounter(taskId);
+      const task = await PomoTaskServices.incrementPomoCounter(taskId);
       
       if (!task) {
         return c.json({ success: false, message: 'Task not found' }, 404);
@@ -179,14 +153,11 @@ export async function incrementPomoCounter(c: Context): Promise<Response> {
     }
 }
 
-/**
- * Reset the pomodoro counter back to zero
- */
 export async function resetPomoCounter(c: Context): Promise<Response> {
     const taskId = Number(c.req.param('id'));
     
     try {
-      const task = await TaskModel.resetPomoCounter(taskId);
+      const task = await PomoTaskServices.resetPomoCounter(taskId);
       
       if (!task) {
         return c.json({ success: false, message: 'Task not found' }, 404);
@@ -202,9 +173,6 @@ export async function resetPomoCounter(c: Context): Promise<Response> {
     }
 }
 
-/**
- * Set the target count for a task
- */
 export async function setPomoTargetCount(c: Context): Promise<Response> {
     const taskId = Number(c.req.param('id'));
     
@@ -216,7 +184,7 @@ export async function setPomoTargetCount(c: Context): Promise<Response> {
         return c.json({ success: false, message: 'Invalid target count' }, 400);
       }
       
-      const task = await TaskModel.setPomoTargetCount(taskId, targetCount);
+      const task = await PomoTaskServices.setPomoTargetCount(taskId, targetCount);
       
       if (!task) {
         return c.json({ success: false, message: 'Task not found' }, 404);
@@ -232,14 +200,11 @@ export async function setPomoTargetCount(c: Context): Promise<Response> {
     }
 }
 
-/**
- * Get progress information for a task
- */
 export async function getTaskProgress(c: Context): Promise<Response> {
     const taskId = Number(c.req.param('id'));
     
     try {
-      const progress = await TaskModel.getTaskProgress(taskId);
+      const progress = await PomoTaskServices.getTaskProgress(taskId);
       
       return c.json({ 
         success: true, 

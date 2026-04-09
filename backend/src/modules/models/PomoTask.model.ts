@@ -58,8 +58,9 @@ export async function getAllPomoTask(userId: number) {
   export async function updatePomoTask(taskId: number, data: UpdatePomoTaskData) {
     const updateData: any = {
       ...data,
-      session: data.sessionId ? {
-        connect: { SessionId: data.sessionId }
+
+      session: data.SessionId ? {
+        connect: { SessionId: data.SessionId }
       } : undefined,
     };
       

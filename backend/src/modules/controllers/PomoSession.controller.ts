@@ -1,6 +1,6 @@
 import type { Context } from 'hono';
 import * as SessionModel from '../models/Pomodoro.model.js';
-import { SessionStatus, TimerType, type CreateSession, type UpdateSession} from '../types/index.js';
+import type { SessionStatus, TimerType, CreatePomodoroData, UpdatePomodoroData} from '../types/index.js';
 
 export async function getAllSession(c:Context) {
     const userId = Number(c.req.param('userId'));
@@ -31,11 +31,10 @@ export async function createSessionController(c: Context) {
     const sessionid = Number(c.req.param('id'));
     try {
         const body = await c.req.json();
-        const sessionData: CreateSession = {
+        const sessionData: CreatePomodoroData = {
             UserID: body.UserId,
             duration_seconds: body.duration || 1500,
-            timer_type: body.timer_type as TimerType,
-            PausedTime: body.duration || 1500,
+            timer_type: body.timer_type,
         };
 
         const session = await SessionModel.createSession(sessionData);
@@ -50,8 +49,8 @@ export async function updatedSessionController(c: Context) {
     
     try {
       const body = await c.req.json();
-      const sessionData: UpdateSession = {
-        Status: body.status,
+      const sessionData: UpdatePomodoroData = {
+        status: body.status,
         remaining_seconds: body.remaining_seconds,
         timer_type: body.timer_type
       };
@@ -100,12 +99,12 @@ export async function startSession(c:Context) {
     try {
         const body = await c.req.json();
         const userId = Number(body.userId);
-        const timerType = body.timer_type as TimerType || TimerType.WORK;
+        const timerType = body.timer_type || 'work';
         const durationSeconds = Number(body.duration_seconds) || 1500;
         const activeSession = await SessionModel.getActiveSession(userId);
       
         if (activeSession) {
-          await SessionModel.updatePomo(activeSession.SessionId!, { Status: SessionStatus.PAUSED });
+          await SessionModel.updatePomo(activeSession.SessionId!, { status: 'paused' });
         }
         const session = await SessionModel.createSession({
             UserID: userId,
@@ -128,7 +127,7 @@ export async function pauseSession(c:Context) {
           return c.json({ success: false, message: 'Session ID is required' }, 400);
       }
 
-      const session = await SessionModel.updatePomo(sessionId, { Status: SessionStatus.PAUSED });
+      const session = await SessionModel.updatePomo(sessionId, { status: 'paused' });
       
       if (!session) {
           return c.json({ success: false, message: 'Session not found' }, 404);
@@ -144,7 +143,7 @@ export async function resumeSession(c:Context) {
     const sessionId = Number(c.req.param('id'));
     
     try {
-      const session = await SessionModel.updatePomo(sessionId, { Status: SessionStatus.ACTIVE });
+      const session = await SessionModel.updatePomo(sessionId, { status: 'active' });
       
       if (!session) {
         return c.json({ success: false, message: 'Session not found' }, 404);
@@ -161,7 +160,7 @@ export async function completeSession(c: Context) {
     
     try {
       const session = await SessionModel.updatePomo(sessionId, { 
-        Status: SessionStatus.COMPLETED,
+        status: 'completed',
         remaining_seconds: 0
       });
       

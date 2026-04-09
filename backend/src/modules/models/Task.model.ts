@@ -1,5 +1,4 @@
 import { PrismaClient, type task } from '../../generated/prisma/index.js';
-import type { Context } from 'hono';
 import type { TaskStatus, UpdateTaskData } from '../types/index.js';
 import * as dotenv from 'dotenv';
 import { handlePrismaError } from '../../errors/prisma.js';

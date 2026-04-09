@@ -32,20 +32,21 @@ const sessionIdParam = z.object({
 });
 
 const createTaskSchema = z.object({
-  title: z.string().min(1),
-  shortBreak: z.number().int().nonnegative().default(5),
-  longBreak: z.number().int().nonnegative().default(15),
-  targetCount: z.number().int().nonnegative().default(4),
+    sessionId: z.number().int().positive().optional(),
+  Pomo_Task_Title: z.string().min(1),
+  Pomo_Task_Short: z.number().int().nonnegative().default(5),
+  Pomo_Task_Long: z.number().int().nonnegative().default(15),
+  Pomo_Target_Count: z.number().int().nonnegative().default(4),
 });
  
 const updateTaskSchema = z.object({
-  title: z.string().min(1).optional(),
-  shortBreak: z.number().int().nonnegative().optional(),
-  longBreak: z.number().int().nonnegative().optional(),
-  status: z.boolean().optional(),
-  completedCount: z.number().int().nonnegative().optional(),
-  targetCount: z.number().int().nonnegative().optional(),
-  sessionId: z.number().int().positive().optional(),
+  Pomo_Task_Title: z.string().min(1).optional(),
+  Pomo_Task_Short: z.number().int().nonnegative().optional(),
+  Pomo_Task_Long: z.number().int().nonnegative().optional(),
+  Pomo_Task_Status: z.boolean().optional(),
+  Pomo_Completed_Count: z.number().int().nonnegative().optional(),
+  Pomo_Target_Count: z.number().int().nonnegative().optional(),
+  SessionId: z.number().int().positive().optional(),
 });
  
 const assignSessionSchema = z.object({
