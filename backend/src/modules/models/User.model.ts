@@ -1,10 +1,10 @@
-import { db } from '../index.js'
+import { PrismaClient } from '../../generated/prisma/index.js';
 import bcrypt from 'bcrypt';
-
+const prisma = new PrismaClient();
 export async function createUserInDb(email: string, plainPassword: string) {
   const hash = await bcrypt.hash(plainPassword, 10);
   
-  const user = await db.user.create({
+  const user = await prisma.user.create({
     data: {
       User_Email: email,
       User_Password: hash,
@@ -32,7 +32,7 @@ export async function createUserInDb(email: string, plainPassword: string) {
   return user.UserID;
 }
 export async function fetchProfile(userid: number) {
-  const profile = await db.profile.findUnique({
+  const profile = await prisma.profile.findUnique({
     where: {
       UserID: userid
     },
@@ -69,7 +69,7 @@ export async function updateProfile(userid: number, data: {
   
   if (Object.keys(updateData).length === 0) return;
   
-  await db.profile.update({
+  await prisma.profile.update({
     where: {
       UserID: userid
     },

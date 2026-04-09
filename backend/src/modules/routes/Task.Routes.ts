@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import { authMiddleware } from '../middlewares/authenticator.js';
+import { authMiddleware } from '../../middlewares/authenticator.js';
 import * as TaskController from '../controllers/task.controller.js';
-import * as Validator from '../middlewares/Task.validators.js';
+import * as Validator from '../../middlewares/Task.validators.js';
 
 const TaskRoute = new Hono();
 

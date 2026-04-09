@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import * as UserController from '../controllers/user.controller.js';
-import { authMiddleware } from '../middlewares/authenticator.js';
+import { authMiddleware } from '../../middlewares/authenticator.js';
 import { uploadProfilePicController } from '../controllers/user.controller.js';
 
 const UserRoutes = new Hono();

@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
-import type { UpdatePomoTaskInput } from '../types/index.js';
-import { Prisma, PrismaClient } from '../generated/prisma/index.js';
+import type { UpdatePomoTaskData } from '../types/index.js';
+import { Prisma, PrismaClient } from '../../generated/prisma/index.js';
 const prisma = new PrismaClient();
 dotenv.config();
 export async function getAllPomoTask(userId: number) {
@@ -55,11 +55,11 @@ export async function getAllPomoTask(userId: number) {
   
   
   
-  export async function updatePomoTask(taskId: number, data: UpdatePomoTaskInput) {
+  export async function updatePomoTask(taskId: number, data: UpdatePomoTaskData) {
     const updateData: any = {
       ...data,
-      session: data.SessionId ? {
-        connect: { SessionId: data.SessionId }
+      session: data.sessionId ? {
+        connect: { SessionId: data.sessionId }
       } : undefined,
     };
       

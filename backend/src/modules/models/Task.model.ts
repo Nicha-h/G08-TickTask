@@ -1,7 +1,8 @@
-import { PrismaClient, type task } from '../generated/prisma/index.js';
+import { PrismaClient, type task } from '../../generated/prisma/index.js';
 import type { Context } from 'hono';
-import type { TaskStatus } from '../types/index.js';
+import type { TaskStatus, UpdateTaskData } from '../types/index.js';
 import * as dotenv from 'dotenv';
+import { handlePrismaError } from '../../errors/prisma.js';
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -52,6 +53,14 @@ export async function getTasksByUser(userId: number, date?: string): Promise<tas
   return tasks;
 }
 
+export async function getTaskById(TaskID: number): Promise<task | null> {
+  const task = await prisma.task.findUnique({
+    where: {
+      TaskID: TaskID,
+    },
+  });
+  return task;
+}
 
 export async function createTask(taskData: {
   UserID: number;
@@ -110,100 +119,42 @@ export async function createTask(taskData: {
 }
 
 
-export const updateTask = async (c: Context) => {
-  const id = Number(c.req.param('id'));
-  const user = c.get('user') as { id: number };
-  const body = await c.req.json();
-
+export const updateTask = async (data: UpdateTaskData, TaskID: number) => {
   try {
-    await prisma.task.updateMany({
-      where: {
-        TaskID: id,
-        UserID: user.id
-      },
-      data: {
-        Task_Title: body.Task_Title,
-        Task_Description: body.Task_Description,
-        Task_Status: body.Task_Status,
-        Task_Color: body.Task_Color,
-        Task_Icon: body.Task_icon,
-        Task_Start_Date: body.Task_Start_Date,
-        Task_End_Date: body.Task_End_Date,
-        Task_Start_Time: body.Task_Start_Time,
-        Task_End_Time: body.Task_End_Time
-      }
+    const task = await prisma.task.findUnique({
+      where: { TaskID: TaskID },
     });
-
-    return c.json({ message: 'Task updated successfully' });
-  } catch (err) {
-    console.error('Error updating task:', err);
-    return c.json({ error: 'Failed to update task' }, 500);
-  }
-};
-
-export const patchTask = async (c: Context) => {
-  const id = Number(c.req.param('id'));
-  const user = c.get('user') as { id: number };
-  const body = await c.req.json();
-
-  const allowedFields = [
-    'Task_Title',
-    'Task_Description',
-    'Task_Status',
-    'Task_Color',
-    'Task_Icon',
-    'Task_Start_Date',
-    'Task_End_Date',
-    'Task_Start_Time',
-    'Task_End_Time'
-  ];
-
-  const data: Record<string, any> = {};
-  for (const key of allowedFields) {
-    if (body[key] !== undefined) {
-      data[key] = body[key];
+    if(!task) {
+      throw new Error('Task not found');
     }
-  }
-
-  try {
-    await prisma.task.updateMany({
-      where: {
-        TaskID: id,
-        UserID: user.id
+    return await prisma.task.update({
+      where: { TaskID: TaskID },
+      data: data,
+      include: {
+        user: true,
       },
-      data
     });
-
-    return c.json({ message: 'Task patched successfully' });
   } catch (error) {
-    console.error('Error patching task:', error);
-    return c.json({ error: 'Failed to patch task' }, 500);
+    throw handlePrismaError(error);
   }
 };
 
-export const deleteTask = async (c: Context) => {
-  const id = Number(c.req.param('id'));
-  const user = c.get('user') as { id: number };
-
+export const deleteTask = async (TaskID: number) => {
   try {
-    // Delete related task_category records first
     await prisma.task_category.deleteMany({
       where: {
-        TaskID: id
+        TaskID: TaskID
       }
     });
 
-    // Now delete the task
     await prisma.task.deleteMany({
       where: {
-        TaskID: id,
-        UserID: user.id
+        TaskID: TaskID,
       }
     });
 
-    return c.json({ message: 'Task deleted successfully' });
   } catch (error) {
     console.error('Error deleting task:', error);
-    return c.json({ error: 'Failed to delete task' }, 500);
+    throw new Error('Failed to delete task');
   }
 };

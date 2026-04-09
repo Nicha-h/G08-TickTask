@@ -1,6 +1,6 @@
 import type { Context } from 'hono';
 import * as TaskModel from '../models/Task.model.js';
-import { PrismaClient } from '../generated/prisma/index.js';
+import { PrismaClient } from '../../generated/prisma/index.js';
 import { TaskSchema } from '../middlewares/Task.validators.js';
 
 const prisma = new PrismaClient();
@@ -16,8 +16,6 @@ export const getAllTasks = async (c: Context) => {
     return c.json({ error: 'Failed to fetch tasks' }, 500);
   }
 };
-
-
 
 export const getTasksByDate = async (c: Context) => {
   const date = c.req.query('date');

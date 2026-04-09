@@ -1,4 +1,4 @@
-import { PrismaClient, type category } from '../generated/prisma/index.js';
+import { PrismaClient, type category } from '../../generated/prisma/index.js';
 import * as dotenv from 'dotenv';
 import { Category } from '../middlewares/Category.validators.js';
 

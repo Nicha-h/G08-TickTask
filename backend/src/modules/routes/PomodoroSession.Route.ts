@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import * as SessionController from '../controllers/PomoSession.controller.js';
-import { authMiddleware } from '../middlewares/authenticator.js';
+import { authMiddleware } from '../../middlewares/authenticator.js';
 
 const SessionRoutes = new Hono();
 SessionRoutes.use('*', authMiddleware);

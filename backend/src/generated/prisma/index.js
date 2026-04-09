@@ -208,7 +208,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\Work\\TickTask\\G08-TickTask\\backend\\src\\generated\\prisma",
+      "value": "C:\\Users\\Nicha.h\\G08-TickTask\\backend\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -222,7 +222,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\Work\\TickTask\\G08-TickTask\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\Nicha.h\\G08-TickTask\\backend\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -236,6 +236,7 @@ const config = {
     "db"
   ],
   "activeProvider": "sqlite",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {

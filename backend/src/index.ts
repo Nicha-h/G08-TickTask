@@ -2,12 +2,12 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors';
 import { PrismaClient } from './generated/prisma/index.js';
-import UserRoutes from './routes/User.Routes.js';
+import UserRoutes from './modules/routes/User.Routes.js';
 
-import taskRoutes from './routes/Task.Routes.js';
-import CategoryRoute from './routes/Category.Routes.js';
-import SessionRoutes from './routes/PomodoroSession.Route.js';
-import PomoTaskRoute from './routes/PomoTask.Route.js';
+import taskRoutes from './modules/routes/Task.Routes.js';
+import CategoryRoute from './modules/routes/Category.Routes.js';
+import SessionRoutes from './modules/routes/PomodoroSession.Route.js';
+import PomoTaskRoute from './modules/routes/PomoTask.Route.js';
 
 const app = new Hono()
 export const db = new PrismaClient();

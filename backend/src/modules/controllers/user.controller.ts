@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import { PrismaClient } from '../generated/prisma/index.js';
+import { PrismaClient } from '../../generated/prisma/index.js';
 import { z } from 'zod';
 import { createUserInDb, fetchProfile, updateProfile } from '../models/User.model.js';
 import  jwt  from 'jsonwebtoken';
@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import cloudinary from '../utils/Cloudinary.js';
+import cloudinary from '../../config/Cloudinary.js';
 dotenv.config();
 
 const prisma = new PrismaClient();

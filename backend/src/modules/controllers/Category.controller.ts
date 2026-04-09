@@ -1,6 +1,6 @@
 import type { Context } from 'hono';
-import { db } from '../database/db.js';
-import { categorySchema } from '../schemas/Schemas.js';
+import { db } from '../../database/db.js';
+import { CategorySchemas } from '../schemas/category.schema.js';
 import {z} from 'zod';
 import * as categoryModel from '../models/Category.model.js';
 import { Category } from '../middlewares/Category.validators.js';
@@ -100,33 +100,6 @@ export const deleteCategoryController = async (c: Context) => {
   } catch (error) {
     console.error('Error deleting category:', error);
     return c.json({ error: 'Failed to delete category' }, 500);
-  }
-};
-
-export const patchCategoryController = async (c: Context) => {
-  try {
-    const categoryId = parseInt(c.req.param('id'));
-    const user = c.get('user') as { id: number };
-    const updates = await c.req.json();
-    
-    const result = await categoryModel.patchCategory(
-      categoryId,
-      user.id,
-      updates
-    );
-    
-    if (result === null) {
-      return c.json({ error: 'No fields to update' }, 400);
-    }
-    
-    if (!result) {
-      return c.json({ error: 'Category not found or no changes made' }, 404);
-    }
-    
-    return c.json({ message: 'Category updated successfully' });
-  } catch (error) {
-    console.error('Error updating category:', error);
-    return c.json({ error: 'Failed to update category' }, 500);
   }
 };
 
