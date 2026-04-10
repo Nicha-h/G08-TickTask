@@ -5,7 +5,7 @@ import overviewTotaltask from '../assets/overviewTotaltask.svg';
 import overviewCompleted from '../assets/overviewCompleted.svg';
 import overviewinComplete from '../assets/overviewinComplete.svg';
 import plus from '../assets/plus.svg';
-
+import { apiClient } from '../util/apiClient';  
 const Overview = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [data, setData] = useState({
@@ -32,7 +32,7 @@ const Overview = () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('http://localhost:3000/api/tasks/overview', {
+      const response = await apiClient.get(`/api/tasks/overview`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ const Overview = () => {
   const initDonutChart = (currentData) => {
     if (!donutRef.current) return;
 
-    const { completed, inComplete, total } = currentData;
+    const { completed, _inComplete, total } = currentData;
     const completedPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
     donutRef.current.style.background = `

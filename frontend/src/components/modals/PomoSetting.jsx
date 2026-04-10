@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Close from '../../assets/close.svg';
 import DeletePomo from './DeletePomo';
-
+import { apiClient } from '../../util/apiClient';
 function PomoSetting({ task, onClose, onDelete, onUpdate }) {
 
   const [title, setTitle] = useState(task.Pomo_Task_Title || '');
@@ -41,10 +41,8 @@ function PomoSetting({ task, onClose, onDelete, onUpdate }) {
     };
   
     try {
-      const response = await fetch(`http://localhost:3000/api/pomodoroTask/${task.Pomo_TaskId}`, {
-        method: 'PUT',
+      const response = await apiClient.put(`/api/pomodoroTask/${task.Pomo_TaskId}`, updatedData, {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(updatedData),

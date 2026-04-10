@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import ProfilePic from "../components/modals/ProfilePic";
 import { useWindowSize } from "../hooks/useWindowSize";
 import ConfirmLogout from "../components/modals/ConfirmLogout";
-
+import { apiClient } from "../util/apiClient";
 import Men1 from "../assets/ProfilePics/men1.svg";
 import Men2 from "../assets/ProfilePics/men 2.svg";
 import Men3 from "../assets/ProfilePics/men3.svg";
@@ -94,11 +94,9 @@ function ProfileEdit() {
           return;
         }
 
-        const response = await fetch("http://localhost:3000/api/users/profile", {
-          method: "GET",
+        const response = await apiClient.get("/api/users/profile", {
           headers: {
             "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         });
 
@@ -169,11 +167,8 @@ function ProfileEdit() {
       navigate("/login");
       return;
     }
-
-    const res = await fetch("http://localhost:3000/api/users/profile", {
-      method: "PUT",
+    const res = await apiClient.put("/api/users/profile", payload, {
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
@@ -185,12 +180,9 @@ function ProfileEdit() {
     }
 
     alert("Profile updated!");
-
-    const updatedResponse = await fetch("http://localhost:3000/api/users/profile", {
-      method: "GET",
+    const updatedResponse = await apiClient.get("/api/users/profile", {
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
       },
     });
 

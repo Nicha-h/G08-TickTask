@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom"; 
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom"; 
 import "./index.css";
 import App from "./App.jsx";
 //import Signup from "./pages/Signup.jsx";
@@ -17,11 +17,14 @@ import Category from "./pages/Category.jsx";
 import ProfileEdit from "./pages/ProfileEdit.jsx";
 import AddTask from "./pages/AddTask.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
+import ProtectedRoute from "./components/routes/ProtectedRoute.jsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
+      { index: true, element: <Navigate to="/home" replace /> },
       { path: "home", element: <Home /> },
       { path: "pomodoro", element: <Pomodoro /> },
       { path: "calendar", element: <Calendar /> },
@@ -33,11 +36,11 @@ const router = createBrowserRouter([
       { path: "*", element: <NotFoundPage /> }, // catch-all for nested routes
     ],
   },
-  { path: "/signup", element: <Signup /> },
-  { path: "/login", element: <Login /> },
-  { path: "/findYourAccount", element: <FindYourAccount /> },
-  { path: "/reset-Password", element: <ResetPassword /> },
-  { path: "*", element: <NotFoundPage /> }, // catch-all for top-level
+  // { path: "/signup", element: <Signup /> },
+  // { path: "/login", element: <Login /> },
+  // { path: "/findYourAccount", element: <FindYourAccount /> },
+  // { path: "/reset-Password", element: <ResetPassword /> },
+  // { path: "*", element: <NotFoundPage /> }, // catch-all for top-level
 ]);
 
 

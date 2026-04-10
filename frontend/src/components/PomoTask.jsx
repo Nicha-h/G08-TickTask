@@ -6,7 +6,7 @@ import setting from '@iconify-icons/mdi/settings-outline';
 import add from '@iconify-icons/mdi/add-circle-outline';
 import PomoSetting from '../components/modals/PomoSetting'
 import PomoAdd from './modals/PomoAdd';
-
+import { apiClient } from '../util/apiClient';
 function PomoTask({ onTaskSelect, activeTaskId }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ function PomoTask({ onTaskSelect, activeTaskId }) {
   const fetchTasks = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/pomodoroTask', {
+      const response = await apiClient.get('/api/pomodoroTask', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },

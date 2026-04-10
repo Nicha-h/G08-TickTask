@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import addcate from "../assets/addcate.svg";
-import iconAll from "../assets/iconAll.svg";
+import { apiClient } from "../util/apiClient";
 import edit from "../assets/edit.svg";
 import iconFilter from "../assets/iconFilter.svg";
 import iconTickWH from "../assets/iconTickWH.svg";
@@ -9,7 +9,6 @@ import DeleteCategoryModal from "../components/modals/DeleteCategoryModal.jsx";
 import AddCategoryModal from "../components/modals/AddCategoryModal.jsx";
 import EditCategoryModal from "../components/modals/EditCategoryModal.jsx";
 import TaskSettingModal from "../components/modals/TaskSettingModal.jsx";
-import axios from "axios";
 import { iconOptions, iconComponents, defaultIcon } from "../components/modals/icon.jsx";
 
 const colorOptions = [
@@ -36,7 +35,7 @@ export default function Category() {
   const [editingCategory, setEditingCategory] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
-  const [categoryFetchError, setCategoryFetchError] = useState(null);
+  const [_categoryFetchError, setCategoryFetchError] = useState(null);
   const [categoryTaskCounts, setCategoryTaskCounts] = useState({});
   const [categoryProgress, setCategoryProgress] = useState({});
   const token = localStorage.getItem("token");
@@ -69,7 +68,7 @@ export default function Category() {
   }, [isMobile]);
 
   useEffect(() => {
-  axios.get("http://localhost:3000/api/tasks", {
+  apiClient.get("/api/tasks", {
     headers: { Authorization: `Bearer ${token}` },
     
   }).then(res => {
@@ -106,7 +105,7 @@ export default function Category() {
           return;
         }
 
-        const response = await axios.get("http://localhost:3000/api/category", {
+        const response = await apiClient.get("/api/category", {
           headers: { 
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -158,12 +157,10 @@ export default function Category() {
         
         if (!selectedCategoryId) {
           // Fetch all tasks /ᐠ｡ꞈ｡ᐟ\
-          const response = await axios.get(
-            `http://localhost:3000/api/tasks`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
+          const response = await apiClient.get("/api/tasks", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
             }
           );
           
@@ -188,13 +185,11 @@ export default function Category() {
         }
         
         // Fetch tasks for specific category (. ❛ ᴗ ❛.)
-        const response = await axios.get(
-          `http://localhost:3000/api/category/${selectedCategoryId}/tasks`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await apiClient.get(`/api/category/${selectedCategoryId}/tasks`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
         );
         
         if (response.data) {
@@ -224,7 +219,7 @@ export default function Category() {
       const counts = {};
       for (const cat of categories) {
         try {
-          const res = await axios.get(`http://localhost:3000/api/category/${cat.CategoryId}/count`, {
+          const res = await apiClient.get(`/api/category/${cat.CategoryId}/count`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           counts[cat.CategoryId] = res.data.taskCount;
@@ -245,7 +240,7 @@ export default function Category() {
       for (const cat of categories) {
         try {
           // Remove the space after "progress"
-          const res = await axios.get(`http://localhost:3000/api/category/${cat.CategoryId}/progress`, {
+          const res = await apiClient.get(`/api/category/${cat.CategoryId}/progress`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           progressObj[cat.CategoryId] = res.data.progress ?? 0;
@@ -279,7 +274,7 @@ export default function Category() {
 
   try {
     const token = localStorage.getItem('token');
-    await axios.delete(`http://localhost:3000/api/category/${categoryToDelete}`, {
+    await apiClient.delete(`/api/category/${categoryToDelete}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -335,12 +330,9 @@ export default function Category() {
     };
 
     // Remove unused response variable
-    await axios.patch(
-      `http://localhost:3000/api/tasks/${actualTaskId}`,
-      updatePayload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    await apiClient.patch(`/api/tasks/${actualTaskId}`, updatePayload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }

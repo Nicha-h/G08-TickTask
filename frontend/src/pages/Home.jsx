@@ -4,11 +4,10 @@ import { format } from 'date-fns';
 import AddTask from '../components/AddTask';
 import CategoryBox from '../components/CategoryBox';
 import { NavLink, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useWindowSize } from '../hooks/useWindowSize';
 import Men1 from '../assets/ProfilePics/men1.svg';
-
+import { apiClient } from '../util/apiClient';
 
 function Home() {
   const date = new Date();
@@ -56,7 +55,7 @@ function Home() {
   const fetchUsername = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/api/users/profile`, {
+      const response = await apiClient.get(`/api/users/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

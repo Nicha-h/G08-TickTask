@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, NavLink } from "react-router-dom";
 import TaskSettingModal from "../components/modals/TaskSettingModal"; // make sure the path is correct
 import {iconComponents} from "../components/modals/icon"; // assuming this maps Task_Icon to actual image paths
-
+import { apiClient } from "../util/apiClient";
 const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
   const [tasks, setTasks] = useState(initialTasks || []);
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,8 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
   const fetchTasks = async (date) => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3000/api/tasks/by-date?date=' + date, {
+      const response = await apiClient.get(`/api/tasks/by-date`, {
+        params: { date },
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },

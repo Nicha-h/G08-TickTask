@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Close from '../../assets/close.svg';
-
+import { apiClient } from '../../util/apiClient';
 function PomoAdd({ task = {}, onClose, onAdd }) {
   const [title, setTitle] = useState(task?.Pomo_Task_Title || '');
   const [pomodoro, setPomodoro] = useState('');
@@ -26,13 +26,10 @@ function PomoAdd({ task = {}, onClose, onAdd }) {
     };
   
     try {
-      const response = await fetch(`http://localhost:3000/api/pomodoroTask`, {
-        method: 'POST',
+      const response = await apiClient.post(`/api/pomodoroTask`, data, {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(data),
+        }
       });
   
       if (!response.ok) {

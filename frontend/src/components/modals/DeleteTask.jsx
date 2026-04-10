@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Close from '../../assets/close.svg';
-import axios from 'axios';
+import { apiClient } from '../../util/apiClient';
 function DeleteTask({ onClose, task, onDelete }) {
   const [isClosing, setIsClosing] = useState(false);
   const token = localStorage.getItem('token');
@@ -15,12 +15,10 @@ function DeleteTask({ onClose, task, onDelete }) {
 
   const handleDelete = async (TaskID) => {
     try {
-      const response = await axios.delete(
-        `http://localhost:3000/api/tasks/${TaskID}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+      const response = await apiClient.delete(`/api/tasks/${TaskID}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         }
       );
 

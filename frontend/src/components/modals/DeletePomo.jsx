@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Close from '../../assets/close.svg';
-
+import { apiClient } from '../../util/apiClient';
 function DeletePomo({ onClose, task, onDelete}) {
 
   const [isClosing, setIsClosing] = useState(false);
@@ -14,10 +14,8 @@ function DeletePomo({ onClose, task, onDelete}) {
 
   const handleDelete = async (PomotaskId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/pomodoroTask/${PomotaskId}`, {
-        method: 'DELETE',
+      const response = await apiClient.delete(`/api/pomodoroTask/${PomotaskId}`, {
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });

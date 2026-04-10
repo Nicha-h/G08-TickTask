@@ -7,7 +7,7 @@ import edit from '@iconify-icons/mdi/pencil-outline'
 import signout from '@iconify-icons/mdi/sign-out-variant'
 import { Icon } from '@iconify/react/dist/iconify.js';
 import ConfirmLogout from './modals/ConfirmLogout';
-
+import { apiClient } from '../util/apiClient';
 import Men1 from "../assets/ProfilePics/men1.svg";
 import Men2 from "../assets/ProfilePics/men 2.svg";
 import Men3 from "../assets/ProfilePics/men3.svg";
@@ -85,8 +85,7 @@ function Navbar() {
           return;
         }
 
-        const response = await fetch("http://localhost:3000/api/users/profile", {
-          method: "GET",
+        const response = await apiClient.get("http://localhost:3000/api/users/profile", {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
