@@ -1,6 +1,6 @@
-import { PrismaClient, type category } from '../generated/prisma/index.js';
-import * as dotenv from 'dotenv';
-import { Category } from '../middlewares/Category.validators.js';
+import { PrismaClient, type category } from "../generated/prisma/index.js";
+import * as dotenv from "dotenv";
+import { Category } from "../middlewares/Category.validators.js";
 
 dotenv.config();
 
@@ -14,13 +14,16 @@ export async function getUserCategories(userId: number) {
   });
 }
 
-export const getTasksByCategoryId = async (userId:number, categoryId: number) => {
+export const getTasksByCategoryId = async (
+  userId: number,
+  categoryId: number,
+) => {
   const results = await prisma.task_category.findMany({
     where: {
       CategoryId: categoryId,
       task: {
-        UserID: userId
-      }
+        UserID: userId,
+      },
     },
     include: {
       task: true,
@@ -30,8 +33,13 @@ export const getTasksByCategoryId = async (userId:number, categoryId: number) =>
   return results;
 };
 
-
-export async function createCategory(userId: number, name: string, color: string, icon: string, isCustom = false): Promise<category> {
+export async function createCategory(
+  userId: number,
+  name: string,
+  color: string,
+  icon: string,
+  isCustom = false,
+): Promise<category> {
   const category = await prisma.category.create({
     data: {
       Category_Name: name,
@@ -53,13 +61,21 @@ export async function deleteCategory(categoryId: number, userId: number) {
   });
 }
 
-export async function updateCategory(categoryId: number, userId: number, color: string, icon: string, Category_is_Primary: boolean) {
+export async function updateCategory(
+  categoryId: number,
+  userId: number,
+  color: string,
+  icon: string,
+  Category_is_Primary: boolean,
+  name?: string,
+) {
   const updatedCategory = await prisma.category.updateMany({
     where: {
       CategoryId: categoryId,
       userId: userId,
     },
     data: {
+      ...(name && { Category_Name: name }),
       Category_Color: color,
       Category_icon: icon,
       Category_is_Primary: Category_is_Primary,
@@ -68,12 +84,16 @@ export async function updateCategory(categoryId: number, userId: number, color: 
   return updatedCategory;
 }
 
-export async function patchCategory(categoryId: number, userId: number, updates: {
-  Category_Name?: string;
-  Category_Color?: string;
-  Category_icon?: string;
-  Category_is_Primary?: boolean;
-}) {
+export async function patchCategory(
+  categoryId: number,
+  userId: number,
+  updates: {
+    Category_Name?: string;
+    Category_Color?: string;
+    Category_icon?: string;
+    Category_is_Primary?: boolean;
+  },
+) {
   const updatedCategory = await prisma.category.updateMany({
     where: {
       CategoryId: categoryId,
@@ -82,16 +102,19 @@ export async function patchCategory(categoryId: number, userId: number, updates:
     data: updates,
   });
 
-  return updatedCategory.count > 0; 
+  return updatedCategory.count > 0;
 }
 
-export async function assignTaskToCategories(TaskID: number, categoryId: number) {
+export async function assignTaskToCategories(
+  TaskID: number,
+  categoryId: number,
+) {
   const task = await prisma.task.findUnique({
     where: { TaskID: TaskID },
   });
 
   if (!task) {
-    throw new Error('Task not found');
+    throw new Error("Task not found");
   }
 
   const category = await prisma.category.findUnique({
@@ -99,7 +122,7 @@ export async function assignTaskToCategories(TaskID: number, categoryId: number)
   });
 
   if (!category) {
-    throw new Error('Category not found');
+    throw new Error("Category not found");
   }
 
   await prisma.task_category.create({
@@ -110,7 +133,6 @@ export async function assignTaskToCategories(TaskID: number, categoryId: number)
   });
 }
 
-
 export async function removeTaskCategories(taskId: number) {
   await prisma.task_category.deleteMany({
     where: {
@@ -119,7 +141,10 @@ export async function removeTaskCategories(taskId: number) {
   });
 }
 
-export const getCategoryProgress = async (categoryId: number, userId: number) => {
+export const getCategoryProgress = async (
+  categoryId: number,
+  userId: number,
+) => {
   const total = await prisma.task_category.count({
     where: {
       CategoryId: categoryId,
@@ -134,7 +159,7 @@ export const getCategoryProgress = async (categoryId: number, userId: number) =>
       CategoryId: categoryId,
       task: {
         UserID: userId,
-        Task_Status: 'Completed',
+        Task_Status: "Completed",
       },
     },
   });
