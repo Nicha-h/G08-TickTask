@@ -2,11 +2,25 @@
   "name": "backend",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup src/index.ts --format cjs --clean",
+    "start": "node dist/index.cjs",
+    "migrate": "prisma migrate dev",
+    "seed": "tsx prisma/users.seed.ts",
+    "seed:roles": "tsx prisma/roles.seed.ts",
+    "seed:all": "tsx prisma/roles.seed.ts && tsx prisma/users.seed.ts",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write .",
+    "check": "eslint . && prettier --check .",
+    "test": "vitest",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.0",
     "@hono/standard-validator": "^0.2.2",
+    "@hono/swagger-ui": "^0.6.1",
     "@hono/zod-openapi": "^1.2.4",
     "@prisma/client": "^6.7.0",
     "@valibot/to-json-schema": "^1.6.0",
@@ -29,6 +43,8 @@
     "@types/node": "^20.11.17",
     "@types/nodemailer": "^8.0.0",
     "prisma": "^6.8.1",
-    "tsx": "^4.7.1"
+    "tsup": "^8.5.1",
+    "tsx": "^4.7.1",
+    "typescript": "^6.0.2"
   }
 }

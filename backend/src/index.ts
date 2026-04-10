@@ -1,28 +1,40 @@
 import { serve } from '@hono/node-server'
-import { Hono } from 'hono'
 import { cors } from 'hono/cors';
 import { PrismaClient } from './generated/prisma/index.js';
 import UserRoutes from './modules/routes/User.Routes.js';
-
-import taskRoutes from './modules/routes/Task.Routes.js';
-import CategoryRoute from './modules/routes/Category.Routes.js';
-import SessionRoutes from './modules/routes/PomodoroSession.Route.js';
-import PomoTaskRoute from './modules/routes/PomoTask.Route.js';
-
-const app = new Hono()
+import config from './config/env.js';
+import { OpenAPIHono } from '@hono/zod-openapi';
+import { swaggerUI } from '@hono/swagger-ui';
+import { setupRoutes } from './routes/index.js';
+import 'dotenv/config'; 
+import { errorHandler } from './modules/middlewares/error.js';
+const app = new OpenAPIHono();
 export const db = new PrismaClient();
+app.onError(errorHandler);
 
+app.use(
+  cors({
+    origin: (origin) => {
+      if (config.isProduction) {
+        // return 'https://smartcity.sit.kmutt.ac.th';
+      }
+      return origin || 'http://localhost:5173';
+    },
+    allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS']	,
+    credentials: true,
+  })
+);
 
-app.use('*', cors());
-app.use('*', async (c, next) => {
-  console.log(`[${c.req.method}] ${c.req.url}`);
-  await next();
+app.notFound((c) => {
+  return c.json(
+    {
+      error: 'API Endpoint not found',
+      status: 404,
+      message: 'The resource you are looking for does not exist.',
+    },
+    404
+  );
 });
-app.route('/api/tasks', taskRoutes);
-app.route('/api/users', UserRoutes);
-app.route('/api/category', CategoryRoute);
-app.route('/api/pomodoroSession', SessionRoutes);
-app.route('/api/pomodoroTask', PomoTaskRoute);
 
 db.$connect()
 	.then(() => {
