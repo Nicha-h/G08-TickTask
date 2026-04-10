@@ -2,14 +2,36 @@ import type { Context } from 'hono';
 import { PomoTaskServices } from '../services/index.js';
 import { findById } from '../models/PomoTask.model.js';
 
+// Helper function to create success response
+const successResponse = (data: any, message?: string) => {
+  const response: any = {
+    success: true,
+    data,
+    timestamp: new Date().toISOString(),
+  };
+  if (message) {
+    response.message = message;
+  }
+  return response;
+};
+
+// Helper function to create error response
+const errorResponse = (name: string, message: string, statusCode: number) => {
+  return {
+    success: false as const,
+    error: { name, message, statusCode },
+    timestamp: new Date().toISOString(),
+  };
+};
+
 export async function getAllTask(c: Context) {
   const user = c.get('user'); 
 
   try {
     const tasks = await PomoTaskServices.getAllPomoTask(user.id);
-    return c.json({ success: true, data: tasks });
+    return c.json(successResponse(tasks), 200);
   } catch (error) {
-    return c.json({ success: false, message: 'Failed to fetch tasks', error: String(error) }, 500);
+    return c.json(errorResponse('Error', 'Failed to fetch tasks', 500), 500);
   }
 }
 
@@ -17,9 +39,9 @@ export async function getTaskBySession(c: Context) {
     const sessionId = Number(c.req.param('sessionId'));
     try {
         const tasks = await PomoTaskServices.getPomoTaskBySessionId(sessionId);
-        return c.json({ success: true, data: tasks });
+        return c.json(successResponse(tasks), 200);
     } catch (error) {
-        return c.json({ success: false, message:'Failed to fetch tasks', error: String(error) }, 500);
+        return c.json(errorResponse('Error', 'Failed to fetch tasks', 500), 500);
     }
 }
 
@@ -27,9 +49,9 @@ export async function getTaskById(c: Context) {
     const taskId  = Number(c.req.param('id'));
     try {
         const tasks = await findById(taskId);
-        return c.json({ success: true, data: tasks });
+        return c.json(successResponse(tasks), 200);
     } catch (error) {
-        return c.json({ success: false, message:'Failed to fetch tasks', error: String(error) }, 500);
+        return c.json(errorResponse('Error', 'Failed to fetch tasks', 500), 500);
     }
 }
 
@@ -47,10 +69,10 @@ export const CreatePomoTaskController = async (c: Context) => {
       }
     );
 
-    return c.json({ success: true, data: newTask }, 201);
+    return c.json(successResponse(newTask, 'Task created successfully'), 201);
   } catch (error) {
     console.error('CreatePomoTask error:', error);
-    return c.json({ success: false, message: 'Failed to create task', error: String(error) }, 500);
+    return c.json(errorResponse('Error', 'Failed to create task', 500), 500);
   }
 };
 
@@ -72,12 +94,12 @@ export async function updatePomoTaskController(c: Context) {
     const updatedTask = await PomoTaskServices.updatePomoTask(taskId, updateData);
     
     if (!updatedTask) {
-      return c.json({ success: false, message: 'Task not found or no changes made' }, 404);
+      return c.json(errorResponse('NotFound', 'Task not found or no changes made', 404), 404);
     }
     
-    return c.json({ success: true, data: updatedTask });
+    return c.json(successResponse(updatedTask), 200);
   } catch (error) {
-    return c.json({ success: false, message: 'Failed to update task', error: String(error) }, 500);
+    return c.json(errorResponse('Error', 'Failed to update task', 500), 500);
   }
 }
 
@@ -87,9 +109,9 @@ export async function deletePomoTaskController(c: Context) {
     
     try {
       await PomoTaskServices.deletePomoTask(taskId);
-      return c.json({ success: true, message: 'Task deleted successfully' });
+      return c.json(successResponse(null, 'Task deleted successfully'), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to delete task', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to delete task', 500), 500);
     }
 }
 
@@ -101,22 +123,22 @@ export async function assignTaskToSession(c: Context) {
       const sessionId = Number(body.sessionId);
       
       if (isNaN(sessionId)) {
-        return c.json({ success: false, message: 'Invalid session ID' }, 400);
+        return c.json(errorResponse('BadRequest', 'Invalid session ID', 400), 400);
       }
       
       const task = await PomoTaskServices.assignTaskToSession(taskId, sessionId);
       
       if (!task) {
-        return c.json({ success: false, message: 'Task not found' }, 404);
+        return c.json(errorResponse('NotFound', 'Task not found', 404), 404);
       }
       
-      return c.json({ success: true, data: task });
+      return c.json(successResponse(task), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to assign task to session', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to assign task to session', 500), 500);
     }
 }
 
-export async function completePomoTask(c: Context): Promise<Response> {
+export async function completePomoTask(c: Context) {
   const taskId = Number(c.req.param('id'));
   const { Pomo_Task_Status } = await c.req.json(); 
 
@@ -124,56 +146,48 @@ export async function completePomoTask(c: Context): Promise<Response> {
     const task = await PomoTaskServices.completePomoTask(taskId, Pomo_Task_Status);
 
     if (!task) {
-      return c.json({ success: false, message: 'Task not found' }, 404);
+      return c.json(errorResponse('NotFound', 'Task not found', 404), 404);
     }
 
-    return c.json({ success: true, data: task });
+    return c.json(successResponse(task), 200);
   } catch (error) {
-    return c.json({ success: false, message: 'Failed to complete task', error: String(error) }, 500);
+    return c.json(errorResponse('Error', 'Failed to complete task', 500), 500);
   }
 }
 
-export async function incrementPomoCounter(c: Context): Promise<Response> {
+export async function incrementPomoCounter(c: Context) {
     const taskId = Number(c.req.param('id'));
     
     try {
       const task = await PomoTaskServices.incrementPomoCounter(taskId);
       
       if (!task) {
-        return c.json({ success: false, message: 'Task not found' }, 404);
+        return c.json(errorResponse('NotFound', 'Task not found', 404), 404);
       }
       
-      return c.json({ 
-        success: true, 
-        data: task,
-        message: 'Pomodoro counter incremented successfully' 
-      });
+      return c.json(successResponse(task, 'Pomodoro counter incremented successfully'), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to increment pomodoro counter', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to increment pomodoro counter', 500), 500);
     }
 }
 
-export async function resetPomoCounter(c: Context): Promise<Response> {
+export async function resetPomoCounter(c: Context) {
     const taskId = Number(c.req.param('id'));
     
     try {
       const task = await PomoTaskServices.resetPomoCounter(taskId);
       
       if (!task) {
-        return c.json({ success: false, message: 'Task not found' }, 404);
+        return c.json(errorResponse('NotFound', 'Task not found', 404), 404);
       }
       
-      return c.json({ 
-        success: true, 
-        data: task,
-        message: 'Pomodoro counter reset successfully' 
-      });
+      return c.json(successResponse(task, 'Pomodoro counter reset successfully'), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to reset pomodoro counter', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to reset pomodoro counter', 500), 500);
     }
 }
 
-export async function setPomoTargetCount(c: Context): Promise<Response> {
+export async function setPomoTargetCount(c: Context) {
     const taskId = Number(c.req.param('id'));
     
     try {
@@ -181,36 +195,29 @@ export async function setPomoTargetCount(c: Context): Promise<Response> {
       const targetCount = Number(body.targetCount);
       
       if (isNaN(targetCount) || targetCount < 0) {
-        return c.json({ success: false, message: 'Invalid target count' }, 400);
+        return c.json(errorResponse('BadRequest', 'Invalid target count', 400), 400);
       }
       
       const task = await PomoTaskServices.setPomoTargetCount(taskId, targetCount);
       
       if (!task) {
-        return c.json({ success: false, message: 'Task not found' }, 404);
+        return c.json(errorResponse('NotFound', 'Task not found', 404), 404);
       }
       
-      return c.json({ 
-        success: true, 
-        data: task,
-        message: 'Target count set successfully' 
-      });
+      return c.json(successResponse(task, 'Target count set successfully'), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to set target count', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to set target count', 500), 500);
     }
 }
 
-export async function getTaskProgress(c: Context): Promise<Response> {
+export async function getTaskProgress(c: Context) {
     const taskId = Number(c.req.param('id'));
     
     try {
       const progress = await PomoTaskServices.getTaskProgress(taskId);
       
-      return c.json({ 
-        success: true, 
-        data: progress
-      });
+      return c.json(successResponse(progress), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to get task progress', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to get task progress', 500), 500);
     }
 }

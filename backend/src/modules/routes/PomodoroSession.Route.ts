@@ -1,19 +1,50 @@
-import { Hono } from 'hono';
-import * as SessionController from '../controllers/PomoSession.controller.js';
-import { authMiddleware } from '../middlewares/authenticator.js';
-
-const SessionRoutes = new Hono();
-SessionRoutes.use('*', authMiddleware);
-SessionRoutes.get('/user/:userId', SessionController.getAllSession);
-SessionRoutes.get('/:id', SessionController.getPomoSessionbyId);
-SessionRoutes.post('/', SessionController.createSessionController);
-SessionRoutes.put('/:id', SessionController.updatedSessionController);
-SessionRoutes.delete('/:id', SessionController.deleteSessionController);
-SessionRoutes.get('/active/:userId', SessionController.getActiveSessionController);
-SessionRoutes.post('/start', SessionController.startSession);
-SessionRoutes.put('/:id/pause', SessionController.pauseSession);
-SessionRoutes.put('/:id/resume', SessionController.resumeSession);
-SessionRoutes.put('/:id/complete', SessionController.completeSession);
-SessionRoutes.put('/:id/time', SessionController.updateRemainingTime);
-
-export default SessionRoutes;
+import {PomodoroController} from '../controllers/index.js';
+import type { OpenAPIHono } from '@hono/zod-openapi';
+import { PomodoroSchemas } from '../schemas/index.js';
+const setupPomodoroRoutes = (app: OpenAPIHono) => {
+    app.openapi(
+        PomodoroSchemas.getAllSessionsRoute,
+        PomodoroController.getAllSession
+    ),
+    app.openapi(
+        PomodoroSchemas.getSessionByIdRoute,
+        PomodoroController.getPomoSessionbyId
+    ),
+    app.openapi(
+        PomodoroSchemas.createSessionRoute,
+        PomodoroController.createSessionController
+    ),
+    app.openapi(
+        PomodoroSchemas.updateSessionRoute,
+        PomodoroController.updatedSessionController
+    ),
+    app.openapi(
+        PomodoroSchemas.deleteSessionRoute,
+        PomodoroController.deleteSessionController
+    ),
+    app.openapi(
+        PomodoroSchemas.getActiveSessionRoute,
+        PomodoroController.getActiveSessionController
+    ),
+    app.openapi(
+        PomodoroSchemas.startSessionRoute,
+        PomodoroController.startSession
+    ),
+    app.openapi(
+        PomodoroSchemas.pauseSessionRoute,
+        PomodoroController.pauseSession
+    ),
+    app.openapi(
+        PomodoroSchemas.resumeSessionRoute,
+        PomodoroController.resumeSession
+    ),
+    app.openapi(
+        PomodoroSchemas.completeSessionRoute,
+        PomodoroController.completeSession
+    ),
+    app.openapi(
+        PomodoroSchemas.updateRemainingTimeRoute,
+        PomodoroController.updateRemainingTime
+    );
+}
+export default setupPomodoroRoutes;

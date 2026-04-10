@@ -2,14 +2,36 @@ import type { Context } from 'hono';
 import * as SessionModel from '../models/Pomodoro.model.js';
 import type { SessionStatus, TimerType, CreatePomodoroData, UpdatePomodoroData} from '../types/index.js';
 
+// Helper function to create success response
+const successResponse = (data: any, message?: string) => {
+  const response: any = {
+    success: true,
+    data,
+    timestamp: new Date().toISOString(),
+  };
+  if (message) {
+    response.message = message;
+  }
+  return response;
+};
+
+// Helper function to create error response
+const errorResponse = (name: string, message: string, statusCode: number) => {
+  return {
+    success: false as const,
+    error: { name, message, statusCode },
+    timestamp: new Date().toISOString(),
+  };
+};
+
 export async function getAllSession(c:Context) {
     const userId = Number(c.req.param('userId'));
     try{
         const sessions = await SessionModel.getPomoSession(userId);
-        return c.json({success: true, data: sessions});
+        return c.json(successResponse(sessions), 200);
 
     }catch (error){
-        return c.json({success: false, message: 'Failed to fetch sessions', error: String(error)}, 500);
+        return c.json(errorResponse('Error', 'Failed to fetch sessions', 500), 500);
     }
 }
 
@@ -19,28 +41,27 @@ export async function getPomoSessionbyId(c:Context) {
     try {
         const session = await SessionModel.getPomoSessionbyId(sessionid);
         if (!session) {
-            return c.json({ success: false, message: 'Session not found' }, 404);
+            return c.json(errorResponse('NotFound', 'Session not found', 404), 404);
           }
-        return c.json({ success: true, data: session });
+        return c.json(successResponse(session), 200);
     } catch (error) {
-        return c.json({success: false, message: 'Failed to fetch sessions', error: String(error)}, 500);
+        return c.json(errorResponse('Error', 'Failed to fetch sessions', 500), 500);
     }
 }
 
 export async function createSessionController(c: Context) {
-    const sessionid = Number(c.req.param('id'));
     try {
         const body = await c.req.json();
         const sessionData: CreatePomodoroData = {
-            UserID: body.UserId,
-            duration_seconds: body.duration || 1500,
+            UserID: body.UserID,
+            duration_seconds: body.duration_seconds || 1500,
             timer_type: body.timer_type,
         };
 
         const session = await SessionModel.createSession(sessionData);
-        return c.json({ success: true, data: session }, 201);
+        return c.json(successResponse(session, 'Session created successfully'), 201);
     } catch (error) {
-        return c.json({success: false, message: 'Failed to create sessions', error: String(error)}, 500);
+        return c.json(errorResponse('Error', 'Failed to create sessions', 500), 500);
     }
 }
 
@@ -58,12 +79,12 @@ export async function updatedSessionController(c: Context) {
       const updatedSession = await SessionModel.updatePomo(sessionId, sessionData);
       
       if (!updatedSession) {
-        return c.json({ success: false, message: 'Session not found or no changes made' }, 404);
+        return c.json(errorResponse('NotFound', 'Session not found or no changes made', 404), 404);
       }
       
-      return c.json({ success: true, data: updatedSession });
+      return c.json(successResponse(updatedSession), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to update session', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to update session', 500), 500);
     }
 }
 
@@ -74,11 +95,11 @@ export async function deleteSessionController(c: Context) {
         const deleted = await SessionModel.deletePomo(sessionId);
         
         if (!deleted) {
-            return c.json({ success: false, message: 'Session not found' }, 404);
+            return c.json(errorResponse('NotFound', 'Session not found', 404), 404);
           }
-          return c.json({ success: true, message: 'Session deleted successfully' });
+          return c.json(successResponse(null, 'Session deleted successfully'), 200);
     } catch (error) {
-        return c.json({success: false, message: 'Failed to delete sessions', error: String(error)}, 500);
+        return c.json(errorResponse('Error', 'Failed to delete sessions', 500), 500);
     }
 }
 
@@ -87,11 +108,11 @@ export async function getActiveSessionController(c: Context) {
     try {
         const session = await SessionModel.getActiveSession(userId);
         if(!session){
-            return c.json({success: false, message: 'No active session found'}, 404);
+            return c.json(errorResponse('NotFound', 'No active session found', 404), 404);
         }
-        return c.json({ success: true, data: session });
+        return c.json(successResponse(session), 200);
     } catch (error) {
-        return c.json({success: false, message: 'Failed to fetch active session', error: String(error)}, 500);
+        return c.json(errorResponse('Error', 'Failed to fetch active session', 500), 500);
     }
 }
 
@@ -112,9 +133,9 @@ export async function startSession(c:Context) {
             timer_type: timerType
           });
           
-        return c.json({ success: true, data: session }, 201);
+        return c.json(successResponse(session, 'Session started successfully'), 201);
     } catch (error) {
-          return c.json({ success: false, message: 'Failed to start session', error: String(error) }, 500);
+          return c.json(errorResponse('Error', 'Failed to start session', 500), 500);
     }
 }
 
@@ -124,18 +145,18 @@ export async function pauseSession(c:Context) {
       const sessionId = Number(body.sessionId);
       
       if (!sessionId) {
-          return c.json({ success: false, message: 'Session ID is required' }, 400);
+          return c.json(errorResponse('BadRequest', 'Session ID is required', 400), 400);
       }
 
       const session = await SessionModel.updatePomo(sessionId, { status: 'paused' });
       
       if (!session) {
-          return c.json({ success: false, message: 'Session not found' }, 404);
+          return c.json(errorResponse('NotFound', 'Session not found', 404), 404);
       }
       
-      return c.json({ success: true, data: session });
+      return c.json(successResponse(session), 200);
   } catch (error) {
-      return c.json({ success: false, message: 'Failed to pause session', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to pause session', 500), 500);
   }
 }
 
@@ -146,12 +167,12 @@ export async function resumeSession(c:Context) {
       const session = await SessionModel.updatePomo(sessionId, { status: 'active' });
       
       if (!session) {
-        return c.json({ success: false, message: 'Session not found' }, 404);
+        return c.json(errorResponse('NotFound', 'Session not found', 404), 404);
       }
       
-      return c.json({ success: true, data: session });
+      return c.json(successResponse(session), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to resume session', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to resume session', 500), 500);
     }
 }
 
@@ -165,12 +186,12 @@ export async function completeSession(c: Context) {
       });
       
       if (!session) {
-        return c.json({ success: false, message: 'Session not found' }, 404);
+        return c.json(errorResponse('NotFound', 'Session not found', 404), 404);
       }
       
-      return c.json({ success: true, data: session });
+      return c.json(successResponse(session), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to complete session', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to complete session', 500), 500);
     }
 }
 
@@ -182,17 +203,17 @@ export async function updateRemainingTime(c:Context) {
       const remainingSeconds = Number(body.remaining_seconds);
       
       if (isNaN(remainingSeconds)) {
-        return c.json({ success: false, message: 'Invalid remaining seconds value' }, 400);
+        return c.json(errorResponse('BadRequest', 'Invalid remaining seconds value', 400), 400);
       }
       
       const session = await SessionModel.updatePomo(sessionId, { remaining_seconds: remainingSeconds });
       
       if (!session) {
-        return c.json({ success: false, message: 'Session not found' }, 404);
+        return c.json(errorResponse('NotFound', 'Session not found', 404), 404);
       }
       
-      return c.json({ success: true, data: session });
+      return c.json(successResponse(session), 200);
     } catch (error) {
-      return c.json({ success: false, message: 'Failed to update remaining time', error: String(error) }, 500);
+      return c.json(errorResponse('Error', 'Failed to update remaining time', 500), 500);
     }
 }

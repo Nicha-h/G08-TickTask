@@ -22,6 +22,7 @@ const taskSchema = z.object({
   Task_Status: z.enum(['Incomplete', 'Completed']).default('Incomplete'),
   Task_Color: z.string().max(255).optional().default('#D1F4FF'),
 });
+const TasksSchema = z.array(taskSchema);
 const createTaskSchema = taskSchema.extend({
     UserID : z.coerce.number().int().positive(),
 });
@@ -47,12 +48,9 @@ const getTasksByDateRoute = createGetRoute({
     middleware: [authMiddleware],
 });
 const getAllTasksRoute = createGetRoute({
-    path: '/tasks/{userId}',
-    params: z.object({
-        userId: z.coerce.number().int().positive(),
-    }),
+    path: '/tasks',
     summary: 'Get all tasks for the authenticated user',
-    responseSchema: z.array(taskSchema),
+    responseSchema: TasksSchema,
     tags: ['Tasks'],
     middleware: [authMiddleware],
 });
@@ -106,4 +104,5 @@ export const TaskSchemas = {
     createTaskRoute,
     updateTaskRoute,
     deleteTaskRoute,
+    TasksSchema
 };

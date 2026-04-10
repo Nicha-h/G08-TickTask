@@ -8,6 +8,7 @@ import * as dotenv from 'dotenv';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import cloudinary from '../../config/Cloudinary.js';
+import { successResponse, errorResponse } from '../../utils/response.js';
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -21,7 +22,7 @@ export async function createUserController(c: Context) {
     const parsed = userSchema.safeParse(body);
   
     if (!parsed.success) {
-      return c.json({ error: parsed.error.format() }, 400);
+      return errorResponse(c, 'Validation failed', 400);
     }
   
     const { email, password } = parsed.data;
@@ -35,17 +36,16 @@ export async function createUserController(c: Context) {
         { expiresIn: '1h' }
       );
   
-      return c.json({
-        message: 'User created successfully',
+      return successResponse(c, {
         token,
         user: {
           id: insertId,
           email,
         },
-      });
+      }, 201);
     } catch (err) {
       console.error(err);
-      return c.json({ error: 'Something went wrong' }, 500);
+      return errorResponse(c, 'Something went wrong', 500);
     }
 }
 
@@ -59,12 +59,12 @@ export async function loginUserController(c: Context) {
   });
 
   if (!user) {
-    return c.json({ message: 'Invalid credentials' }, 401);
+    return errorResponse(c, 'Invalid credentials', 401);
   }
 
   const match = await bcrypt.compare(password, user.User_Password);
   if (!match) {
-    return c.json({ message: 'Invalid credentials' }, 401);
+    return errorResponse(c, 'Invalid credentials', 401);
   }
 
   const token = jwt.sign(
@@ -73,7 +73,7 @@ export async function loginUserController(c: Context) {
     { expiresIn: '1d' }
   );
 
-  return c.json({
+  return successResponse(c, {
     message: 'Login successful',
     token,
     user: {
@@ -87,11 +87,11 @@ export async function fetchProfileController(c: Context) {
   try {
     const user = c.get('user'); 
     const profile = await fetchProfile(user.id);
-    return c.json(profile);
+    return successResponse(c, profile);
 
     } catch (err) {
       console.error(err);
-      return c.json({ error: 'Failed to fetch profile' }, 500);
+      return errorResponse(c, 'Failed to fetch profile', 500);
     }
 }
 
@@ -106,10 +106,10 @@ export async function updateProfileController(c: Context) {
       iconPath: body.iconPath,
     });
 
-    return c.json({ message: 'Profile updated successfully' });
+    return successResponse(c, { message: 'Profile updated successfully' });
   } catch (err) {
     console.error(err);
-    return c.json({ error: 'Failed to update profile' }, 500);
+    return errorResponse(c, 'Failed to update profile', 500);
   }
 }
 
@@ -118,11 +118,11 @@ export async function uploadProfilePicController(c: Context) {
   const file = body.image as File;
 
   if (!file) {
-    return c.json({ error: 'No file uploaded' }, 400);
+    return errorResponse(c, 'No file uploaded', 400);
   }
   const MAX_SIZE = 20 * 1024 * 1024;
   if (file.size > MAX_SIZE) {
-    return c.json({ error: 'File too large. Max size is 20MB.' }, 400);
+    return errorResponse(c, 'File too large. Max size is 20MB.', 400);
   }
 
   const buffer = await file.arrayBuffer();
@@ -135,10 +135,10 @@ export async function uploadProfilePicController(c: Context) {
       transformation: [{ width: 200, height: 200, crop: 'fill' }],
     });
 
-    return c.json({ imageUrl: result.secure_url });
+    return successResponse(c, { imageUrl: result.secure_url });
   } catch (err) {
     console.error(err);
-    return c.json({ error: 'Failed to upload image' }, 500);
+    return errorResponse(c, 'Failed to upload image', 500);
   }
 }
 
@@ -151,7 +151,7 @@ export async function checkEmailController(c: Context) {
     });
 
     if (!user) {
-      return c.json({ exists: false });
+      return successResponse(c, { exists: false });
     }
 
     // Generate token
@@ -188,11 +188,11 @@ export async function checkEmailController(c: Context) {
       `,
     });
 
-    return c.json({ exists: true, message: 'Reset email sent' });
+    return successResponse(c, { exists: true, message: 'Reset email sent' });
 
   } catch (error) {
     console.error('Server error in checkEmailController:', error);
-    return c.json({ exists: false, error: 'Internal server error' }, 500);
+    return errorResponse(c, 'Internal server error', 500);
   }
 }
  
@@ -212,7 +212,7 @@ export async function resetPasswordController(c:Context) {
     });
 
     if (!user) {
-      return c.json({ error: 'Invalid or expired token' }, 400);
+      return errorResponse(c, 'Invalid or expired token', 400);
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -226,10 +226,10 @@ export async function resetPasswordController(c:Context) {
       }
     });
 
-    return c.json({ success: true, message: 'Password reset successful' });
+    return successResponse(c, { success: true, message: 'Password reset successful' });
     
   } catch (error) {
     console.error('Server error in resetPasswordController:', error);
-    return c.json({ error: 'Internal server error' }, 500);
+    return errorResponse(c, 'Internal server error', 500);
   }
 }

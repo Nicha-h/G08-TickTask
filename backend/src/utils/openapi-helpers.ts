@@ -66,7 +66,9 @@ const createGetRoute = <
     },
     responses: {
       200: successResponse(config.responseSchema, 'Success'),
+      400: commonErrors[400],
       404: commonErrors[404],
+      500: errorResponse('Internal Server Error'),
     },
   });
 
@@ -103,7 +105,9 @@ const createPostRoute = <
       200: successResponse(config.responseSchema, 'Success'),
       201: successResponse(config.responseSchema, 'Created'),
       400: commonErrors[400],
+      404: commonErrors[404],
       409: commonErrors[409],
+      500: errorResponse('Internal Server Error'),
     },
   });
 
@@ -140,6 +144,7 @@ const createPutRoute = <
       200: successResponse(config.responseSchema, 'Updated'),
       400: commonErrors[400],
       404: commonErrors[404],
+      500: errorResponse('Internal Server Error'),
     },
   });
 
@@ -163,7 +168,9 @@ const createDeleteRoute = <TParams extends z.ZodObject<any>>(config: {
     },
     responses: {
       200: successResponse(z.null(), 'Deleted'),
+      400: commonErrors[400],
       404: commonErrors[404],
+      500: errorResponse('Internal Server Error'),
     },
   });
 

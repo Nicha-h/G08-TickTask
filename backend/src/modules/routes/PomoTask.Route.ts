@@ -1,24 +1,56 @@
-import { Hono } from 'hono';
+import type { OpenAPIHono } from '@hono/zod-openapi';
 import * as TaskController from '../controllers/PomoTask.controller.js';
-import { authMiddleware } from '../middlewares/authenticator.js';
+import {PomoTaskSchemas} from '../schemas/index.js';
 
-const PomotaskRoutes = new Hono();
+const setupPomoTaskRoutes = (app: OpenAPIHono) => {
+    app.openapi(
+        PomoTaskSchemas.getAllTasksRoute,
+        TaskController.getAllTask
+    ),
+    app.openapi(
+        PomoTaskSchemas.getTaskBySessionRoute,
+        TaskController.getTaskBySession
+    ),
+    app.openapi(
+        PomoTaskSchemas.getTaskByIdRoute,
+        TaskController.getTaskById
+    ),
+    app.openapi(
+        PomoTaskSchemas.createTaskRoute,
+        TaskController.CreatePomoTaskController
+    ),
+    app.openapi(
+        PomoTaskSchemas.updateTaskRoute,
+        TaskController.updatePomoTaskController
+    ),
+    app.openapi(
+        PomoTaskSchemas.deleteTaskRoute,
+        TaskController.deletePomoTaskController
+    ),
+    app.openapi(
+        PomoTaskSchemas.assignTaskToSessionRoute,
+        TaskController.assignTaskToSession
+    ),
+    app.openapi(
+        PomoTaskSchemas.completeTaskRoute,
+        TaskController.completePomoTask
+    ),
+    app.openapi(
+        PomoTaskSchemas.incrementPomoCounterRoute,
+        TaskController.incrementPomoCounter
+    ),
+    app.openapi(
+        PomoTaskSchemas.resetPomoCounterRoute,
+        TaskController.resetPomoCounter
+    ),
+    app.openapi(
+        PomoTaskSchemas.setPomoTargetCountRoute,
+        TaskController.setPomoTargetCount
+    ),
+    app.openapi(
+        PomoTaskSchemas.getTaskProgressRoute,
+        TaskController.getTaskProgress
+    );
 
-PomotaskRoutes.use('*', authMiddleware);
-
-PomotaskRoutes.get('/', TaskController.getAllTask);
-PomotaskRoutes.get('/session/:sessionId', TaskController.getTaskBySession);
-PomotaskRoutes.get('/:id', TaskController.getTaskById);
-PomotaskRoutes.post('/', TaskController.CreatePomoTaskController);
-PomotaskRoutes.put('/:id', TaskController.updatePomoTaskController);
-PomotaskRoutes.delete('/:id', TaskController.deletePomoTaskController);
-PomotaskRoutes.put('/:id/assign', TaskController.assignTaskToSession);
-PomotaskRoutes.put('/:id/complete', TaskController.completePomoTask);
-
-//counter functionality
-PomotaskRoutes.post('/:id/increment', TaskController.incrementPomoCounter);
-PomotaskRoutes.post('/:id/reset', TaskController.resetPomoCounter);
-PomotaskRoutes.post('/:id/target', TaskController.setPomoTargetCount);
-PomotaskRoutes.get('/:id/progress', TaskController.getTaskProgress);
-
-export default PomotaskRoutes;
+}
+export default setupPomoTaskRoutes;

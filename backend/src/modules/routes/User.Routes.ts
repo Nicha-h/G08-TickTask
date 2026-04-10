@@ -1,17 +1,39 @@
-import { Hono } from 'hono';
-import * as UserController from '../controllers/user.controller.js';
-import { authMiddleware } from '../middlewares/authenticator.js';
-import { uploadProfilePicController } from '../controllers/user.controller.js';
+import type { OpenAPIHono } from '@hono/zod-openapi';
+import { UserController } from '../controllers/index.js';
+import { UserSchemas } from '../schemas/index.js';
 
-const UserRoutes = new Hono();
-
-
-UserRoutes.get('/profile', authMiddleware, UserController.fetchProfileController);
-UserRoutes.post('/signup', UserController.createUserController); 
-UserRoutes.post('/login', UserController.loginUserController);
-UserRoutes.put('/profile', authMiddleware, UserController.updateProfileController);
-UserRoutes.post('/check-email', UserController.checkEmailController);
-UserRoutes.post('/reset-password', UserController.resetPasswordController);
-UserRoutes.post('/profile/upload-profile-pic', uploadProfilePicController);
-
-export default UserRoutes;
+const setupUserRoutes = (app: OpenAPIHono) => {
+    app.openapi(
+        UserSchemas.createUserRoute,
+        UserController.createUserController
+    )
+    app.openapi(
+        UserSchemas.loginUserRoute,
+        UserController.loginUserController
+    )
+    app.openapi(
+        UserSchemas.fetchProfileRoute,
+        UserController.fetchProfileController
+    )
+    app.openapi(
+        UserSchemas.updateProfileRoute,
+        UserController.updateProfileController
+    )
+    app.openapi(
+        UserSchemas.checkEmailRoute,
+        UserController.checkEmailController
+    )
+    app.openapi(
+        UserSchemas.resetPasswordRoute,
+        UserController.resetPasswordController
+    )
+    app.openapi(
+        UserSchemas.uploadProfilePicRoute,
+        UserController.uploadProfilePicController
+    )
+    app.openapi(
+        UserSchemas.getUserProfileRoute,
+        UserController.fetchProfileController
+    )
+}
+export default setupUserRoutes;
