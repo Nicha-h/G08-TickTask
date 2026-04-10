@@ -1,17 +1,35 @@
-import { Hono } from 'hono';
-import { authMiddleware } from '../middlewares/authenticator.js';
-import * as TaskController from '../controllers/task.controller.js';
-import * as Validator from '../middlewares/Task.validators.js';
+import type { OpenAPIHono } from "@hono/zod-openapi";
+import * as TaskSchemas from "../schemas/task.schemas.js";
+import * as TaskController from "../controllers/task.controller.js";
+import { authMiddleware } from "../middlewares/authenticator.js";
 
-const TaskRoute = new Hono();
+export function setupTaskRoutes(app: OpenAPIHono) {
+  app.use("/api/tasks", authMiddleware);
+  app.use("/api/tasks/*", authMiddleware);
 
-TaskRoute.use('*', authMiddleware);
-
-TaskRoute.get('/',Validator.validateStatusParam, TaskController.getAllTasks); 
-TaskRoute.get('/by-date',Validator.validateDateParam, TaskController.getTasksByDate); 
-TaskRoute.post('/',Validator.validateCreateTask, TaskController.createTaskController); 
-TaskRoute.put('/:id',Validator.validateUpdateTask, TaskController.updateTaskController);
-TaskRoute.patch('/:id',TaskController.patchTaskController);
-TaskRoute.delete('/:id', TaskController.deleteTaskController); 
-TaskRoute.get('/overview', TaskController.getTasksOverview); 
-export default TaskRoute;
+  app.openapi(TaskSchemas.getTasksRoute, TaskController.getAllTasks as any);
+  app.openapi(
+    TaskSchemas.getTasksByDateRoute,
+    TaskController.getTasksByDate as any,
+  );
+  app.openapi(
+    TaskSchemas.createTaskRoute,
+    TaskController.createTaskController as any,
+  );
+  app.openapi(
+    TaskSchemas.updateTaskRoute,
+    TaskController.updateTaskController as any,
+  );
+  app.openapi(
+    TaskSchemas.patchTaskRoute,
+    TaskController.patchTaskController as any,
+  );
+  app.openapi(
+    TaskSchemas.deleteTaskRoute,
+    TaskController.deleteTaskController as any,
+  );
+  app.openapi(
+    TaskSchemas.getTasksOverviewRoute,
+    TaskController.getTasksOverview as any,
+  );
+}
