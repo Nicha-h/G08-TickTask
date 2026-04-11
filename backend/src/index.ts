@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { swaggerUI } from "@hono/swagger-ui";
 import { cors } from "hono/cors";
@@ -6,6 +7,8 @@ import { PrismaClient } from "./generated/prisma/index.js";
 import { setupRoutes } from "./routes/index.js";
 import { BACKEND_URL, FRONTEND_URL, PORT } from "./utils/env.js";
 import type { Context } from "hono";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 // ━━━ Create OpenAPIHono app ━━━
 const app = new OpenAPIHono();
@@ -29,7 +32,7 @@ app.use("*", async (c, next) => {
 });
 
 // ━━━ Health check ━━━
-app.get("/", (c) => {
+app.get("/api/health", (c) => {
   return c.json({
     name: "TickTask API",
     version: "1.0.0",
@@ -74,6 +77,28 @@ app.get("/doc", (c: Context) => {
 
 // ━━━ Swagger UI ━━━
 app.get("/swagger", swaggerUI({ url: "/doc" }));
+
+// ━━━ Serve frontend static files in production ━━━
+const isProd = process.env.NODE_ENV === "production";
+if (isProd) {
+  app.use(
+    "*",
+    serveStatic({ root: "./public" }),
+  );
+
+  // SPA fallback: serve index.html for any non-API route
+  app.use("*", async (c) => {
+    const path = c.req.path;
+    if (path.startsWith("/api/")) {
+      return c.json(
+        { error: "API Endpoint not found", status: 404 },
+        404,
+      );
+    }
+    const html = await readFile(join(process.cwd(), "public", "index.html"), "utf-8");
+    return c.html(html);
+  });
+}
 
 // ━━━ 404 handler ━━━
 app.notFound((c) => {

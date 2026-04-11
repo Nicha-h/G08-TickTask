@@ -1,0 +1,10 @@
+{
+  "name": "g08-ticktask",
+  "private": true,
+  "scripts": {
+    "docker:build": "docker build -t ticktask .",
+    "docker:start": "docker run --rm -d --name ticktask -p 3000:3000 -e NODE_ENV=production -e DATABASE_URL=file:/app/data/ticktask.db -e JWT_SECRET=dev-secret -e BACKEND_URL=http://localhost:3000 -e FRONTEND_URL=http://localhost:3000 ticktask",
+    "docker:stop": "docker stop ticktask",
+    "docker:remove": "docker rmi ticktask"
+  }
+}

@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '../../assets/Logo.svg';
-import Hidden from '../../assets/Hidden.svg';
+import Hidden from '../../assets/hidden.svg';
 import Reveal from '../../assets/Eye.svg';
 import { apiClient } from '../../util/apiClient';
 function Signup() {
