@@ -1,34 +1,37 @@
-import type { Context } from 'hono';
-import type { ContentfulStatusCode } from 'hono/utils/http-status';
+import type { Context } from "hono";
 
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: {
-    name: string;
-    message: string;
-    statusCode: number;
+export function successResponse<T>(
+  c: Context,
+  data: T,
+  statusCode: number = 200,
+  message?: string,
+) {
+  const response = {
+    success: true,
+    data,
+    ...(message && { message }),
+    timestamp: new Date().toISOString(),
   };
-  timestamp: string;
+
+  return c.json(response, statusCode as any);
 }
 
-export const successResponse = (c: Context, data: any, status: number = 200) => {
-  return c.json({
-    success: true,
-    data: data,
-    timestamp: new Date().toISOString(),
-  }, status as any);
-};
-
-export const errorResponse = (c: Context, message: string, statusCode: number) => {
-  return c.json({
-    success: false, 
-    error: {
-      name: "Error",
-      message: message,
-      statusCode: statusCode,
+export function errorResponse(
+  c: Context,
+  message: string,
+  statusCode: number = 500,
+  errorName?: string,
+) {
+  return c.json(
+    {
+      success: false,
+      error: {
+        name: errorName || "API_ERROR",
+        message,
+        statusCode,
+      },
+      timestamp: new Date().toISOString(),
     },
-    timestamp: new Date().toISOString(),
-  }, statusCode as any);
-};
+    statusCode as any,
+  );
+}

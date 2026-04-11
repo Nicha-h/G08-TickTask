@@ -1,14 +1,21 @@
 import type { OpenAPIHono } from '@hono/zod-openapi';
-import setupUserRoutes from '../modules/routes/User.Routes.js';
-import setupCategoryRoutes from '../modules/routes/Category.Routes.js';
-import setupTaskRoutes from '../modules/routes/Task.Routes.js';
-import setupPomodoroSessionRoutes from '../modules/routes/PomodoroSession.Route.js';
-import setupPomoTaskRoutes from '../modules/routes/PomoTask.Route.js';
+import { setupUserRoutes } from './User.Routes.js';
+import { setupTaskRoutes } from './Task.Routes.js';
+import { setupCategoryRoutes } from './Category.Routes.js';
+import { setupPomodoroSessionRoutes } from './PomodoroSession.Route.js';
+import { setupPomoTaskRoutes } from './PomoTask.Route.js';
 
 export const setupRoutes = (app: OpenAPIHono) => {
+  // User routes
   setupUserRoutes(app);
-  setupCategoryRoutes(app);
+
+  // Task routes
   setupTaskRoutes(app);
+
+  // Category routes
+  setupCategoryRoutes(app);
+
+  // Pomodoro routes
   setupPomodoroSessionRoutes(app);
   setupPomoTaskRoutes(app);
 };
