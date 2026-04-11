@@ -8,11 +8,11 @@ import close from '../assets/close.svg';
 import AddToCate from '../assets/AddToCate.svg';
 import CustomColor from '../assets/CustomColor.svg';
 import iconSmile from '../assets/iconSmile.svg';
-import axios from "axios";
 import { iconComponents } from "../components/modals/icon.jsx";
 import calendarIcon from "@iconify-icons/lucide/calendar";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import timerIcon from "@iconify-icons/lucide/clock"
+import { apiClient } from "../util/apiClient";
 const AddTask = () => {
   const [title, setTitle] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -43,7 +43,7 @@ const AddTask = () => {
   ];
 
   useEffect(() => {
-  axios.get("http://localhost:3000/api/category", {
+  apiClient.get(`/api/category`, {
     headers: { Authorization: `Bearer ${token}` },
   }).then(res => {
     setCategoryList(res.data);
@@ -63,12 +63,10 @@ const saveTask = async () => {
   return `${yyyy}-${mm}-${dd}`;   
 };
   try {
-    const response = await axios.post(
-      "http://localhost:3000/api/tasks",
-      {
-        Task_Title: title,
-        Task_Description: description,
-        Task_Start_Date: formatDate(startDate),
+    const response = await apiClient.post(`/api/tasks`, {
+      Task_Title: title,
+      Task_Description: description,
+      Task_Start_Date: formatDate(startDate),
         Task_End_Date: formatDate(endDate),
         Task_Start_Time: startTime,
         Task_End_Time: endTime,
@@ -87,15 +85,13 @@ const saveTask = async () => {
 
     // If category was selected, assign the task to category
     if (selectedCategoryId) {
-      await axios.put(
-        `http://localhost:3000/api/category/${taskId}/assign`,
-        { CategoryId: selectedCategoryId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      await apiClient.put(`/api/category/${taskId}/assign`, {
+        CategoryId: selectedCategoryId
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         }
-      );
+      });
     }
 
     navigate(-1); 

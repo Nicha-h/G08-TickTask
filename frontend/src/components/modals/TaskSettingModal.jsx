@@ -7,10 +7,9 @@ import close from "../../assets/close.svg";
 import AddToCate from "../../assets/AddToCate.svg";
 import CustomColor from "../../assets/CustomColor.svg";
 import iconSmile from "../../assets/iconSmile.svg";
-import axios from "axios";
 import DeleteTask from "./DeleteTask.jsx";
 import { iconComponents } from "./icon.jsx"; 
-
+import { apiClient } from "../../util/apiClient";
 const TaskSettingModal = ({ task, onSave, onClose }) => {
   const [title, setTitle] = useState(task?.Task_Title || "");
   const [startDate, setStartDate] = useState(task?.Task_Start_Date || "");
@@ -52,7 +51,7 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/category", {
+        const response = await apiClient.get("/api/category", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCategory(response.data || []); 
@@ -145,8 +144,8 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
         Task_Icon: selectedIcon,
       };
 
-      const response = await axios.put(
-        `http://localhost:3000/api/tasks/${taskId}`, 
+      const response = await apiClient.put(
+        `/api/tasks/${taskId}`,
         taskData,
         {
           headers: {
@@ -159,8 +158,8 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
       console.log("Task updated successfully:", response.data);
       if (selectedCategoryId) {
         try {
-          await axios.put(
-            `http://localhost:3000/api/category/${taskId}/assign`,
+          await apiClient.put(
+            `/api/category/${taskId}/assign`,
             { CategoryId: selectedCategoryId },
             {
               headers: {
@@ -243,7 +242,7 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
       throw new Error(`Task ID is missing. Available properties: ${Object.keys(task || {}).join(', ')}`);
     }
 
-    await axios.delete(`http://localhost:3000/api/tasks/${taskId}`, {
+    await apiClient.delete(`/api/tasks/${taskId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

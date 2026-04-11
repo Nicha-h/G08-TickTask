@@ -4,12 +4,12 @@ import weekday from "dayjs/plugin/weekday";
 import isoWeek from "dayjs/plugin/isoWeek";
 import next from "../assets/next.svg";
 import prev1 from "../assets/prev1.svg";
-import setting from "../assets/setting.svg";
+// import setting from "../assets/setting.svg";
 import plus from "../assets/plus.svg";
 import { useNavigate } from "react-router-dom";
 import TaskSettingModal from "../components/modals/TaskSettingModal.jsx";
-import iconSmile from "../assets/iconSmile.svg";
-import axios from "axios";
+// import iconSmile from "../assets/iconSmile.svg";
+import { apiClient } from "../util/apiClient.js";
 
 
 
@@ -23,7 +23,7 @@ const Calendar = () => {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
   const [selectedTask, setSelectedTask] = useState(null);
   const [tasks, setTasks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 const [error, setError] = useState(null);
 
 const token = localStorage.getItem("token");
@@ -32,7 +32,7 @@ useEffect(() => {
   const fetchTasks = async () => {
     setIsLoading(true);
     try {
- const response = await axios.get(`http://localhost:3000/api/tasks`, { 
+ const response = await apiClient.get(`/api/tasks`, { 
       params: {  
         date: currentDate.format('YYYY-MM-DD')
       },
@@ -161,9 +161,9 @@ useEffect(() => {
   };
 
 
-  const closeModal = () => {
-    setSelectedTask(null);
-  };
+  // const closeModal = () => {
+  //   setSelectedTask(null);
+  // };
   
 
   // Render calendar cells with events

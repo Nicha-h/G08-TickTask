@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import PomoTask from '../components/PomoTask';
-import axios from 'axios';
-
+import { apiClient } from '../util/apiClient';
 function Pomodoro() {
   const [activeMode, setActiveMode] = useState('Pomodoro');
   const [timer, setTimer] = useState(25 * 60);
@@ -11,8 +10,8 @@ function Pomodoro() {
   const [activeTask, setActiveTask] = useState(null);
   const [tasks, setTasks] = useState([]);
   
-  const API_URL = 'http://localhost:3000/api/pomodoro';
-  const TASK_API_URL = 'http://localhost:3000/api/pomodoroTask';
+  const API_URL = `${apiClient.defaults.baseURL}/api/pomodoro`;
+  const TASK_API_URL = `${apiClient.defaults.baseURL}/api/pomodoroTask`;
 
   const getAuthHeader = () => {
     const token = localStorage.getItem('token');
@@ -50,7 +49,7 @@ function Pomodoro() {
   useEffect(() => {
     const fetchCurrentSession = async () => {
       try {
-        const res = await axios.get(`${API_URL}/current`, getAuthHeader());
+        const res = await apiClient.get(`${API_URL}/current`, getAuthHeader());
         if (res.data) {
           const { mode, remaining, running } = res.data;
           setActiveMode(mode);
@@ -67,7 +66,7 @@ function Pomodoro() {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get(TASK_API_URL, getAuthHeader());
+      const response = await apiClient.get(TASK_API_URL, getAuthHeader());
       if (response.data && response.data.data) {
         const fetchedTasks = response.data.data;
         setTasks(fetchedTasks);
@@ -90,14 +89,14 @@ function Pomodoro() {
       setIsRunning(false);
       setIntervalId(null);
       try {
-        await axios.post(`${API_URL}/pause`, {}, getAuthHeader());
+        await apiClient.post(`${API_URL}/pause`, {}, getAuthHeader());
       } catch (err) {
         console.error('Pause error:', err);
       }
     } else {
       // Start/resume the timer
       try {
-        await axios.post(`${API_URL}/start`, {
+        await apiClient.post(`${API_URL}/start`, {
           mode: activeMode,
           duration: modes[activeMode],
           taskId: activeTask?.Pomo_TaskId
@@ -125,7 +124,7 @@ function Pomodoro() {
 
   const completeSession = async () => {
     try {
-      await axios.post(`${API_URL}/complete`, {}, getAuthHeader());
+      await apiClient.post(`${API_URL}/complete`, {}, getAuthHeader());
       
       if (activeMode === 'Pomodoro' && activeTask) {
         const updatedCompletedCount = activeTask.Pomo_Completed_Count + 1;
@@ -162,7 +161,7 @@ function Pomodoro() {
   
   const updateTaskProgress = async (taskId, completedCount, markCompleted) => {
     try {
-      const response = await axios.put(
+      const response = await apiClient.put(
         `${TASK_API_URL}/${taskId}/complete`, 
         {
           Pomo_Task_Status: markCompleted,

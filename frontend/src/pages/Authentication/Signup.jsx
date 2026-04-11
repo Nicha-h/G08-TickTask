@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '../../assets/Logo.svg';
 import Hidden from '../../assets/Hidden.svg';
 import Reveal from '../../assets/Eye.svg';
-
+import { apiClient } from '../../util/apiClient';
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -25,15 +25,9 @@ function Signup() {
   const onSubmit = async (data) => {
     try {
       // POST request
-      const response = await fetch('http://localhost:3000/api/users/signup', { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password, 
-        }),
+      const response = await apiClient.post(`/api/users/signup`, { 
+        email: data.email,
+        password: data.password, 
       });
   
       if (!response.ok) {

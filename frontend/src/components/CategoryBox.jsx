@@ -1,8 +1,7 @@
 import {useEffect, useState} from 'react';
-import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { iconComponents } from './modals/icon';
-
+import { apiClient } from '../util/apiClient';
 
 function CategoryBox() {
 
@@ -51,7 +50,7 @@ function CategoryBox() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/api/category`, {
+      const response = await apiClient.get(`/api/category`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -74,7 +73,7 @@ function CategoryBox() {
   const fetchTaskCount = async (categoryId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`http://localhost:3000/api/category/${categoryId}/count`, {
+      const response = await apiClient.get(`/api/category/${categoryId}/count`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

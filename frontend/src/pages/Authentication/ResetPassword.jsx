@@ -7,7 +7,7 @@ import { NavLink } from 'react-router-dom';
 import Reveal from '../../assets/Eye.svg';
 import Hidden from '../../assets/Hidden.svg';
 import FYI from '../../assets/vineboom.svg';
-
+import { apiClient } from '../../util/apiClient';
 function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -31,14 +31,10 @@ function ResetPassword() {
   const onSubmit = async (data) => {
   try {
     const token = new URLSearchParams(window.location.search).get('token'); 
-
-    const response = await fetch('http://localhost:3000/api/users/reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token,
-        newPassword: data.password,
-      }),
+    
+    const response = await apiClient.post(`/api/users/reset-password`, {
+      token,
+      newPassword: data.password,
     });
 
     const result = await response.json();

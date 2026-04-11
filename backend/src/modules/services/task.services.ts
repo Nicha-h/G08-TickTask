@@ -1,0 +1,175 @@
+import { taskModel } from '../models/index.js';
+import { PrismaClient } from '../../generated/prisma/index.js';
+import type {
+  Task,
+  CreateTaskData,
+  UpdateTaskData,
+} from '../types/index.js';
+
+const prisma = new PrismaClient();
+
+const getAllTask = async (userId: number): Promise<Task[]> => {
+  const tasks = await taskModel.getTasksByUser(userId);
+  return tasks.map(task => ({
+    ...task,
+    Task_Start_Date: task.Task_Start_Date ?? '',
+    Task_End_Date: task.Task_End_Date ?? '',
+    Task_Start_Time: task.Task_Start_Time ?? '',
+    Task_End_Time: task.Task_End_Time ?? '',
+    Task_Description: task.Task_Description ?? '',
+    Task_Color: task.Task_Color ?? '#D1F4FF',
+    Task_Icon: task.Task_Icon ?? 'iconWork.svg',
+  }));
+}
+const getTasksByDate = async (date: string, userId: number): Promise<Task[]> => {
+  const tasks = await taskModel.getTasksByDate(date, userId);
+  return tasks.map(task => ({
+    ...task,
+    Task_Start_Date: task.Task_Start_Date ?? '',
+    Task_End_Date: task.Task_End_Date ?? '',
+    Task_Start_Time: task.Task_Start_Time ?? '',
+    Task_End_Time: task.Task_End_Time ?? '',
+    Task_Description: task.Task_Description ?? '',
+    Task_Color: task.Task_Color ?? '#D1F4FF',
+    Task_Icon: task.Task_Icon ?? 'iconWork.svg',
+  }));
+}
+const createTask = async (data: CreateTaskData): Promise<Task> => {
+  const task = await taskModel.createTask(data);
+    if (!task) {
+    throw new Error('Failed to create task');
+  }
+    return {
+    ...task,
+    Task_Start_Date: task.Task_Start_Date ?? '',
+    Task_End_Date: task.Task_End_Date ?? '',
+    Task_Start_Time: task.Task_Start_Time ?? '',
+    Task_End_Time: task.Task_End_Time ?? '',
+    Task_Description: task.Task_Description ?? '',
+    Task_Color: task.Task_Color ?? '#D1F4FF',
+    Task_Icon: task.Task_Icon ?? 'iconWork.svg',
+  };
+}
+const updateTask = async (
+  data: UpdateTaskData,
+  TaskID: number
+): Promise<Task> => {
+  const updatedTask = await taskModel.updateTask( data, TaskID);
+  if (!updatedTask) throw new Error('Failed to update task');
+  return {
+    ...updatedTask,
+    Task_Start_Date: updatedTask.Task_Start_Date ?? '',
+    Task_End_Date: updatedTask.Task_End_Date ?? '',
+    Task_Start_Time: updatedTask.Task_Start_Time ?? '',
+    Task_End_Time: updatedTask.Task_End_Time ?? '',
+    Task_Description: updatedTask.Task_Description ?? '',
+    Task_Color: updatedTask.Task_Color ?? '#D1F4FF',
+    Task_Icon: updatedTask.Task_Icon ?? 'iconWork.svg',
+  };
+};
+
+const deleteTask = async (TaskID: number) => {
+  await taskModel.deleteTask(TaskID);
+}
+
+const getTasksOverview = async (userId: number) => {
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  const yearEnd = new Date(now.getFullYear() + 1, 0, 1);
+
+  const todayTotal = await prisma.task.count({
+    where: {
+      UserID: userId,
+      OR: [
+        { Task_Start_Date: { gte: todayStart.toISOString(), lt: todayEnd.toISOString() } },
+        { Task_End_Date: { gte: todayStart.toISOString(), lt: todayEnd.toISOString() } }
+      ]
+    }
+  });
+
+  const todayCompleted = await prisma.task.count({
+    where: {
+      UserID: userId,
+      Task_Status: 'Completed',
+      OR: [
+        { Task_Start_Date: { gte: todayStart.toISOString(), lt: todayEnd.toISOString() } },
+        { Task_End_Date: { gte: todayStart.toISOString(), lt: todayEnd.toISOString() } }
+      ]
+    }
+  });
+
+  const monthTotal = await prisma.task.count({
+    where: {
+      UserID: userId,
+      OR: [
+        { Task_Start_Date: { gte: monthStart.toISOString(), lt: monthEnd.toISOString() } },
+        { Task_End_Date: { gte: monthStart.toISOString(), lt: monthEnd.toISOString() } }
+      ]
+    }
+  });
+
+  const monthCompleted = await prisma.task.count({
+    where: {
+      UserID: userId,
+      Task_Status: 'Completed',
+      OR: [
+        { Task_Start_Date: { gte: monthStart.toISOString(), lt: monthEnd.toISOString() } },
+        { Task_End_Date: { gte: monthStart.toISOString(), lt: monthEnd.toISOString() } }
+      ]
+    }
+  });
+
+  const yearTotal = await prisma.task.count({
+    where: {
+      UserID: userId,
+      OR: [
+        { Task_Start_Date: { gte: yearStart.toISOString(), lt: yearEnd.toISOString() } },
+        { Task_End_Date: { gte: yearStart.toISOString(), lt: yearEnd.toISOString() } }
+      ]
+    }
+  });
+
+  const yearCompleted = await prisma.task.count({
+    where: {
+      UserID: userId,
+      Task_Status: 'Completed',
+      OR: [
+        { Task_Start_Date: { gte: yearStart.toISOString(), lt: yearEnd.toISOString() } },
+        { Task_End_Date: { gte: yearStart.toISOString(), lt: yearEnd.toISOString() } }
+      ]
+    }
+  });
+
+  return {
+    today: {
+      total: todayTotal,
+      completed: todayCompleted,
+      inComplete: todayTotal - todayCompleted
+    },
+    month: {
+      total: monthTotal,
+      completed: monthCompleted,
+      inComplete: monthTotal - monthCompleted
+    },
+    year: {
+      total: yearTotal,
+      completed: yearCompleted,
+      inComplete: yearTotal - yearCompleted
+    }
+  };
+}
+
+export const TaskServices = {
+  getAllTask,
+  getTasksByDate,
+    createTask,
+    updateTask,
+    deleteTask,
+    getTasksOverview
+}

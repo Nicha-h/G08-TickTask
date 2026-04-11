@@ -12,7 +12,7 @@ import Women1 from '../../assets/ProfilePics/women 1.svg';
 import Women2 from '../../assets/ProfilePics/women 2.svg';
 import Women3 from '../../assets/ProfilePics/women 3.svg';
 import Women from '../../assets/ProfilePics/women.svg';
-
+import { apiClient } from '../../util/apiClient';
 const pictures = [
   { name: 'Men1', src: Men1 },
   { name: 'Men2', src: Men2 },
@@ -52,9 +52,10 @@ function ProfilePic({ onClose, onSelect }) {
   const formData = new FormData();
   formData.append("image", file);
 
-  const res = await fetch("http://localhost:3000/api/users/profile/upload-profile-pic", {
-    method: "POST",
-    body: formData,
+  const res = await apiClient.post("/api/users/profile/upload-profile-pic", formData, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    }
   });
 
   const result = await res.json();

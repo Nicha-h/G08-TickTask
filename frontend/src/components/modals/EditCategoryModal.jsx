@@ -3,7 +3,7 @@ import close from "../../assets/close.svg";
 import IconPickerModal from "../modals/IconPickerModal";
 import ColorPickerModal from "../modals/ColorPickerModal";
 import CustomColor from "../../assets/CustomColor.svg"; // อย่าลืม import ไอคอน CustomColor
-import axios from "axios";
+import { apiClient } from "../../util/apiClient";
 import { iconComponents } from "./icon";
 
 const EditCategoryModal = ({
@@ -59,8 +59,8 @@ const EditCategoryModal = ({
         throw new Error("Erm whaat the sigma invalid category ID");
       }
 
-      await axios.patch(
-        `http://localhost:3000/api/category/${categoryId}`,
+      await apiClient.patch(
+        `/api/category/${categoryId}`,
         updatedCategory,
         {
           headers: {

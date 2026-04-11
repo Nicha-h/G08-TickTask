@@ -6,9 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '../../assets/Logo.svg';
 import Hidden from '../../assets/Hidden.svg';
 import Reveal from '../../assets/Eye.svg';
-import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
-
+import { apiClient } from '../../util/apiClient';
 function LoginPage() {
   const navigate = useNavigate();
   const [users] = useState([]);
@@ -27,7 +26,7 @@ function LoginPage() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post('http://localhost:3000/api/users/login', data);
+      const response = await apiClient.post(`/api/users/login`, data);
       const { token } = response.data;
   
       localStorage.setItem('token', token);
