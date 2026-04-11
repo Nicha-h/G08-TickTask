@@ -133,7 +133,7 @@ export const createTaskRoute = createRoute({
 
 export const updateTaskRoute = createRoute({
   method: "put",
-  path: "/api/tasks/:id",
+  path: "/api/tasks/{id}",
   operationId: "updateTask",
   tags: ["Tasks"],
   summary: "Update a task",
@@ -170,7 +170,7 @@ export const updateTaskRoute = createRoute({
 
 export const patchTaskRoute = createRoute({
   method: "patch",
-  path: "/api/tasks/:id",
+  path: "/api/tasks/{id}",
   operationId: "patchTask",
   tags: ["Tasks"],
   summary: "Partially update a task",
@@ -207,7 +207,7 @@ export const patchTaskRoute = createRoute({
 
 export const deleteTaskRoute = createRoute({
   method: "delete",
-  path: "/api/tasks/:id",
+  path: "/api/tasks/{id}",
   operationId: "deleteTask",
   tags: ["Tasks"],
   summary: "Delete a task",

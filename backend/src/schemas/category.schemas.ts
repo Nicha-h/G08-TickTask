@@ -86,7 +86,7 @@ export const createCategoryRoute = createRoute({
 
 export const updateCategoryRoute = createRoute({
   method: "put",
-  path: "/api/category/:id",
+  path: "/api/category/{id}",
   operationId: "updateCategory",
   tags: ["Categories"],
   summary: "Update a category",
@@ -123,7 +123,7 @@ export const updateCategoryRoute = createRoute({
 
 export const patchCategoryRoute = createRoute({
   method: "patch",
-  path: "/api/category/:id",
+  path: "/api/category/{id}",
   operationId: "patchCategory",
   tags: ["Categories"],
   summary: "Partially update a category",
@@ -160,7 +160,7 @@ export const patchCategoryRoute = createRoute({
 
 export const deleteCategoryRoute = createRoute({
   method: "delete",
-  path: "/api/category/:id",
+  path: "/api/category/{id}",
   operationId: "deleteCategory",
   tags: ["Categories"],
   summary: "Delete a category",
@@ -190,7 +190,7 @@ export const deleteCategoryRoute = createRoute({
 
 export const getCategoryProgressRoute = createRoute({
   method: "get",
-  path: "/api/category/:id/progress",
+  path: "/api/category/{id}/progress",
   operationId: "getCategoryProgress",
   tags: ["Categories"],
   summary: "Get category progress",
@@ -215,7 +215,7 @@ export const getCategoryProgressRoute = createRoute({
 
 export const assignTaskToCategoryRoute = createRoute({
   method: "put",
-  path: "/api/category/:id/assign",
+  path: "/api/category/{id}/assign",
   operationId: "assignTaskToCategory",
   tags: ["Categories"],
   summary: "Assign task to category",
@@ -244,7 +244,7 @@ export const assignTaskToCategoryRoute = createRoute({
 
 export const getTaskCountRoute = createRoute({
   method: "get",
-  path: "/api/category/:id/count",
+  path: "/api/category/{id}/count",
   operationId: "getCategoryTaskCount",
   tags: ["Categories"],
   summary: "Get task count in category",
@@ -266,7 +266,7 @@ export const getTaskCountRoute = createRoute({
 
 export const getTasksByCategoryRoute = createRoute({
   method: "get",
-  path: "/api/category/:id/tasks",
+  path: "/api/category/{id}/tasks",
   operationId: "getTasksByCategory",
   tags: ["Categories"],
   summary: "Get tasks in category",

@@ -25,7 +25,7 @@ export const errorResponseSchema = z.object({
 
 export const getSessionsRoute = createRoute({
   method: "get",
-  path: "/api/pomodoroSession/user/:userId",
+  path: "/api/pomodoroSession/user/{userId}",
   operationId: "getSessionsByUser",
   tags: ["Pomodoro Sessions"],
   summary: "Get all sessions for user",
@@ -47,7 +47,7 @@ export const getSessionsRoute = createRoute({
 
 export const getSessionByIdRoute = createRoute({
   method: "get",
-  path: "/api/pomodoroSession/:id",
+  path: "/api/pomodoroSession/{id}",
   operationId: "getSessionById",
   tags: ["Pomodoro Sessions"],
   summary: "Get session by ID",
@@ -105,7 +105,7 @@ export const createSessionRoute = createRoute({
 
 export const updateSessionRoute = createRoute({
   method: "put",
-  path: "/api/pomodoroSession/:id",
+  path: "/api/pomodoroSession/{id}",
   operationId: "updateSession",
   tags: ["Pomodoro Sessions"],
   summary: "Update session",
@@ -134,7 +134,7 @@ export const updateSessionRoute = createRoute({
 
 export const deleteSessionRoute = createRoute({
   method: "delete",
-  path: "/api/pomodoroSession/:id",
+  path: "/api/pomodoroSession/{id}",
   operationId: "deleteSession",
   tags: ["Pomodoro Sessions"],
   summary: "Delete session",
@@ -156,7 +156,7 @@ export const deleteSessionRoute = createRoute({
 
 export const getActiveSessionRoute = createRoute({
   method: "get",
-  path: "/api/pomodoroSession/active/:userId",
+  path: "/api/pomodoroSession/active/{userId}",
   operationId: "getActiveSession",
   tags: ["Pomodoro Sessions"],
   summary: "Get active session for user",
@@ -209,7 +209,7 @@ export const startSessionRoute = createRoute({
 
 export const pauseSessionRoute = createRoute({
   method: "put",
-  path: "/api/pomodoroSession/:id/pause",
+  path: "/api/pomodoroSession/{id}/pause",
   operationId: "pauseSession",
   tags: ["Pomodoro Sessions"],
   summary: "Pause session",
@@ -231,7 +231,7 @@ export const pauseSessionRoute = createRoute({
 
 export const resumeSessionRoute = createRoute({
   method: "put",
-  path: "/api/pomodoroSession/:id/resume",
+  path: "/api/pomodoroSession/{id}/resume",
   operationId: "resumeSession",
   tags: ["Pomodoro Sessions"],
   summary: "Resume session",
@@ -253,7 +253,7 @@ export const resumeSessionRoute = createRoute({
 
 export const completeSessionRoute = createRoute({
   method: "put",
-  path: "/api/pomodoroSession/:id/complete",
+  path: "/api/pomodoroSession/{id}/complete",
   operationId: "completeSession",
   tags: ["Pomodoro Sessions"],
   summary: "Complete session",
@@ -275,7 +275,7 @@ export const completeSessionRoute = createRoute({
 
 export const updateRemainingTimeRoute = createRoute({
   method: "put",
-  path: "/api/pomodoroSession/:id/time",
+  path: "/api/pomodoroSession/{id}/time",
   operationId: "updateRemainingTime",
   tags: ["Pomodoro Sessions"],
   summary: "Update remaining time",

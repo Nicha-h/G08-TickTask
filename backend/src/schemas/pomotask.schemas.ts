@@ -45,7 +45,7 @@ export const getAllPomoTasksRoute = createRoute({
 
 export const getTaskBySessionRoute = createRoute({
   method: "get",
-  path: "/api/pomodoroTask/session/:sessionId",
+  path: "/api/pomodoroTask/session/{sessionId}",
   operationId: "getPomoTasksBySession",
   tags: ["Pomodoro Tasks"],
   summary: "Get tasks by session",
@@ -67,7 +67,7 @@ export const getTaskBySessionRoute = createRoute({
 
 export const getTaskByIdRoute = createRoute({
   method: "get",
-  path: "/api/pomodoroTask/:id",
+  path: "/api/pomodoroTask/{id}",
   operationId: "getPomoTaskById",
   tags: ["Pomodoro Tasks"],
   summary: "Get task by ID",
@@ -125,7 +125,7 @@ export const createPomoTaskRoute = createRoute({
 
 export const updatePomoTaskRoute = createRoute({
   method: "put",
-  path: "/api/pomodoroTask/:id",
+  path: "/api/pomodoroTask/{id}",
   operationId: "updatePomoTask",
   tags: ["Pomodoro Tasks"],
   summary: "Update task",
@@ -154,7 +154,7 @@ export const updatePomoTaskRoute = createRoute({
 
 export const deletePomoTaskRoute = createRoute({
   method: "delete",
-  path: "/api/pomodoroTask/:id",
+  path: "/api/pomodoroTask/{id}",
   operationId: "deletePomoTask",
   tags: ["Pomodoro Tasks"],
   summary: "Delete task",
@@ -176,7 +176,7 @@ export const deletePomoTaskRoute = createRoute({
 
 export const assignTaskToSessionRoute = createRoute({
   method: "put",
-  path: "/api/pomodoroTask/:id/assign",
+  path: "/api/pomodoroTask/{id}/assign",
   operationId: "assignPomoTaskToSession",
   tags: ["Pomodoro Tasks"],
   summary: "Assign task to session",
@@ -205,7 +205,7 @@ export const assignTaskToSessionRoute = createRoute({
 
 export const completePomoTaskRoute = createRoute({
   method: "put",
-  path: "/api/pomodoroTask/:id/complete",
+  path: "/api/pomodoroTask/{id}/complete",
   operationId: "completePomoTask",
   tags: ["Pomodoro Tasks"],
   summary: "Complete task",
@@ -227,7 +227,7 @@ export const completePomoTaskRoute = createRoute({
 
 export const incrementPomoCounterRoute = createRoute({
   method: "post",
-  path: "/api/pomodoroTask/:id/increment",
+  path: "/api/pomodoroTask/{id}/increment",
   operationId: "incrementPomoCounter",
   tags: ["Pomodoro Tasks"],
   summary: "Increment pomodoro counter",
@@ -249,7 +249,7 @@ export const incrementPomoCounterRoute = createRoute({
 
 export const resetPomoCounterRoute = createRoute({
   method: "post",
-  path: "/api/pomodoroTask/:id/reset",
+  path: "/api/pomodoroTask/{id}/reset",
   operationId: "resetPomoCounter",
   tags: ["Pomodoro Tasks"],
   summary: "Reset pomodoro counter",
@@ -271,7 +271,7 @@ export const resetPomoCounterRoute = createRoute({
 
 export const setPomoTargetCountRoute = createRoute({
   method: "post",
-  path: "/api/pomodoroTask/:id/target",
+  path: "/api/pomodoroTask/{id}/target",
   operationId: "setPomoTargetCount",
   tags: ["Pomodoro Tasks"],
   summary: "Set pomodoro target count",
@@ -300,7 +300,7 @@ export const setPomoTargetCountRoute = createRoute({
 
 export const getTaskProgressRoute = createRoute({
   method: "get",
-  path: "/api/pomodoroTask/:id/progress",
+  path: "/api/pomodoroTask/{id}/progress",
   operationId: "getPomoTaskProgress",
   tags: ["Pomodoro Tasks"],
   summary: "Get task progress",
