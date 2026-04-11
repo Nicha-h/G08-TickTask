@@ -49,7 +49,7 @@ function PomoTask({ onTaskSelect, activeTaskId }) {
       
       const completedCount = !currentStatus ? taskToUpdate.Pomo_Target_Count : 0;
       
-      const response = await fetch(`http://localhost:3000/api/pomodoroTask/${pomo_TaskId}/complete`, {
+      const response = await fetch(`${apiClient.defaults.baseURL}/api/pomodoroTask/${pomo_TaskId}/complete`, {
         method: 'PUT', 
         headers: {
           'Content-Type': 'application/json',

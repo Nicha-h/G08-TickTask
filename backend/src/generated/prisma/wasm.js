@@ -208,7 +208,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Nicha.h\\G08-TickTask\\backend\\src\\generated\\prisma",
+      "value": "/home/oakar/G08-TickTask/backend/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -217,12 +217,12 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "debian-openssl-3.0.x",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Nicha.h\\G08-TickTask\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "/home/oakar/G08-TickTask/backend/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {

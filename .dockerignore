@@ -1,0 +1,24 @@
+node_modules
+npm-debug.log*
+.git
+.gitignore
+*.md
+.env
+.env.*
+.env.docker
+.vscode
+.idea
+
+# Frontend build output (built in Docker)
+frontend/dist
+frontend/node_modules
+
+# Backend build artifacts
+backend/node_modules
+backend/src/generated
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# OS files
+.DS_Store
+Thumbs.db

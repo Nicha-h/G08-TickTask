@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '../../assets/Logo.svg';
 import Hidden from '../../assets/hidden.svg';
 import Reveal from '../../assets/Eye.svg';
+import { getBaseAPIURL } from '../../../util/apiClient';
 
 function Signup() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ function Signup() {
   const onSubmit = async (data) => {
     try {
       // POST request
-      const response = await fetch('http://localhost:3000/api/users/signup', {
+      const response = await fetch(`${getBaseAPIURL}/api/users/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

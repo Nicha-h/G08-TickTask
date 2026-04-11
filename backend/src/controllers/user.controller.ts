@@ -48,7 +48,10 @@ export async function createUserController(c: Context) {
         email,
       },
     });
-  } catch (err) {
+  } catch (err: any) {
+    if (err?.code === "P2002") {
+      return c.json({ error: "Email already exists" }, 409);
+    }
     console.error(err);
     return c.json({ error: "Something went wrong" }, 500);
   }
