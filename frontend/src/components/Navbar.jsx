@@ -85,23 +85,14 @@ function Navbar() {
           return;
         }
 
-        const response = await apiClient.get("http://localhost:3000/api/users/profile", {
+        const response = await apiClient.get("/api/users/profile", {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
 
-        if (!response.ok) {
-          if (response.status === 401) {
-            localStorage.removeItem("token");
-            navigate("/login");
-            return;
-          }
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const userData = await response.json();
+        const userData = response.data;
         setUser(userData);
         setProfilePicture(userData.User_profile_icon_path || "Men1");
         setError(null);

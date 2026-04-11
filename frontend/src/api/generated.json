@@ -1,0 +1,3726 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TickTask Pomodoro API",
+    "version": "1.0.0",
+    "description": "API for the TickTask Pomodoro app \u00e2\u20ac\u201d manage sessions, tasks, timers, and progress tracking."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {},
+    "parameters": {}
+  },
+  "paths": {
+    "/api/users/signup": {
+      "post": {
+        "operationId": "signupUser",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Sign up a new user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 6
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "User_Email": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  },
+                  "required": [
+                    "UserID",
+                    "User_Email"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "operationId": "loginUser",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Login user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "UserID": {
+                          "type": "number"
+                        },
+                        "User_Email": {
+                          "type": "string",
+                          "format": "email"
+                        }
+                      },
+                      "required": [
+                        "UserID",
+                        "User_Email"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "user"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/check-email": {
+      "post": {
+        "operationId": "checkEmail",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Check if email exists",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email check result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "exists": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "exists"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/reset-password": {
+      "post": {
+        "operationId": "resetPassword",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Reset user password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/profile": {
+      "get": {
+        "operationId": "getProfile",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get user profile",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "User_Email": {
+                      "type": "string",
+                      "format": "email"
+                    }
+                  },
+                  "required": [
+                    "UserID",
+                    "User_Email"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateProfile",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update user profile",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "iconType": {
+                    "type": "string"
+                  },
+                  "iconPath": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/profile/upload-profile-pic": {
+      "post": {
+        "operationId": "uploadProfilePic",
+        "tags": [
+          "Users"
+        ],
+        "summary": "Upload profile picture",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile picture uploaded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "operationId": "getTasks",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Get all tasks",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Completed",
+                "Incomplete"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "TaskID": {
+                        "type": "number"
+                      },
+                      "Task_Title": {
+                        "type": "string"
+                      },
+                      "Task_Description": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "Task_Status": {
+                        "type": "string",
+                        "enum": [
+                          "Completed",
+                          "Incomplete"
+                        ]
+                      },
+                      "Task_Start_Date": {
+                        "type": "string"
+                      },
+                      "Task_End_Date": {
+                        "type": "string"
+                      },
+                      "Task_Start_Time": {
+                        "type": "string"
+                      },
+                      "Task_End_Time": {
+                        "type": "string"
+                      },
+                      "Task_Color": {
+                        "type": "string"
+                      },
+                      "Task_Icon": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "UserID": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "TaskID",
+                      "Task_Title",
+                      "Task_Description",
+                      "Task_Status",
+                      "Task_Start_Date",
+                      "Task_End_Date",
+                      "Task_Start_Time",
+                      "Task_End_Time",
+                      "Task_Color",
+                      "Task_Icon",
+                      "UserID"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createTask",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Create a new task",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Task_Title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "Task_Description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Task_Start_Date": {
+                    "type": "string"
+                  },
+                  "Task_End_Date": {
+                    "type": "string"
+                  },
+                  "Task_Status": {
+                    "type": "string",
+                    "enum": [
+                      "Completed",
+                      "Incomplete"
+                    ]
+                  },
+                  "Task_Color": {
+                    "type": "string"
+                  },
+                  "Task_Icon": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Task_Start_Time": {
+                    "type": "string"
+                  },
+                  "Task_End_Time": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "Task_Title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "TaskID": {
+                      "type": "number"
+                    },
+                    "Task_Title": {
+                      "type": "string"
+                    },
+                    "Task_Description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "Task_Status": {
+                      "type": "string",
+                      "enum": [
+                        "Completed",
+                        "Incomplete"
+                      ]
+                    },
+                    "Task_Start_Date": {
+                      "type": "string"
+                    },
+                    "Task_End_Date": {
+                      "type": "string"
+                    },
+                    "Task_Start_Time": {
+                      "type": "string"
+                    },
+                    "Task_End_Time": {
+                      "type": "string"
+                    },
+                    "Task_Color": {
+                      "type": "string"
+                    },
+                    "Task_Icon": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "UserID": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "TaskID",
+                    "Task_Title",
+                    "Task_Description",
+                    "Task_Status",
+                    "Task_Start_Date",
+                    "Task_End_Date",
+                    "Task_Start_Time",
+                    "Task_End_Time",
+                    "Task_Color",
+                    "Task_Icon",
+                    "UserID"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/by-date": {
+      "get": {
+        "operationId": "getTasksByDate",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Get tasks by date",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tasks for the date",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "TaskID": {
+                        "type": "number"
+                      },
+                      "Task_Title": {
+                        "type": "string"
+                      },
+                      "Task_Description": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "Task_Status": {
+                        "type": "string",
+                        "enum": [
+                          "Completed",
+                          "Incomplete"
+                        ]
+                      },
+                      "Task_Start_Date": {
+                        "type": "string"
+                      },
+                      "Task_End_Date": {
+                        "type": "string"
+                      },
+                      "Task_Start_Time": {
+                        "type": "string"
+                      },
+                      "Task_End_Time": {
+                        "type": "string"
+                      },
+                      "Task_Color": {
+                        "type": "string"
+                      },
+                      "Task_Icon": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "UserID": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "TaskID",
+                      "Task_Title",
+                      "Task_Description",
+                      "Task_Status",
+                      "Task_Start_Date",
+                      "Task_End_Date",
+                      "Task_Start_Time",
+                      "Task_End_Time",
+                      "Task_Color",
+                      "Task_Icon",
+                      "UserID"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}": {
+      "put": {
+        "operationId": "updateTask",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Update a task",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Task_Title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "Task_Description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Task_Start_Date": {
+                    "type": "string"
+                  },
+                  "Task_End_Date": {
+                    "type": "string"
+                  },
+                  "Task_Status": {
+                    "type": "string",
+                    "enum": [
+                      "Completed",
+                      "Incomplete"
+                    ]
+                  },
+                  "Task_Color": {
+                    "type": "string"
+                  },
+                  "Task_Icon": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Task_Start_Time": {
+                    "type": "string"
+                  },
+                  "Task_End_Time": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "Task_Title"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "TaskID": {
+                      "type": "number"
+                    },
+                    "Task_Title": {
+                      "type": "string"
+                    },
+                    "Task_Description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "Task_Status": {
+                      "type": "string",
+                      "enum": [
+                        "Completed",
+                        "Incomplete"
+                      ]
+                    },
+                    "Task_Start_Date": {
+                      "type": "string"
+                    },
+                    "Task_End_Date": {
+                      "type": "string"
+                    },
+                    "Task_Start_Time": {
+                      "type": "string"
+                    },
+                    "Task_End_Time": {
+                      "type": "string"
+                    },
+                    "Task_Color": {
+                      "type": "string"
+                    },
+                    "Task_Icon": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "UserID": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "TaskID",
+                    "Task_Title",
+                    "Task_Description",
+                    "Task_Status",
+                    "Task_Start_Date",
+                    "Task_End_Date",
+                    "Task_Start_Time",
+                    "Task_End_Time",
+                    "Task_Color",
+                    "Task_Icon",
+                    "UserID"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patchTask",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Partially update a task",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Task_Title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "Task_Description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Task_Start_Date": {
+                    "type": "string"
+                  },
+                  "Task_End_Date": {
+                    "type": "string"
+                  },
+                  "Task_Status": {
+                    "type": "string",
+                    "enum": [
+                      "Completed",
+                      "Incomplete"
+                    ]
+                  },
+                  "Task_Color": {
+                    "type": "string"
+                  },
+                  "Task_Icon": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "Task_Start_Time": {
+                    "type": "string"
+                  },
+                  "Task_End_Time": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "TaskID": {
+                      "type": "number"
+                    },
+                    "Task_Title": {
+                      "type": "string"
+                    },
+                    "Task_Description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "Task_Status": {
+                      "type": "string",
+                      "enum": [
+                        "Completed",
+                        "Incomplete"
+                      ]
+                    },
+                    "Task_Start_Date": {
+                      "type": "string"
+                    },
+                    "Task_End_Date": {
+                      "type": "string"
+                    },
+                    "Task_Start_Time": {
+                      "type": "string"
+                    },
+                    "Task_End_Time": {
+                      "type": "string"
+                    },
+                    "Task_Color": {
+                      "type": "string"
+                    },
+                    "Task_Icon": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "UserID": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "TaskID",
+                    "Task_Title",
+                    "Task_Description",
+                    "Task_Status",
+                    "Task_Start_Date",
+                    "Task_End_Date",
+                    "Task_Start_Time",
+                    "Task_End_Time",
+                    "Task_Color",
+                    "Task_Icon",
+                    "UserID"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteTask",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Delete a task",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tasks/overview": {
+      "get": {
+        "operationId": "getTasksOverview",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Get tasks overview",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tasks overview",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    },
+                    "completed": {
+                      "type": "number"
+                    },
+                    "incomplete": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "total",
+                    "completed",
+                    "incomplete"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category": {
+      "get": {
+        "operationId": "getCategories",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Get all categories",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "CategoryId": {
+                        "type": "number"
+                      },
+                      "Category_Name": {
+                        "type": "string"
+                      },
+                      "Category_Color": {
+                        "type": "string"
+                      },
+                      "Category_icon": {
+                        "type": "string"
+                      },
+                      "Category_is_Primary": {
+                        "type": "boolean"
+                      },
+                      "userId": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "CategoryId",
+                      "Category_Name",
+                      "Category_Color",
+                      "Category_icon",
+                      "Category_is_Primary",
+                      "userId"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createCategory",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Create a category",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Category_Name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "Category_Icon": {
+                    "type": "string"
+                  },
+                  "Category_Color": {
+                    "type": "string"
+                  },
+                  "Category_is_Primary": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "Category_Name",
+                  "Category_Icon",
+                  "Category_Color"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Category created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "CategoryId": {
+                      "type": "number"
+                    },
+                    "Category_Name": {
+                      "type": "string"
+                    },
+                    "Category_Color": {
+                      "type": "string"
+                    },
+                    "Category_icon": {
+                      "type": "string"
+                    },
+                    "Category_is_Primary": {
+                      "type": "boolean"
+                    },
+                    "userId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "CategoryId",
+                    "Category_Name",
+                    "Category_Color",
+                    "Category_icon",
+                    "Category_is_Primary",
+                    "userId"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/{id}": {
+      "put": {
+        "operationId": "updateCategory",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Update a category",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Category_Name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "Category_Icon": {
+                    "type": "string"
+                  },
+                  "Category_Color": {
+                    "type": "string"
+                  },
+                  "Category_is_Primary": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "Category_Name",
+                  "Category_Icon",
+                  "Category_Color"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "CategoryId": {
+                      "type": "number"
+                    },
+                    "Category_Name": {
+                      "type": "string"
+                    },
+                    "Category_Color": {
+                      "type": "string"
+                    },
+                    "Category_icon": {
+                      "type": "string"
+                    },
+                    "Category_is_Primary": {
+                      "type": "boolean"
+                    },
+                    "userId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "CategoryId",
+                    "Category_Name",
+                    "Category_Color",
+                    "Category_icon",
+                    "Category_is_Primary",
+                    "userId"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patchCategory",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Partially update a category",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Category_Name": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "Category_Icon": {
+                    "type": "string"
+                  },
+                  "Category_Color": {
+                    "type": "string"
+                  },
+                  "Category_is_Primary": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "CategoryId": {
+                      "type": "number"
+                    },
+                    "Category_Name": {
+                      "type": "string"
+                    },
+                    "Category_Color": {
+                      "type": "string"
+                    },
+                    "Category_icon": {
+                      "type": "string"
+                    },
+                    "Category_is_Primary": {
+                      "type": "boolean"
+                    },
+                    "userId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "CategoryId",
+                    "Category_Name",
+                    "Category_Color",
+                    "Category_icon",
+                    "Category_is_Primary",
+                    "userId"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteCategory",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Delete a category",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Category not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/{id}/progress": {
+      "get": {
+        "operationId": "getCategoryProgress",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Get category progress",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category progress",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number"
+                    },
+                    "completed": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "total",
+                    "completed"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/{id}/assign": {
+      "put": {
+        "operationId": "assignTaskToCategory",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Assign task to category",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "taskId": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "taskId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task assigned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/{id}/count": {
+      "get": {
+        "operationId": "getCategoryTaskCount",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Get task count in category",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task count",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "count": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "count"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/category/{id}/tasks": {
+      "get": {
+        "operationId": "getTasksByCategory",
+        "tags": [
+          "Categories"
+        ],
+        "summary": "Get tasks in category",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tasks in category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "TaskID": {
+                        "type": "number"
+                      },
+                      "Task_Title": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "TaskID",
+                      "Task_Title"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroSession/user/{userId}": {
+      "get": {
+        "operationId": "getSessionsByUser",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Get all sessions for user",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of sessions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "SessionId": {
+                        "type": "number"
+                      },
+                      "UserID": {
+                        "type": "number"
+                      },
+                      "Status": {
+                        "type": "string"
+                      },
+                      "StartTime": {
+                        "type": "string"
+                      },
+                      "EndTime": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "PausedTime": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "duration_seconds": {
+                        "type": "number"
+                      },
+                      "remaining_seconds": {
+                        "type": "number"
+                      },
+                      "timer_type": {
+                        "type": "string"
+                      },
+                      "last_updated": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "SessionId",
+                      "UserID",
+                      "Status",
+                      "StartTime",
+                      "EndTime",
+                      "PausedTime",
+                      "duration_seconds",
+                      "remaining_seconds",
+                      "timer_type",
+                      "last_updated"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroSession/{id}": {
+      "get": {
+        "operationId": "getSessionById",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Get session by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "SessionId": {
+                      "type": "number"
+                    },
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "EndTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "PausedTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "duration_seconds": {
+                      "type": "number"
+                    },
+                    "remaining_seconds": {
+                      "type": "number"
+                    },
+                    "timer_type": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "SessionId",
+                    "UserID",
+                    "Status",
+                    "StartTime",
+                    "EndTime",
+                    "PausedTime",
+                    "duration_seconds",
+                    "remaining_seconds",
+                    "timer_type",
+                    "last_updated"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Session not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updateSession",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Update session",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "duration_seconds": {
+                    "type": "number"
+                  },
+                  "timer_type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "SessionId": {
+                      "type": "number"
+                    },
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "EndTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "PausedTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "duration_seconds": {
+                      "type": "number"
+                    },
+                    "remaining_seconds": {
+                      "type": "number"
+                    },
+                    "timer_type": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "SessionId",
+                    "UserID",
+                    "Status",
+                    "StartTime",
+                    "EndTime",
+                    "PausedTime",
+                    "duration_seconds",
+                    "remaining_seconds",
+                    "timer_type",
+                    "last_updated"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deleteSession",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Delete session",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroSession/active/{userId}": {
+      "get": {
+        "operationId": "getActiveSession",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Get active session for user",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "nullable": true,
+                  "properties": {
+                    "SessionId": {
+                      "type": "number"
+                    },
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "EndTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "PausedTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "duration_seconds": {
+                      "type": "number"
+                    },
+                    "remaining_seconds": {
+                      "type": "number"
+                    },
+                    "timer_type": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "SessionId",
+                    "UserID",
+                    "Status",
+                    "StartTime",
+                    "EndTime",
+                    "PausedTime",
+                    "duration_seconds",
+                    "remaining_seconds",
+                    "timer_type",
+                    "last_updated"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroSession/start": {
+      "post": {
+        "operationId": "startSession",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Start a session",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "duration_seconds": {
+                    "type": "number"
+                  },
+                  "timer_type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session started",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "SessionId": {
+                      "type": "number"
+                    },
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "EndTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "PausedTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "duration_seconds": {
+                      "type": "number"
+                    },
+                    "remaining_seconds": {
+                      "type": "number"
+                    },
+                    "timer_type": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "SessionId",
+                    "UserID",
+                    "Status",
+                    "StartTime",
+                    "EndTime",
+                    "PausedTime",
+                    "duration_seconds",
+                    "remaining_seconds",
+                    "timer_type",
+                    "last_updated"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroSession": {
+      "post": {
+        "operationId": "createSession",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Create a pomodoro session",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "duration_seconds": {
+                    "type": "number"
+                  },
+                  "timer_type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "SessionId": {
+                      "type": "number"
+                    },
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "EndTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "PausedTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "duration_seconds": {
+                      "type": "number"
+                    },
+                    "remaining_seconds": {
+                      "type": "number"
+                    },
+                    "timer_type": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "SessionId",
+                    "UserID",
+                    "Status",
+                    "StartTime",
+                    "EndTime",
+                    "PausedTime",
+                    "duration_seconds",
+                    "remaining_seconds",
+                    "timer_type",
+                    "last_updated"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroSession/{id}/pause": {
+      "put": {
+        "operationId": "pauseSession",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Pause session",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session paused",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "SessionId": {
+                      "type": "number"
+                    },
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "EndTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "PausedTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "duration_seconds": {
+                      "type": "number"
+                    },
+                    "remaining_seconds": {
+                      "type": "number"
+                    },
+                    "timer_type": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "SessionId",
+                    "UserID",
+                    "Status",
+                    "StartTime",
+                    "EndTime",
+                    "PausedTime",
+                    "duration_seconds",
+                    "remaining_seconds",
+                    "timer_type",
+                    "last_updated"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroSession/{id}/resume": {
+      "put": {
+        "operationId": "resumeSession",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Resume session",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session resumed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "SessionId": {
+                      "type": "number"
+                    },
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "EndTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "PausedTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "duration_seconds": {
+                      "type": "number"
+                    },
+                    "remaining_seconds": {
+                      "type": "number"
+                    },
+                    "timer_type": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "SessionId",
+                    "UserID",
+                    "Status",
+                    "StartTime",
+                    "EndTime",
+                    "PausedTime",
+                    "duration_seconds",
+                    "remaining_seconds",
+                    "timer_type",
+                    "last_updated"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroSession/{id}/complete": {
+      "put": {
+        "operationId": "completeSession",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Complete session",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "SessionId": {
+                      "type": "number"
+                    },
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "EndTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "PausedTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "duration_seconds": {
+                      "type": "number"
+                    },
+                    "remaining_seconds": {
+                      "type": "number"
+                    },
+                    "timer_type": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "SessionId",
+                    "UserID",
+                    "Status",
+                    "StartTime",
+                    "EndTime",
+                    "PausedTime",
+                    "duration_seconds",
+                    "remaining_seconds",
+                    "timer_type",
+                    "last_updated"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroSession/{id}/time": {
+      "put": {
+        "operationId": "updateRemainingTime",
+        "tags": [
+          "Pomodoro Sessions"
+        ],
+        "summary": "Update remaining time",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "remaining_seconds": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "remaining_seconds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Time updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "SessionId": {
+                      "type": "number"
+                    },
+                    "UserID": {
+                      "type": "number"
+                    },
+                    "Status": {
+                      "type": "string"
+                    },
+                    "StartTime": {
+                      "type": "string"
+                    },
+                    "EndTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "PausedTime": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "duration_seconds": {
+                      "type": "number"
+                    },
+                    "remaining_seconds": {
+                      "type": "number"
+                    },
+                    "timer_type": {
+                      "type": "string"
+                    },
+                    "last_updated": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "SessionId",
+                    "UserID",
+                    "Status",
+                    "StartTime",
+                    "EndTime",
+                    "PausedTime",
+                    "duration_seconds",
+                    "remaining_seconds",
+                    "timer_type",
+                    "last_updated"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroTask": {
+      "get": {
+        "operationId": "getAllPomoTasks",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Get all pomodoro tasks",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Pomo_TaskId": {
+                        "type": "number"
+                      },
+                      "Pomo_Task_Title": {
+                        "type": "string"
+                      },
+                      "Pomo_Task_Short": {
+                        "type": "number"
+                      },
+                      "Pomo_Task_Long": {
+                        "type": "number"
+                      },
+                      "Pomo_Task_Status": {
+                        "type": "boolean"
+                      },
+                      "Pomo_Completed_Count": {
+                        "type": "number"
+                      },
+                      "Pomo_Target_Count": {
+                        "type": "number"
+                      },
+                      "SessionId": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "Pomo_TaskId",
+                      "Pomo_Task_Title",
+                      "Pomo_Task_Short",
+                      "Pomo_Task_Long",
+                      "Pomo_Task_Status",
+                      "Pomo_Completed_Count",
+                      "Pomo_Target_Count",
+                      "SessionId"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "createPomoTask",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Create pomodoro task",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Pomo_Task_Title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "Pomo_Task_Short": {
+                    "type": "number"
+                  },
+                  "Pomo_Task_Long": {
+                    "type": "number"
+                  },
+                  "Pomo_Target_Count": {
+                    "type": "number"
+                  },
+                  "SessionId": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "Pomo_Task_Title",
+                  "SessionId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Pomo_TaskId": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Title": {
+                      "type": "string"
+                    },
+                    "Pomo_Task_Short": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Long": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Status": {
+                      "type": "boolean"
+                    },
+                    "Pomo_Completed_Count": {
+                      "type": "number"
+                    },
+                    "Pomo_Target_Count": {
+                      "type": "number"
+                    },
+                    "SessionId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Pomo_TaskId",
+                    "Pomo_Task_Title",
+                    "Pomo_Task_Short",
+                    "Pomo_Task_Long",
+                    "Pomo_Task_Status",
+                    "Pomo_Completed_Count",
+                    "Pomo_Target_Count",
+                    "SessionId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroTask/session/{sessionId}": {
+      "get": {
+        "operationId": "getPomoTasksBySession",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Get tasks by session",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "sessionId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tasks for session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Pomo_TaskId": {
+                        "type": "number"
+                      },
+                      "Pomo_Task_Title": {
+                        "type": "string"
+                      },
+                      "Pomo_Task_Short": {
+                        "type": "number"
+                      },
+                      "Pomo_Task_Long": {
+                        "type": "number"
+                      },
+                      "Pomo_Task_Status": {
+                        "type": "boolean"
+                      },
+                      "Pomo_Completed_Count": {
+                        "type": "number"
+                      },
+                      "Pomo_Target_Count": {
+                        "type": "number"
+                      },
+                      "SessionId": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "Pomo_TaskId",
+                      "Pomo_Task_Title",
+                      "Pomo_Task_Short",
+                      "Pomo_Task_Long",
+                      "Pomo_Task_Status",
+                      "Pomo_Completed_Count",
+                      "Pomo_Target_Count",
+                      "SessionId"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroTask/{id}": {
+      "get": {
+        "operationId": "getPomoTaskById",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Get task by ID",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Pomo_TaskId": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Title": {
+                      "type": "string"
+                    },
+                    "Pomo_Task_Short": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Long": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Status": {
+                      "type": "boolean"
+                    },
+                    "Pomo_Completed_Count": {
+                      "type": "number"
+                    },
+                    "Pomo_Target_Count": {
+                      "type": "number"
+                    },
+                    "SessionId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Pomo_TaskId",
+                    "Pomo_Task_Title",
+                    "Pomo_Task_Short",
+                    "Pomo_Task_Long",
+                    "Pomo_Task_Status",
+                    "Pomo_Completed_Count",
+                    "Pomo_Target_Count",
+                    "SessionId"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "updatePomoTask",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Update task",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Pomo_Task_Title": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "Pomo_Task_Short": {
+                    "type": "number"
+                  },
+                  "Pomo_Task_Long": {
+                    "type": "number"
+                  },
+                  "Pomo_Target_Count": {
+                    "type": "number"
+                  },
+                  "SessionId": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Pomo_TaskId": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Title": {
+                      "type": "string"
+                    },
+                    "Pomo_Task_Short": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Long": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Status": {
+                      "type": "boolean"
+                    },
+                    "Pomo_Completed_Count": {
+                      "type": "number"
+                    },
+                    "Pomo_Target_Count": {
+                      "type": "number"
+                    },
+                    "SessionId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Pomo_TaskId",
+                    "Pomo_Task_Title",
+                    "Pomo_Task_Short",
+                    "Pomo_Task_Long",
+                    "Pomo_Task_Status",
+                    "Pomo_Completed_Count",
+                    "Pomo_Target_Count",
+                    "SessionId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "deletePomoTask",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Delete task",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroTask/{id}/progress": {
+      "get": {
+        "operationId": "getPomoTaskProgress",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Get task progress",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task progress",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "completed": {
+                      "type": "number"
+                    },
+                    "target": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "completed",
+                    "target"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroTask/{id}/increment": {
+      "post": {
+        "operationId": "incrementPomoCounter",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Increment pomodoro counter",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Counter incremented",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Pomo_TaskId": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Title": {
+                      "type": "string"
+                    },
+                    "Pomo_Task_Short": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Long": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Status": {
+                      "type": "boolean"
+                    },
+                    "Pomo_Completed_Count": {
+                      "type": "number"
+                    },
+                    "Pomo_Target_Count": {
+                      "type": "number"
+                    },
+                    "SessionId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Pomo_TaskId",
+                    "Pomo_Task_Title",
+                    "Pomo_Task_Short",
+                    "Pomo_Task_Long",
+                    "Pomo_Task_Status",
+                    "Pomo_Completed_Count",
+                    "Pomo_Target_Count",
+                    "SessionId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroTask/{id}/reset": {
+      "post": {
+        "operationId": "resetPomoCounter",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Reset pomodoro counter",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Counter reset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Pomo_TaskId": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Title": {
+                      "type": "string"
+                    },
+                    "Pomo_Task_Short": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Long": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Status": {
+                      "type": "boolean"
+                    },
+                    "Pomo_Completed_Count": {
+                      "type": "number"
+                    },
+                    "Pomo_Target_Count": {
+                      "type": "number"
+                    },
+                    "SessionId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Pomo_TaskId",
+                    "Pomo_Task_Title",
+                    "Pomo_Task_Short",
+                    "Pomo_Task_Long",
+                    "Pomo_Task_Status",
+                    "Pomo_Completed_Count",
+                    "Pomo_Target_Count",
+                    "SessionId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroTask/{id}/target": {
+      "post": {
+        "operationId": "setPomoTargetCount",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Set pomodoro target count",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "targetCount": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "targetCount"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Target set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Pomo_TaskId": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Title": {
+                      "type": "string"
+                    },
+                    "Pomo_Task_Short": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Long": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Status": {
+                      "type": "boolean"
+                    },
+                    "Pomo_Completed_Count": {
+                      "type": "number"
+                    },
+                    "Pomo_Target_Count": {
+                      "type": "number"
+                    },
+                    "SessionId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Pomo_TaskId",
+                    "Pomo_Task_Title",
+                    "Pomo_Task_Short",
+                    "Pomo_Task_Long",
+                    "Pomo_Task_Status",
+                    "Pomo_Completed_Count",
+                    "Pomo_Target_Count",
+                    "SessionId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroTask/{id}/assign": {
+      "put": {
+        "operationId": "assignPomoTaskToSession",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Assign task to session",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "sessionId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task assigned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Pomo_TaskId": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Title": {
+                      "type": "string"
+                    },
+                    "Pomo_Task_Short": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Long": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Status": {
+                      "type": "boolean"
+                    },
+                    "Pomo_Completed_Count": {
+                      "type": "number"
+                    },
+                    "Pomo_Target_Count": {
+                      "type": "number"
+                    },
+                    "SessionId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Pomo_TaskId",
+                    "Pomo_Task_Title",
+                    "Pomo_Task_Short",
+                    "Pomo_Task_Long",
+                    "Pomo_Task_Status",
+                    "Pomo_Completed_Count",
+                    "Pomo_Target_Count",
+                    "SessionId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/pomodoroTask/{id}/complete": {
+      "put": {
+        "operationId": "completePomoTask",
+        "tags": [
+          "Pomodoro Tasks"
+        ],
+        "summary": "Complete task",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Pomo_TaskId": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Title": {
+                      "type": "string"
+                    },
+                    "Pomo_Task_Short": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Long": {
+                      "type": "number"
+                    },
+                    "Pomo_Task_Status": {
+                      "type": "boolean"
+                    },
+                    "Pomo_Completed_Count": {
+                      "type": "number"
+                    },
+                    "Pomo_Target_Count": {
+                      "type": "number"
+                    },
+                    "SessionId": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Pomo_TaskId",
+                    "Pomo_Task_Title",
+                    "Pomo_Task_Short",
+                    "Pomo_Task_Long",
+                    "Pomo_Task_Status",
+                    "Pomo_Completed_Count",
+                    "Pomo_Target_Count",
+                    "SessionId"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "api:generate": "orval"
+    "api:generate": "curl -s http://localhost:3000/doc > src/api/generate.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

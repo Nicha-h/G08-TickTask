@@ -2,7 +2,7 @@ import { defineConfig } from 'orval';
 
 export default defineConfig({
   TickTask: {
-    input: './openapi.json', // Path to your spec (or a URL)
+    input: './src/api/generated.json', // Path to your spec (or a URL)
     output: {
       mode: 'tags-split',    // Splits files by OpenAPI tags (e.g., user.ts, pet.ts)
       target: './src/api/generated/endpoints',

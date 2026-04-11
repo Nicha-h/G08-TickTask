@@ -21,15 +21,12 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
   const fetchTasks = async (date) => {
     setLoading(true);
     try {
-      const response = await apiClient.get(`/api/tasks/by-date`, {
-        params: { date },
+      const response = await apiClient.get(`/api/tasks/by-date?date=${date}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-
-      if (!response.ok) throw new Error('Failed to fetch tasks');
-      const data = await response.json();
+      const data = await response.data;
 
       setTasks(data);
     } catch (err) {
