@@ -277,7 +277,7 @@ function Pomodoro() {
 
   return (
     <div className='-mt-32 flex flex-col justify-center items-center w-full min-h-screen px-4'>
-      {error && <ErrorBox message={error} onClose={() => setError('')} />}
+      {error && <ErrorBox errorMessage={error} onClose={() => setError('')} />}
       <div className="w-full max-w-2xl border-2 flex flex-col items-center font-fredoka rounded-lg shadow-md">
         {/* Header */}
         <div className="w-full py-4 flex justify-center items-center border-b-2">
