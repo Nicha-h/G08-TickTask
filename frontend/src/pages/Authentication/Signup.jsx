@@ -27,18 +27,20 @@ function Signup() {
   const onSubmit = async (data) => {
     try {
       // POST request
-      await apiClient.post(`/api/users/signup`, { 
+      const signupResponse = await apiClient.post(`/api/users/signup`, { 
         email: data.email,
         password: data.password, 
       });
   
-      // Automatically login after successful signup
-      const loginResponse = await apiClient.post(`/api/users/login`, {
-        email: data.email,
-        password: data.password,
-      });
+      let token = signupResponse.data?.token;
 
-      const { token } = loginResponse.data;
+      if (!token) {
+        const loginResponse = await apiClient.post(`/api/users/login`, {
+          email: data.email,
+          password: data.password,
+        });
+        token = loginResponse.data.token;
+      }
   
       localStorage.setItem('token', token);
       const decoded = jwtDecode(token);
@@ -49,11 +51,14 @@ function Signup() {
       navigate('/home');
     } catch (error) {
       console.error('Error during signup:', error);
-      if (error.response && (error.response.status === 400 || error.response.status === 409)) {
-        setErrorMessage('User with this email already exists.');
+       if (error.response && error.response.status === 400) {
+        setErrorMessage('Please check your email and password and try again.');
+      } else if (error.response && error.response.status === 409) {
+        setErrorMessage('A user with this email already exists.');
       } else {
         setErrorMessage('Something went wrong. Please try again later.');
       }
+
     }
   };
 
