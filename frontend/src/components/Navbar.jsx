@@ -1,23 +1,23 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from 'react';
 import Logo from '../assets/Logo.svg';
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import SearchIcon from '../assets/Search.svg';
-import edit from '@iconify-icons/mdi/pencil-outline'
-import signout from '@iconify-icons/mdi/sign-out-variant'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import SearchIcon from '../assets/search.svg';
+import edit from '@iconify-icons/mdi/pencil-outline';
+import signout from '@iconify-icons/mdi/sign-out-variant';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import ConfirmLogout from './modals/ConfirmLogout';
 import { apiClient } from '../util/apiClient';
-import Men1 from "../assets/ProfilePics/men1.svg";
-import Men2 from "../assets/ProfilePics/men 2.svg";
-import Men3 from "../assets/ProfilePics/men3.svg";
-import Men4 from "../assets/ProfilePics/men 4.svg";
-import Men5 from "../assets/ProfilePics/men 5.svg";
-import Men from "../assets/ProfilePics/men.svg";
-import Women1 from "../assets/ProfilePics/women 1.svg";
-import Women2 from "../assets/ProfilePics/women 2.svg";
-import Women3 from "../assets/ProfilePics/women 3.svg";
-import Women from "../assets/ProfilePics/women.svg";
+import Men1 from '../assets/ProfilePics/men1.svg';
+import Men2 from '../assets/ProfilePics/men2.svg';
+import Men3 from '../assets/ProfilePics/men3.svg';
+import Men4 from '../assets/ProfilePics/men4.svg';
+import Men5 from '../assets/ProfilePics/men5.svg';
+import Men from '../assets/ProfilePics/men.svg';
+import Women1 from '../assets/ProfilePics/women1.svg';
+import Women2 from '../assets/ProfilePics/women2.svg';
+import Women3 from '../assets/ProfilePics/women3.svg';
+import Women from '../assets/ProfilePics/women.svg';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -30,7 +30,7 @@ function Navbar() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [profilePicture, setProfilePicture] = useState("Men1");
+  const [profilePicture, setProfilePicture] = useState('Men1');
 
   const presetMap = {
     Men1,
@@ -47,58 +47,60 @@ function Navbar() {
 
   // Helper function to get profile picture source
   const getProfilePicSrc = (picturePath) => {
-  if (!picturePath) return Men1;
+    if (!picturePath) return Men1;
 
-  // If it's a base64 custom image
-  if (picturePath.startsWith("data:image")) {
-    return picturePath;
-  }
+    // If it's a base64 custom image
+    if (picturePath.startsWith('data:image')) {
+      return picturePath;
+    }
 
-  // If it's a full URL (including Cloudinary links)
-  if (picturePath.startsWith("http://") || picturePath.startsWith("https://")) {
-    return picturePath;
-  }
+    // If it's a full URL (including Cloudinary links)
+    if (
+      picturePath.startsWith('http://') ||
+      picturePath.startsWith('https://')
+    ) {
+      return picturePath;
+    }
 
-  if (presetMap[picturePath]) {
-    return presetMap[picturePath];
-  }
+    if (presetMap[picturePath]) {
+      return presetMap[picturePath];
+    }
 
-  return Men1;
-};
-
+    return Men1;
+  };
 
   const handleClick = (buttonName) => {
     setActiveButton(buttonName);
-    setShowDropdown(false); 
+    setShowDropdown(false);
   };
 
   const handleProfileClick = () => {
-    setShowDropdown(prev => !prev);
+    setShowDropdown((prev) => !prev);
   };
 
   useEffect(() => {
     async function fetchUser() {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem('token');
         if (!token) {
-          navigate("/login");
+          navigate('/login');
           return;
         }
 
-        const response = await apiClient.get("/api/users/profile", {
+        const response = await apiClient.get('/api/users/profile', {
           headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
           },
         });
 
         const userData = response.data;
         setUser(userData);
-        setProfilePicture(userData.User_profile_icon_path || "Men1");
+        setProfilePicture(userData.User_profile_icon_path || 'Men1');
         setError(null);
       } catch (err) {
-        console.error("Failed to fetch user:", err);
-        setError("Failed to load profile data");
+        console.error('Failed to fetch user:', err);
+        setError('Failed to load profile data');
       } finally {
         setLoading(false);
       }
@@ -126,19 +128,35 @@ function Navbar() {
       <div className="flex flex-col items-center w-full">
         <div className="fixed top-0 w-full bg-white shadow-[0px_4px_8px_0px_rgba(0,0,0,0.25)] z-10 border-2">
           <div className="flex justify-between items-center max-w-7xl mx-auto p-2 relative">
-            <img className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20" src={Logo} alt="Logo" />
+            <img
+              className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20"
+              src={Logo}
+              alt="Logo"
+            />
             <div className="flex justify-center items-center gap-[38px] font-poppins font-semibold">
               {/* Navigation buttons - you can keep these static during loading */}
-              <NavLink to="/home" className="rounded-xl w-[100px] h-[38px] md:w-[100px] md:h-[38px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black">
+              <NavLink
+                to="/home"
+                className="rounded-xl w-[100px] h-[38px] md:w-[100px] md:h-[38px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black"
+              >
                 Home
               </NavLink>
-              <NavLink to="/pomodoro" className="rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black">
+              <NavLink
+                to="/pomodoro"
+                className="rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black"
+              >
                 Pomodoro
               </NavLink>
-              <NavLink to="/calendar" className="rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black">
+              <NavLink
+                to="/calendar"
+                className="rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black"
+              >
                 Calendar
               </NavLink>
-              <NavLink to="/overview" className="rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black">
+              <NavLink
+                to="/overview"
+                className="rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center bg-white text-black border-2 border-black"
+              >
                 Overview
               </NavLink>
             </div>
@@ -160,7 +178,11 @@ function Navbar() {
       <div className="fixed top-0 w-full bg-white shadow-[0px_4px_8px_0px_rgba(0,0,0,0.25)] z-10 border-2">
         <div className="flex justify-between items-center max-w-7xl mx-auto p-2 relative">
           {/* Logo */}
-          <img className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20" src={Logo} alt="Logo" />
+          <img
+            className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20"
+            src={Logo}
+            alt="Logo"
+          />
 
           {/* Buttons Container */}
           <div className="flex justify-center items-center gap-[38px] font-poppins font-semibold">
@@ -170,8 +192,9 @@ function Navbar() {
               end
               onClick={() => handleClick('Home')}
               className={`rounded-xl w-[100px] h-[38px] md:w-[100px] md:h-[38px] lg:w-[158px] lg:h-[41px] flex justify-center items-center transition-all duration-200 ease-in-out transform ${
-                activeButton === 'Home' ? 'bg-primary text-white border-2 border-primary2 scale-105 shadow-lg' :
-                'bg-white text-black border-2 border-black hover:scale-105 hover:shadow-lg'
+                activeButton === 'Home'
+                  ? 'bg-primary text-white border-2 border-primary2 scale-105 shadow-lg'
+                  : 'bg-white text-black border-2 border-black hover:scale-105 hover:shadow-lg'
               }`}
             >
               Home
@@ -182,8 +205,9 @@ function Navbar() {
               to="/pomodoro"
               onClick={() => handleClick('Pomodoro')}
               className={`rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center transition-all duration-200 ease-in-out transform ${
-                activeButton === 'Pomodoro' ? 'bg-primary text-white border-2 border-primary2 scale-105 shadow-lg' :
-                'bg-white text-black border-2 border-black hover:scale-105 hover:shadow-lg'
+                activeButton === 'Pomodoro'
+                  ? 'bg-primary text-white border-2 border-primary2 scale-105 shadow-lg'
+                  : 'bg-white text-black border-2 border-black hover:scale-105 hover:shadow-lg'
               }`}
             >
               Pomodoro
@@ -194,8 +218,9 @@ function Navbar() {
               to="/calendar"
               onClick={() => handleClick('Calendar')}
               className={`rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center transition-all duration-200 ease-in-out transform ${
-                activeButton === 'Calendar' ? 'bg-primary text-white border-2 border-primary2 scale-105 shadow-lg' :
-                'bg-white text-black border-2 border-black hover:scale-105 hover:shadow-lg'
+                activeButton === 'Calendar'
+                  ? 'bg-primary text-white border-2 border-primary2 scale-105 shadow-lg'
+                  : 'bg-white text-black border-2 border-black hover:scale-105 hover:shadow-lg'
               }`}
             >
               Calendar
@@ -206,8 +231,9 @@ function Navbar() {
               to="/overview"
               onClick={() => handleClick('Overview')}
               className={`rounded-xl w-[120px] h-[40px] md:w-[120px] md:h-[40px] lg:w-[158px] lg:h-[41px] flex justify-center items-center transition-all duration-200 ease-in-out transform ${
-                activeButton === 'Overview' ? 'bg-primary text-white border-2 border-primary2 scale-105 shadow-lg' :
-                'bg-white text-black border-2 border-black hover:scale-105 hover:shadow-lg'
+                activeButton === 'Overview'
+                  ? 'bg-primary text-white border-2 border-primary2 scale-105 shadow-lg'
+                  : 'bg-white text-black border-2 border-black hover:scale-105 hover:shadow-lg'
               }`}
             >
               Overview
@@ -227,17 +253,17 @@ function Navbar() {
               src={getProfilePicSrc(profilePicture)}
               alt="profile"
             />
-            
+
             {/* Dropdown menu */}
             <AnimatePresence>
-            {showDropdown && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="absolute right-0 mt-12 w-64 bg-white border shadow-lg py-4 flex flex-col gap-2 z-20"
-              >
+              {showDropdown && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-12 w-64 bg-white border shadow-lg py-4 flex flex-col gap-2 z-20"
+                >
                   {/* Top section: Profile info */}
                   <div className="flex items-center gap-3 px-4 mb-2">
                     <img
@@ -250,7 +276,9 @@ function Navbar() {
                         {user?.Username || 'Loading...'}
                       </span>
                       <span className="text-gray-500 text-xs">
-                        {user?.user?.User_Email || user?.User_Email || 'Loading...'}
+                        {user?.user?.User_Email ||
+                          user?.User_Email ||
+                          'Loading...'}
                       </span>
                     </div>
                   </div>
@@ -266,8 +294,10 @@ function Navbar() {
                     }}
                     className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition rounded-md"
                   >
-                    <Icon icon={edit} className='w-6 h-6'/>
-                    <span className="text-black font-poppins font-black">Edit Profile</span>
+                    <Icon icon={edit} className="w-6 h-6" />
+                    <span className="text-black font-poppins font-black">
+                      Edit Profile
+                    </span>
                   </button>
 
                   {/* Sign out button */}
@@ -278,23 +308,22 @@ function Navbar() {
                     }}
                     className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 transition rounded-md text-red-500 font-medium"
                   >
-                    <Icon icon={signout} className='w-6 h-6'/>
+                    <Icon icon={signout} className="w-6 h-6" />
                     <span>Sign out</span>
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
-
         </div>
       </div>
-              
+
       {/* Page Content */}
       <div className="mt-32 w-full max-w-7xl mx-auto">
         <Outlet />
       </div>
       {showLogoutModal && (
-        <ConfirmLogout onClose={() => setShowLogoutModal(false)}/>
+        <ConfirmLogout onClose={() => setShowLogoutModal(false)} />
       )}
     </div>
   );
