@@ -17,9 +17,14 @@ function ErrorBox({ onClose, errorMessage }) {
         <div className={`bg-white p-7 rounded-lg shadow-lg text-center w-full max-w-md relative ${
             isClosing ? 'animate-scale-out' : 'animate-scale-in'}`}>
 
-            <div className="absolute top-4 right-4 cursor-pointer hover:scale-105" onClick={closeModal}>
-                <img src={Close} alt="Close" className="h-6 w-6" />
-            </div>    
+            <button
+                type="button"
+                className="absolute top-4 right-4 cursor-pointer hover:scale-105 transition focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+                onClick={closeModal}
+                aria-label="Close error dialog"
+            >
+                <img src={Close} alt="" aria-hidden="true" className="h-6 w-6" />
+            </button>
             {/* Title */}
             <h2 className="text-xl font-fredoka font-bold mb-4 text-red-500">Error</h2>
             
