@@ -50,17 +50,16 @@ function Pomodoro() {
   useEffect(() => {
     const fetchCurrentSession = async () => {
       try {
-        // Wait, for session current active, we should use the active endpoint
-        // Let's decode the token to get userId or assume we don't fetch current for now.
-        // The endpoint is /api/pomodoroSession/active/{userId}
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-          const user = JSON.parse(userStr);
-          const res = await apiClient.get(`${API_URL}/active/${user.id || user.userId}`, getAuthHeader());
-          if (res.data && res.data.SessionId) {
-            // Need to map based on backend response which provides timer_type
-            // and duration_seconds etc. For now we will rely entirely on local state.
-          }
+        // The active-session endpoint expects a userId path parameter.
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          return;
+        }
+
+        const res = await apiClient.get(`${API_URL}/active/${userId}`, getAuthHeader());
+        if (res.data && res.data.SessionId) {
+          // Need to map based on backend response which provides timer_type
+          // and duration_seconds etc. For now we will rely entirely on local state.
         }
       } catch (err) {
         console.error('Error fetching current session:', err);
