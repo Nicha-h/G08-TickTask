@@ -8,7 +8,7 @@ import Hidden from '../../assets/hidden.svg';
 import Reveal from '../../assets/Eye.svg';
 import {jwtDecode} from 'jwt-decode';
 import { apiClient } from '../../util/apiClient';
-import ErrorBox from '../../components/ErrorBoxes';
+import ErrorBox from '../../components/ErrorBox';
 function LoginPage() {
   const navigate = useNavigate();
   const [users] = useState([]);
