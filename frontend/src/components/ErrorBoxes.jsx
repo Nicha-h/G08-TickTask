@@ -1,14 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Close from '../assets/close.svg';
 
 function ErrorBox({ onClose, errorMessage }) {
 
   const [isClosing, setIsClosing] = useState(false);
+  const closeTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const closeModal = () => {
     setIsClosing(true);
-    setTimeout(() => {
+
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+    }
+
+    closeTimeoutRef.current = setTimeout(() => {
       if (onClose) onClose();
-      setIsClosing(false);
     }, 300);
   };
 
