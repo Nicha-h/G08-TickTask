@@ -12,6 +12,7 @@ function Pomodoro() {
   const [tasks, setTasks] = useState([]);
   const [showNoTaskPrompt, setShowNoTaskPrompt] = useState(false);
   const [error, setError] = useState('');
+  const [currentSessionId, setCurrentSessionId] = useState(null);
   const API_URL = `${apiClient.defaults.baseURL}/api/pomodoroSession`;
   const TASK_API_URL = `${apiClient.defaults.baseURL}/api/pomodoroTask`;
 
@@ -38,6 +39,7 @@ function Pomodoro() {
       setIntervalId(null);
     }
     setTimer(modes[activeMode]);
+    setCurrentSessionId(null);
   }, [activeMode]);
   
   useEffect(() => {
@@ -96,8 +98,8 @@ function Pomodoro() {
       setIsRunning(false);
       setIntervalId(null);
       try {
-        if (activeTask?.SessionId) {
-          await apiClient.put(`${API_URL}/${activeTask.SessionId}/pause`, {}, getAuthHeader());
+        if (currentSessionId) {
+          await apiClient.put(`${API_URL}/${currentSessionId}/pause`, {}, getAuthHeader());
         }
       } catch (err) {
         console.error('Pause error:', err);
@@ -113,11 +115,11 @@ function Pomodoro() {
 
   const startTimerExecution = async () => {
     // Start/resume the timer
-    let finalSessionId = activeTask?.SessionId;
+    let finalSessionId = currentSessionId;
     try {
-      if (activeTask?.SessionId && timer !== modes[activeMode]) {
-        // If we are resuming from pause
-        await apiClient.put(`${API_URL}/${activeTask.SessionId}/resume`, {}, getAuthHeader());
+      if (currentSessionId) {
+        // Resume the existing paused session
+        await apiClient.put(`${API_URL}/${currentSessionId}/resume`, {}, getAuthHeader());
       } else {
         // Create/start a new session
         const timerTypeValue = activeMode === 'Pomodoro' 
@@ -129,6 +131,7 @@ function Pomodoro() {
             timer_type: timerTypeValue
         }, getAuthHeader());
         finalSessionId = res.data?.data?.SessionId || res.data?.SessionId;
+        setCurrentSessionId(finalSessionId);
 
         if (activeTask && finalSessionId && activeMode === 'Pomodoro') {
             await apiClient.put(`${TASK_API_URL}/${activeTask.Pomo_TaskId}/assign`, {
@@ -168,8 +171,9 @@ function Pomodoro() {
 
   const completeSession = async () => {
     try {
-      if (activeTask?.SessionId) {
-        await apiClient.put(`${API_URL}/${activeTask.SessionId}/complete`, {}, getAuthHeader());
+      if (currentSessionId) {
+        await apiClient.put(`${API_URL}/${currentSessionId}/complete`, {}, getAuthHeader());
+        setCurrentSessionId(null);
       }
       
       let isLongBreak = false;
@@ -251,6 +255,7 @@ function Pomodoro() {
     setIsRunning(false);
     setIntervalId(null);
     setTimer(modes[activeMode]);
+    setCurrentSessionId(null);
   };
   
   const skipTimer = () => {
