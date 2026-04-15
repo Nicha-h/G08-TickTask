@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, useNavigate, Navigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,10 +8,11 @@ import Hidden from '../../assets/hidden.svg';
 import Reveal from '../../assets/Eye.svg';
 import {jwtDecode} from 'jwt-decode';
 import { apiClient } from '../../util/apiClient';
+import ErrorBox from '../../components/ErrorBox';
 function LoginPage() {
   const navigate = useNavigate();
-  const [users] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const userSchema = z.object({
     email: z.string().email('Please enter a valid email'),
@@ -24,6 +25,10 @@ function LoginPage() {
     formState: { errors },
   } = useForm({ resolver: zodResolver(userSchema) });
 
+  if (localStorage.getItem('token')) {
+    return <Navigate to="/home" replace />;
+  }
+
   const onSubmit = async (data) => {
     try {
       const response = await apiClient.post(`/api/users/login`, data);
@@ -34,25 +39,15 @@ function LoginPage() {
       const userId = decoded.id; 
   
       localStorage.setItem('userId', userId);
-  
-      console.log('User ID:', userId); // or use it however you want
-  
       navigate('/home');
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        alert('Invalid email or password!');
+        setErrorMessage('Invalid email or password. Please try again.');
       } else {
-        alert('Something went wrong. Please try again later.');
+        setErrorMessage('Something went wrong. Please try again later.');
       }
     }
   };
-  
-
-  useEffect(() => {
-    if (users.length > 0) {
-      navigate('/home');
-    }
-  }, [users, navigate]);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -60,6 +55,7 @@ function LoginPage() {
 
   return (
     <>
+      {errorMessage && <ErrorBox errorMessage={errorMessage} onClose={() => setErrorMessage('')} />}
       <div className="flex flex-col justify-center items-center h-screen">
         {/* Logo */}
         <div>
@@ -75,7 +71,7 @@ function LoginPage() {
         </div>
 
         {/* Login Title */}
-        <div className="font-poppins font-bold sm:text-base md:text-xl lg:text-[24px] my-6 sm:my-6 md:my-5 lg:my-[20px] 
+        <div className="font-poppins font-bold sm:text-base md:text-xl lg:text-[24px] my-6 sm:my-6 md:my-5 lg:my-5 
         transition-all duration-200 ease-in-out transform">Login</div>
 
         {/* Form */}

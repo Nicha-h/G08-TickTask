@@ -6,11 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '../../assets/Logo.svg';
 import Hidden from '../../assets/hidden.svg';
 import Reveal from '../../assets/Eye.svg';
+import {jwtDecode} from 'jwt-decode';
 import { apiClient } from '../../util/apiClient';
+import ErrorBox from '../../components/ErrorBox';
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState('');
   const userSchema = z.object({
     email: z.string().email('Please enter a valid email'),
     password: z.string().min(7, 'Your password needs to be at least 7 characters.'),
@@ -25,18 +27,42 @@ function Signup() {
   const onSubmit = async (data) => {
     try {
       // POST request
-      const response = await apiClient.post(`/api/users/signup`, { 
+      const signupResponse = await apiClient.post(`/api/users/signup`, { 
         email: data.email,
         password: data.password, 
       });
   
-      if (!response.ok) {
-        throw new Error('Failed to create user');
+      let token = signupResponse.data?.token;
+
+      if (!token) {
+        const loginResponse = await apiClient.post(`/api/users/login`, {
+          email: data.email,
+          password: data.password,
+        });
+        token = loginResponse.data?.token;
+      }
+
+      if (!token || typeof token !== 'string') {
+        throw new Error('Authentication token is missing or invalid.');
       }
   
-      navigate('/login');
+      localStorage.setItem('token', token);
+      const decoded = jwtDecode(token);
+      const userId = decoded.id; 
+  
+      localStorage.setItem('userId', userId);
+
+      navigate('/home');
     } catch (error) {
       console.error('Error during signup:', error);
+       if (error.response && error.response.status === 400) {
+        setErrorMessage('Please check your email and password and try again.');
+      } else if (error.response && error.response.status === 409) {
+        setErrorMessage('A user with this email already exists.');
+      } else {
+        setErrorMessage('Something went wrong. Please try again later.');
+      }
+
     }
   };
 
@@ -46,6 +72,7 @@ function Signup() {
 
   return (
     <>
+      {errorMessage && <ErrorBox errorMessage={errorMessage} onClose={() => setErrorMessage('')} />}
       <div className="flex flex-col justify-center items-center h-screen">
         {/* Logo */}
         <div>

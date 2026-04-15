@@ -13,6 +13,7 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 import cloudinary from "../utils/Cloudinary.js";
 import { FRONTEND_URL } from "../utils/env.js";
+import { renderPasswordResetEmail } from "../utils/emailTemplates.js";
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -187,12 +188,7 @@ export async function checkEmailController(c: Context) {
       from: '"TickTask" <no-reply@ticktask.com>',
       to: email,
       subject: "Password Reset Request",
-      html: `
-        <h3>Password Reset</h3>
-        <p>Click the link below to reset your password:</p>
-        <a href="${resetLink}">${resetLink}</a>
-        <p>This link will expire in 15 minutes.</p>
-      `,
+      html: renderPasswordResetEmail(resetLink),
     });
 
     return c.json({ exists: true, message: "Reset email sent" });

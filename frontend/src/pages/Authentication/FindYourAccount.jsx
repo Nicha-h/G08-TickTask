@@ -22,7 +22,6 @@ function FindYourAccount() {
   const [emailNotFound, setEmailNotFound] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  
   const onSubmit = async (data) => {
     const { email } = data;
     const emailExists = await checkEmailInDatabase(email);
