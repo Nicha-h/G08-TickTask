@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import WeeklyCalendar from '../components/WeeklyCalendar';
 import { format } from 'date-fns';
 import AddTask from '../components/AddTask';
 import CategoryBox from '../components/CategoryBox';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import { NavLink, useNavigate, useLoaderData } from 'react-router-dom';
 import { useWindowSize } from '../hooks/useWindowSize';
 import Men1 from '../assets/ProfilePics/men1.svg';
-import { apiClient } from '../util/apiClient';
 
 function Home() {
+  const { username } = useLoaderData() || {};
+  
   const date = new Date();
   const [selectedDate, setSelectedDate] = useState(format(date, 'yyyy-MM-dd'));
   const [day, year] = [date.getUTCDate(), date.getFullYear()];
@@ -21,54 +21,9 @@ function Home() {
     hour12: false,
   }).format(date);
 
-  const [userID, setUserID] = useState('');
-  const [username, setUsername] = useState('');
-  const [, setLoading] = useState(true);
-  const [, setError] = useState(null);
   const navigate = useNavigate();
   const { width } = useWindowSize();
   const isMobile = width <= 768;
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const decoded = jwtDecode(token);
-      const idFromToken = decoded.id || decoded.userId || decoded._id;
-      setUserID(idFromToken);
-    } catch (err) {
-      console.error("Invalid token:", err);
-      setError("Authentication failed");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-  useEffect(() => {
-    if (userID) {
-      fetchUsername();
-    }
-  }, [userID]);
-  const fetchUsername = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await apiClient.get(`/api/users/profile`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      console.log("Profile response:", response.data);
-      setUsername(response.data.Username);
-    } catch (err) {
-      console.error("Error fetching username:", err);
-      setError("Failed to fetch user data");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="px-4 sm:px-6 md:px-10 lg:px-20 xl:px-40 py-6 w-full font-poppins">

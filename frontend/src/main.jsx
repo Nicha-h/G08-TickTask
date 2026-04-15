@@ -8,6 +8,7 @@ import Pomodoro from "./pages/Pomodoro.jsx";
 import Calendar from "./pages/Calendar.jsx";
 import Overview from "./pages/Overview.jsx";
 import Home from "./pages/Home.jsx";
+import { homeLoader } from "./components/homeLoader.jsx";
 import Signup from "./pages/Authentication/Signup.jsx";
 import Login from "./pages/Authentication/LoginPage.jsx";
 import FindYourAccount from "./pages/Authentication/FindYourAccount.jsx";
@@ -25,7 +26,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Navigate to="/home" replace /> },
-      { path: "home", element: <Home /> },
+      { path: "home", element: <Home />, loader: homeLoader },
       { path: "pomodoro", element: <Pomodoro /> },
       { path: "calendar", element: <Calendar /> },
       { path: "overview", element: <Overview /> },
