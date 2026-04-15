@@ -7,8 +7,8 @@ import add from '@iconify-icons/mdi/add-circle-outline';
 import PomoSetting from '../components/modals/PomoSetting'
 import PomoAdd from './modals/PomoAdd';
 import { apiClient } from '../util/apiClient';
-function PomoTask({ onTaskSelect, activeTaskId, tasks, setTasks }) {
-  const [loading] = useState(false);
+function PomoTask({ onTaskSelect, activeTaskId, tasks, setTasks, fetchTasks }) {
+  const [loading] = false;
   const [error, setError] = useState('');
   const [selectedTask, setSelectedTask] = useState(null); 
   const [isAdding, setIsAdding] = useState(false);
@@ -109,7 +109,10 @@ function PomoTask({ onTaskSelect, activeTaskId, tasks, setTasks }) {
     <div className="text-red-500 text-center py-4 px-4 w-full">
       <p>Error: {error}</p>
       <button 
-        onClick={() => window.location.reload()} 
+        onClick={() => {
+          setError('');
+          if (fetchTasks) fetchTasks();
+        }} 
         className="mt-2 px-4 py-1 bg-blue-100 rounded-md hover:bg-blue-200 text-sm"
       >
         Retry

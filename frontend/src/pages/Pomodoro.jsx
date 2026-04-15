@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import PomoTask from '../components/PomoTask';
 import { apiClient } from '../util/apiClient';
+import ErrorBox from '../components/ErrorBox';
 function Pomodoro() {
   const [activeMode, setActiveMode] = useState('Pomodoro');
   const [timer, setTimer] = useState(25 * 60);
@@ -10,7 +11,7 @@ function Pomodoro() {
   const [activeTask, setActiveTask] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [showNoTaskPrompt, setShowNoTaskPrompt] = useState(false);
-  
+  const [error, setError] = useState('');
   const API_URL = `${apiClient.defaults.baseURL}/api/pomodoroSession`;
   const TASK_API_URL = `${apiClient.defaults.baseURL}/api/pomodoroTask`;
 
@@ -50,9 +51,6 @@ function Pomodoro() {
   useEffect(() => {
     const fetchCurrentSession = async () => {
       try {
-        // Wait, for session current active, we should use the active endpoint
-        // Let's decode the token to get userId or assume we don't fetch current for now.
-        // The endpoint is /api/pomodoroSession/active/{userId}
         const userStr = localStorage.getItem('user');
         if (userStr) {
           const user = JSON.parse(userStr);
@@ -64,6 +62,7 @@ function Pomodoro() {
         }
       } catch (err) {
         console.error('Error fetching current session:', err);
+        setError('Failed to fetch current session.');
       }
     };
     fetchCurrentSession();
@@ -129,13 +128,11 @@ function Pomodoro() {
         }, getAuthHeader());
         finalSessionId = res.data?.data?.SessionId || res.data?.SessionId;
 
-        // Optionally, assign the task to this new session
-        if (activeTask && finalSessionId) {
+        if (activeTask && finalSessionId && activeMode === 'Pomodoro') {
             await apiClient.put(`${TASK_API_URL}/${activeTask.Pomo_TaskId}/assign`, {
                 sessionId: finalSessionId
             }, getAuthHeader());
             
-            // Also update our local state to reflect the new session ID
             setActiveTask(prev => prev ? { ...prev, SessionId: finalSessionId } : null);
             
             setTasks(prevTasks => prevTasks.map(t => 
@@ -147,6 +144,8 @@ function Pomodoro() {
       }
     } catch (err) {
       console.error('Start error:', err);
+      setError('Failed to start or resume the timer. Please try again.');
+      return; // Abort starting the local timer
     }
 
     const id = setInterval(() => {
@@ -204,6 +203,7 @@ function Pomodoro() {
       fetchTasks();
     } catch (err) {
       console.error('Complete error:', err);
+      setError('Failed to complete the session. Please try again.');
     }
   };
   
@@ -275,6 +275,7 @@ function Pomodoro() {
 
   return (
     <div className='-mt-32 flex flex-col justify-center items-center w-full min-h-screen px-4'>
+      {error && <ErrorBox message={error} onClose={() => setError('')} />}
       <div className="w-full max-w-2xl border-2 flex flex-col items-center font-fredoka rounded-lg shadow-md">
         {/* Header */}
         <div className="w-full py-4 flex justify-center items-center border-b-2">
@@ -357,6 +358,7 @@ function Pomodoro() {
             activeTaskId={activeTask?.Pomo_TaskId} 
             tasks={tasks}
             setTasks={setTasks}
+            fetchTasks={fetchTasks}
           />
         </div>
       </div>
@@ -377,7 +379,7 @@ function Pomodoro() {
                   setShowNoTaskPrompt(false);
                   window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                 }}
-                className="bg-green hover:bg-[#c5cf80] text-black py-2 px-4 rounded border-2 transition-transform hover:scale-105 hover:cursor-pointerfont-bold"
+                className="bg-green hover:bg-[#c5cf80] text-black py-2 px-4 rounded border-2 transition-transform hover:scale-105 hover:cursor-pointer font-bold"
               >
                 {tasks.length > 0 ? "Choose / Add Task" : "Add Task Below"}
               </button>

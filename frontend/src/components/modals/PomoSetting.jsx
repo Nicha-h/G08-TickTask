@@ -39,7 +39,6 @@ function PomoSetting({ task, onClose, onDelete, onUpdate }) {
       Pomo_Task_Short: shortBreak ? Number(shortBreak) : 5,
       Pomo_Task_Long: longBreak ? Number(longBreak) : 15,
       Pomo_Target_Count: pomodoro ? Number(pomodoro) : 4,
-      SessionId: task.SessionId || 1 // Fallback in case SessionId is missing
     };
   
     try {
