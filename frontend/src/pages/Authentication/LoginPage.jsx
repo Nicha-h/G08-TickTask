@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, useNavigate, Navigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,7 +11,6 @@ import { apiClient } from '../../util/apiClient';
 import ErrorBox from '../../components/ErrorBox';
 function LoginPage() {
   const navigate = useNavigate();
-  const [users] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -25,6 +24,10 @@ function LoginPage() {
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: zodResolver(userSchema) });
+
+  if (localStorage.getItem('token')) {
+    return <Navigate to="/home" replace />;
+  }
 
   const onSubmit = async (data) => {
     try {
@@ -45,13 +48,6 @@ function LoginPage() {
       }
     }
   };
-  
-
-  useEffect(() => {
-    if (users.length > 0) {
-      navigate('/home');
-    }
-  }, [users, navigate]);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
