@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Close from '../../assets/close.svg';
 import DeletePomo from './DeletePomo';
 import { apiClient } from '../../util/apiClient';
+import ErrorBox from '../ErrorBox';
 function PomoSetting({ task, onClose, onDelete, onUpdate }) {
 
   const [title, setTitle] = useState(task.Pomo_Task_Title || '');
   const [pomodoro, setPomodoro] = useState(task.Pomo_Target_Count || '');
   const [shortBreak, setShortBreak] = useState(task.Pomo_Task_Short || '');
   const [longBreak, setLongBreak] = useState(task.Pomo_Task_Long || '');
-
+  const [errorMessage, setErrorMessage] = useState('');
   const [isClosing, setIsClosing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const closeModal = () => {
@@ -30,35 +31,29 @@ function PomoSetting({ task, onClose, onDelete, onUpdate }) {
 
   
   const handleSave = async () => {
+    // If title is effectively empty, set it to " "
+    const finalTitle = title.trim() ? title : " ";
+
     const updatedData = {
-      title,
-      shortBreak: Number(shortBreak),
-      longBreak: Number(longBreak),
-      targetCount: Number(pomodoro),
-      status: task.Pomo_Task_Status,            
-      completedCount: task.Pomo_Completed_Count, 
-      sessionId: task.SessionId || null,
+      Pomo_Task_Title: finalTitle,
+      Pomo_Task_Short: shortBreak ? Number(shortBreak) : 5,
+      Pomo_Task_Long: longBreak ? Number(longBreak) : 15,
+      Pomo_Target_Count: pomodoro ? Number(pomodoro) : 4,
     };
   
     try {
       const response = await apiClient.put(`/api/pomodoroTask/${task.Pomo_TaskId}`, updatedData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(updatedData),
+        }
       });
   
-      if (!response.ok) {
-        throw new Error('Failed to save settings');
-      }
-      
-      const result = await response.json();
-      console.log('Saved changes:', result);
-      onUpdate(result.data)
+      const body = response.data;
+      onUpdate(body.data || body);
       onClose();
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Failed to save changes.');
+      setErrorMessage('Failed to save changes.');
     }
   };
   
@@ -70,11 +65,12 @@ function PomoSetting({ task, onClose, onDelete, onUpdate }) {
 
   const handleDeleteClose = () => {
     setShowDeleteModal(false); 
-    onClose();
+    // Do not call onClose() here, just close the delete modal
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      {errorMessage && <ErrorBox errorMessage={errorMessage} onClose={() => setErrorMessage('')} />}
       <div className={`bg-white p-6 w-[350px] sm:w-[450px] md:w-[480px] lg:w-[500px] max-h-[90vh] overflow-y-auto rounded-lg shadow-lg relative ${
         isClosing ? 'animate-scale-out' : 'animate-scale-in'
       }`}
@@ -98,24 +94,27 @@ function PomoSetting({ task, onClose, onDelete, onUpdate }) {
               <input
                 type="number"
                 value={pomodoro}
+                placeholder="4"
                 onChange={(e) => setPomodoro(e.target.value)}
                 className="bg-gray-200 w-[85px] sm:w-[120px] h-[40px] p-2 border-2 rounded-lg"
               />
             </div>
             <div className="flex flex-col">
-              <label className="block font-fredoka font-light text-sm sm:text-sm md:text-base lg:text-base mb-1">Short Break</label>
+              <label className="block font-fredoka font-light text-sm sm:text-sm md:text-base lg:text-base mb-1">Short Break&nbsp;<span className="text-xs text-gray-500">(min)</span></label>
               <input
                 type="number"
                 value={shortBreak}
+                placeholder="5"
                 onChange={(e) => setShortBreak(e.target.value)}
                 className="bg-gray-200 w-[85px] sm:w-[120px] h-[40px] p-2 border-2 rounded-lg"
               />
             </div>
             <div className="flex flex-col">
-              <label className="block font-fredoka font-light text-sm sm:text-sm md:text-base lg:text-base mb-1">Long Break</label>
+              <label className="block font-fredoka font-light text-sm sm:text-sm md:text-base lg:text-base mb-1">Long Break&nbsp;<span className="text-xs text-gray-500">(min)</span></label>
               <input
                 type="number"
                 value={longBreak}
+                placeholder="15"
                 onChange={(e) => setLongBreak(e.target.value)}
                 className="bg-gray-200 w-[85px] sm:w-[120px] h-[40px] p-2 border-2 rounded-lg"
               />

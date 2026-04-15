@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Icon } from '@iconify/react';
 import uncheck from '@iconify-icons/mdi/check-circle-outline';
 import check from '@iconify-icons/mdi/check-circle';
@@ -7,65 +7,34 @@ import add from '@iconify-icons/mdi/add-circle-outline';
 import PomoSetting from '../components/modals/PomoSetting'
 import PomoAdd from './modals/PomoAdd';
 import { apiClient } from '../util/apiClient';
-function PomoTask({ onTaskSelect, activeTaskId }) {
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
+function PomoTask({ onTaskSelect, activeTaskId, tasks, setTasks, fetchTasks }) {
+  const [loading] = false;
   const [error, setError] = useState('');
   const [selectedTask, setSelectedTask] = useState(null); 
   const [isAdding, setIsAdding] = useState(false);
 
-  useEffect(() => {
-    fetchTasks();
-  }, []);
-
-  const fetchTasks = async () => {
-    setLoading(true);
-    try {
-      const response = await apiClient.get('/api/pomodoroTask', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch tasks');
-      const result = await response.json();
-      setTasks(result.data);
-      setError('');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleTaskCompletion = async (pomo_TaskId, currentStatus) => {
     try {
-      // First, find the task to get its current values
       const taskToUpdate = tasks.find(task => task.Pomo_TaskId === pomo_TaskId);
-      
       if (!taskToUpdate) {
         throw new Error('Task not found');
       }
       
       const completedCount = !currentStatus ? taskToUpdate.Pomo_Target_Count : 0;
       
-      const response = await fetch(`${apiClient.defaults.baseURL}/api/pomodoroTask/${pomo_TaskId}/complete`, {
-        method: 'PUT', 
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
+      await apiClient.put(
+        `/api/pomodoroTask/${pomo_TaskId}`, 
+        {
           Pomo_Task_Status: !currentStatus,
           Pomo_Completed_Count: completedCount,
-        }),
-      });
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          }
+        }
+      );
   
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update task completion status');
-      }
-      
       setTasks(prevTasks =>
         prevTasks.map(task =>
           task.Pomo_TaskId === pomo_TaskId
@@ -140,7 +109,10 @@ function PomoTask({ onTaskSelect, activeTaskId }) {
     <div className="text-red-500 text-center py-4 px-4 w-full">
       <p>Error: {error}</p>
       <button 
-        onClick={fetchTasks} 
+        onClick={() => {
+          setError('');
+          if (fetchTasks) fetchTasks();
+        }} 
         className="mt-2 px-4 py-1 bg-blue-100 rounded-md hover:bg-blue-200 text-sm"
       >
         Retry

@@ -1,8 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Logo from '../assets/Logo.svg';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import SearchIcon from '../assets/search.svg';
 import edit from '@iconify-icons/mdi/pencil-outline';
 import signout from '@iconify-icons/mdi/sign-out-variant';
 import { Icon } from '@iconify/react/dist/iconify.js';
@@ -129,9 +128,10 @@ function Navbar() {
         <div className="fixed top-0 w-full bg-white shadow-[0px_4px_8px_0px_rgba(0,0,0,0.25)] z-10 border-2">
           <div className="flex justify-between items-center max-w-7xl mx-auto p-2 relative">
             <img
-              className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20"
+              className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20 cursor-pointer"
               src={Logo}
               alt="Logo"
+              onClick={() => navigate('/home')}
             />
             <div className="flex justify-center items-center gap-[38px] font-poppins font-semibold">
               {/* Navigation buttons - you can keep these static during loading */}
@@ -161,7 +161,6 @@ function Navbar() {
               </NavLink>
             </div>
             <div className="flex flex-row gap-[10px] relative">
-              <img src={SearchIcon} alt="search" />
               <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"></div>
             </div>
           </div>
@@ -179,9 +178,13 @@ function Navbar() {
         <div className="flex justify-between items-center max-w-7xl mx-auto p-2 relative">
           {/* Logo */}
           <img
-            className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20"
+            className="flex justify-start md:w-15 md:h-15 lg:w-20 lg:h-20 cursor-pointer"
             src={Logo}
             alt="Logo"
+            onClick={() => {
+              navigate('/home');
+              handleClick('Home');
+            }}
           />
 
           {/* Buttons Container */}
@@ -242,11 +245,6 @@ function Navbar() {
 
           {/* pfp Container */}
           <div className="flex flex-row gap-[10px] relative" ref={dropdownRef}>
-            <img
-              className="hover:scale-105 transition-all duration-200 ease-in-out transform cursor-pointer"
-              src={SearchIcon}
-              alt="search"
-            />
             <img
               onClick={handleProfileClick}
               className="w-15 h-15 rounded-full object-cover hover:scale-105 transition-all duration-200 ease-in-out transform cursor-pointer"

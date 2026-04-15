@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import Close from '../../assets/close.svg';
 import { apiClient } from '../../util/apiClient';
+import ErrorBox from '../ErrorBox';
 function PomoAdd({ task = {}, onClose, onAdd }) {
   const [title, setTitle] = useState(task?.Pomo_Task_Title || '');
   const [pomodoro, setPomodoro] = useState('');
   const [shortBreak, setShortBreak] = useState('');
   const [longBreak, setLongBreak] = useState('');
   const [isClosing, setIsClosing] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState('');
   const closeModal = () => {
     setIsClosing(true);
     setTimeout(() => {
@@ -17,12 +18,12 @@ function PomoAdd({ task = {}, onClose, onAdd }) {
   };
 
   const handleSave = async () => {
+    const finalTitle = title.trim() ? title : " ";
     const data = {
-      title,
-      shortBreak: Number(shortBreak),
-      longBreak: Number(longBreak),
-      targetCount: Number(pomodoro),
-      sessionId: task.SessionId
+      Pomo_Task_Title: finalTitle,
+      Pomo_Task_Short: shortBreak ? Number(shortBreak) : 5,
+      Pomo_Task_Long: longBreak ? Number(longBreak) : 15,
+      Pomo_Target_Count: pomodoro ? Number(pomodoro) : 4,
     };
   
     try {
@@ -32,24 +33,18 @@ function PomoAdd({ task = {}, onClose, onAdd }) {
         }
       });
   
-      if (!response.ok) {
-        throw new Error('Failed to save settings');
-      }
-  
-      const body = await response.json(); 
-      console.log('Received body:', body);
-      onAdd(body.data); 
+      const body = response.data; 
+      onAdd(body.data || body); 
       onClose();
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Failed to save changes.');
+      setErrorMessage('Failed to save changes.');
     }
   };
-  
-  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      {errorMessage && <ErrorBox errorMessage={errorMessage} onClose={() => setErrorMessage('')} />}
       <div className={`bg-white p-6 w-[350px] sm:w-[450px] md:w-[480px] lg:w-[500px] max-h-[90vh] overflow-y-auto rounded-lg shadow-lg relative ${
         isClosing ? 'animate-scale-out' : 'animate-scale-in'
       }`}
@@ -73,24 +68,27 @@ function PomoAdd({ task = {}, onClose, onAdd }) {
               <input
                 type="number"
                 value={pomodoro}
+                placeholder="4"
                 onChange={(e) => setPomodoro(e.target.value)}
                 className="bg-gray-200 w-[85px] sm:w-[120px] h-[40px] p-2 border-2 rounded-lg"
               />
             </div>
             <div className="flex flex-col">
-              <label className="block font-fredoka font-light text-sm sm:text-sm md:text-base lg:text-base mb-1">Short Break</label>
+              <label className="block font-fredoka font-light text-sm sm:text-sm md:text-base lg:text-base mb-1">Short Break <span className="text-xs text-gray-500">(min)</span></label>
               <input
                 type="number"
                 value={shortBreak}
+                placeholder="5"
                 onChange={(e) => setShortBreak(e.target.value)}
                 className="bg-gray-200 w-[85px] sm:w-[120px] h-[40px] p-2 border-2 rounded-lg"
               />
             </div>
             <div className="flex flex-col">
-              <label className="block font-fredoka font-light text-sm sm:text-sm md:text-base lg:text-base mb-1">Long Break</label>
+              <label className="block font-fredoka font-light text-sm sm:text-sm md:text-base lg:text-base mb-1">Long Break <span className="text-xs text-gray-500">(min)</span></label>
               <input
                 type="number"
                 value={longBreak}
+                placeholder="15"
                 onChange={(e) => setLongBreak(e.target.value)}
                 className="bg-gray-200 w-[85px] sm:w-[120px] h-[40px] p-2 border-2 rounded-lg"
               />
