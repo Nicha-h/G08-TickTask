@@ -39,7 +39,11 @@ function Signup() {
           email: data.email,
           password: data.password,
         });
-        token = loginResponse.data.token;
+        token = loginResponse.data?.token;
+      }
+
+      if (!token || typeof token !== 'string') {
+        throw new Error('Authentication token is missing or invalid.');
       }
   
       localStorage.setItem('token', token);
