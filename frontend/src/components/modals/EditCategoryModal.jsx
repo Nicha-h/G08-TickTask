@@ -26,12 +26,9 @@ const EditCategoryModal = ({
 
   useEffect(() => { 
     if (editingCategory) {
-      setCategoryName(editingCategory.name);
-      setColor(editingCategory.color === undefined ? null : editingCategory.color);
-      setSelectedIcon(editingCategory.icon);
-      console.log("Selected Icon:", selectedIcon);
-      console.log("Resolved Image:", iconComponents[selectedIcon]);
-
+      setCategoryName(editingCategory.Category_Name || editingCategory.name || "");
+      setColor(editingCategory.Category_Color || editingCategory.color || null);
+      setSelectedIcon(editingCategory.Category_icon || editingCategory.Category_Icon || editingCategory.icon || "iconSmile");
     }
   }, [editingCategory]);
 
@@ -47,7 +44,7 @@ const EditCategoryModal = ({
       const updatedCategory = {
         Category_Name: categoryName,
         Category_Color: color || "#D3D3D3",
-        Category_icon: selectedIcon || "smile", // :)
+        Category_icon: selectedIcon || "iconSmile", // :)
         Category_is_Primary: false
       };
       // making sure it is primative type `(*>﹏<*)′
@@ -114,9 +111,9 @@ const EditCategoryModal = ({
                   type="text"
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
-                  disabled={editingCategory.name === "All"}
+                  disabled={editingCategory.Category_Name === "All" || editingCategory.name === "All"}
                   className={`w-full border border-black rounded py-2 px-3 ${
-                    editingCategory.name === "All" ? "bg-gray-100" : ""
+                    (editingCategory.Category_Name === "All" || editingCategory.name === "All") ? "bg-gray-100" : ""
                   }`}
                 />
               </div>
@@ -129,13 +126,13 @@ const EditCategoryModal = ({
             
           }}
                   onClick={() => {
-                    if (editingCategory.name !== "All") {
+                    if (editingCategory.Category_Name !== "All" && editingCategory.name !== "All") {
                       setIconPickerOpen(true);
                     }
                   }}
                 >
                   <img 
-                    src={iconComponents.selectedIcon} 
+                    src={iconComponents[selectedIcon] || iconComponents.iconSmile} 
                     alt="Category icon" 
                     className="w-14 h-14 object-contain" 
                   />

@@ -74,23 +74,7 @@ export default function Category() {
   }).then(res => {
     // Normalize tasks to have a categories array (of CategoryId)
     console.log("Raw tasks data:", res.data); 
-    const normalizedTasks = res.data.map(task => {
-      const taskStatus = task.status || task.Task_Status;
-      
-      return {
-        TaskID: task.id || task.TaskID || task._id,
-        Task_Title: task.title || task.Task_Title,
-        Task_Description: task.description || task.Task_Description,
-        Task_Status: taskStatus,
-        completed: taskStatus === "Complete" || taskStatus === "Completed",
-        categories: task.categories || 
-                 (task.task_category ? task.task_category.map(tc => tc.CategoryId || tc.categoryId) : []) || 
-                 (task.CategoryId ? [task.CategoryId] : []) ||
-                 [1] 
-      };
-    });
-    console.log("Normalized tasks:", normalizedTasks);
-    setTasks(normalizedTasks);
+    setTasks(res.data);
   }).catch(err => {
     console.error("Failed to fetch tasks", err);
   });
@@ -113,15 +97,8 @@ export default function Category() {
         });
         
         if (response.data && Array.isArray(response.data)) {
-          const normalized = response.data.map(cat => ({
-            Category_Name: cat.name || cat.category_name || cat.title || '',
-            Category_Color: cat.color || cat.colour || '#D4B4FF',
-            Category_icon: cat.icon || cat.iconUrl || cat.icon_url || '',
-            CategoryId: cat.CategoryId || cat.id || cat._id || cat.category_id || Math.random().toString(36),
-            ...cat 
-          }));
-          console.log("Normalized categories:", normalized);
-          setCategories(normalized);
+          console.log("Raw categories data:", response.data);
+          setCategories(response.data);
           setCategoryFetchError(null);
         } else {
           setCategoryFetchError("Invalid response format");
@@ -166,20 +143,8 @@ export default function Category() {
           
           if (response.data) {
             // Filter out null/undefined values and format
-            const normalizedTasks = response.data
-              .filter(task => task != null) // Remove null/undefined tasks
-              .map(task => ({
-                TaskID: task.id || task.TaskID || task._id,
-                Task_Title: task.title || task.Task_Title,
-                Task_Description: task.description || task.Task_Description,
-                Task_Status: task.status || task.Task_Status,
-                categories: task.categories || 
-                         (task.task_category ? task.task_category.map(tc => tc.CategoryId || tc.categoryId) : []) || 
-                         (task.CategoryId ? [task.CategoryId] : []) ||
-                         [1],
-                ...task
-              }));
-            setTasks(normalizedTasks);
+            const validTasks = response.data.filter(task => task != null);
+            setTasks(validTasks);
           }
           return;
         }
@@ -193,17 +158,8 @@ export default function Category() {
         );
         
         if (response.data) {
-          const normalizedTasks = response.data
-            .filter(task => task != null)
-            .map(task => ({
-              TaskID: task.id || task.TaskID || task._id,
-              Task_Title: task.title || task.Task_Title,
-              Task_Description: task.description || task.Task_Description,
-              Task_Status: task.status || task.Task_Status,
-              categories: [selectedCategoryId],
-              ...task
-            }));
-          setTasks(normalizedTasks);
+          const validTasks = response.data.filter(task => task != null);
+          setTasks(validTasks);
         }
       } catch (error) {
         console.error("Oops error fetching tasks for category (*>_<*):", error);
@@ -301,7 +257,7 @@ export default function Category() {
 
   const calculateProgress = (categoryId) => {
     const categoryTasks = tasks.filter(
-      (task) => Array.isArray(task.categories) && task.categories.includes(categoryId)
+      (task) => Array.isArray(task.task_category) && task.task_category.some(tc => tc.CategoryId === categoryId)
     );
     if (categoryTasks.length === 0) return 0;
     const completedTasks = categoryTasks.filter((task) => isTaskCompleted(task));
@@ -410,25 +366,14 @@ export default function Category() {
 
   const filteredTasks = tasks
   .filter((task) => {
-    console.log("Task categories:", task.categories); // Add this
-    console.log("Selected category:", selectedCategoryId); // Add this
-    // For "All" category or no selection, show all tasks -w-
     if (!selectedCategoryId || selectedCategoryId === "All") return true;
-    console.log("All category IDs:", categories.map(c => c.CategoryId));
-    console.log("First task's categories:", tasks[0]?.categories);
     
-    if (Array.isArray(task.categories) && task.categories.length > 0) {
-      return task.categories.some(catId => String(catId) === String(selectedCategoryId));
+    if (task.task_category && task.task_category.length > 0) {
+      return task.task_category.some(tc => String(tc.CategoryId) === String(selectedCategoryId));
     }
     
     if (task.CategoryId) {
       return String(task.CategoryId) === String(selectedCategoryId);
-    }
-    
-    if (Array.isArray(task.task_category) && task.task_category.length > 0) {
-      return task.task_category.some(tc => 
-        String(tc.CategoryId || tc.categoryId) === String(selectedCategoryId)
-      );
     }
     
     return selectedCategoryId === "1" || selectedCategoryId === 1;
@@ -741,16 +686,17 @@ return (
                     onClick={() => setEditingTask(task)}
                     style={{
                       backgroundColor:
-                        categories.find((c) => Array.isArray(task.categories) && task.categories.includes(c.CategoryId))?.Category_Color ||
+                        categories.find((c) => Array.isArray(task.task_category) && task.task_category.some(tc => tc.CategoryId === c.CategoryId))?.Category_Color ||
                         "#D4B4FF"
                     }}
                     className="relative rounded-lg px-4 md:px-6 py-4 flex justify-between items-center shadow-sm border border-black cursor-pointer flex-grow  transition-all duration-200 hover:brightness-90"
                   >
                     <div className="flex items-start gap-2">
                       {/* Show all category icons for this task */}
-                      {Array.isArray(task.categories) && task.categories.length > 0 && (
+                      {Array.isArray(task.task_category) && task.task_category.length > 0 && (
                         <div className="flex gap-1 mr-2">
-                          {task.categories.map(cid => {
+                          {task.task_category.map(tc => {
+                            const cid = tc.CategoryId;
                             const cat = categories.find(c => c.CategoryId === cid);
                             return cat ? (
                               <img
@@ -814,9 +760,11 @@ return (
         saveNewCategory={(newCategory) => {
           setCategories([...categories, {
             ...newCategory,
-            CategoryId: newCategory.CategoryId || Math.random().toString(36),
+            CategoryId: newCategory.CategoryId || newCategory.id || newCategory._id,
+            Category_Name: newCategory.Category_Name || newCategory.name || newCategory.category_name || '',
+            Category_Color: newCategory.Category_Color || newCategory.color || '#D4B4FF',
+            Category_icon: newCategory.Category_icon || newCategory.Category_Icon || newCategory.icon || 'iconSmile',
           }]);
-          setAddModalOpen(false);
         }}
         existingCategories={categories}
       />
@@ -829,10 +777,17 @@ return (
         iconOptions={iconOptions}
         saveCategory={(updatedCategory) => {
           const oldId = editingCategory?.CategoryId;
-          const newId = updatedCategory.CategoryId;
+          const newId = updatedCategory.id || updatedCategory._id || updatedCategory.CategoryId || oldId;
           // Update categories
           const updatedCategories = categories.map((cat) =>
-            cat.CategoryId === oldId ? updatedCategory : cat
+            cat.CategoryId === oldId ? { 
+              ...cat, 
+              ...updatedCategory, 
+              CategoryId: newId,
+              Category_Name: updatedCategory.Category_Name || updatedCategory.name || cat.Category_Name,
+              Category_Color: updatedCategory.Category_Color || updatedCategory.color || cat.Category_Color,
+              Category_icon: updatedCategory.Category_icon || updatedCategory.Category_Icon || updatedCategory.icon || cat.Category_icon
+            } : cat
           );
           // Update tasks that use the old category
           const updatedTasks = tasks.map((task) =>
