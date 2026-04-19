@@ -3,7 +3,7 @@ import close from "../../assets/close.svg";
 import IconPickerModal from "../modals/IconPickerModal";
 import CustomColor from "../../assets/CustomColor.svg";
 import ColorPickerModal from "../modals/ColorPickerModal";
-import iconSmile from "../../assets/iconSmile.svg";
+import { apiClient } from "../../util/apiClient";
 import { iconComponents } from "./icon";
 const AddCategoryModal = ({
   addModalOpen,
@@ -29,7 +29,7 @@ const AddCategoryModal = ({
     setSelectedIcon("");
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!categoryName) {
       alert("Please enter a category name.");
       return;
@@ -37,7 +37,7 @@ const AddCategoryModal = ({
 
     const isDuplicate = existingCategories.some(
       (cat) => {
-        const catName = cat.name || cat.Category_Name || cat.category_name || '';
+        const catName = cat.Category_Name || '';
         return catName.trim().toLowerCase() === categoryName.trim().toLowerCase();
       }
     );
@@ -46,15 +46,29 @@ const AddCategoryModal = ({
       return;
     }
 
-    saveNewCategory({
-      CategoryId: Date.now().toString(),
+    const newCategoryData = {
       Category_Name: categoryName,
       Category_Color: selectedColor === null ? "#D3D3D3" : selectedColor,
-      Category_icon: selectedIcon || iconSmile,
-    });
+      Category_Icon: selectedIcon || "iconSmile",
+      Category_is_Primary: colorOptions.includes(selectedColor)
+    };
 
-    resetForm();
-    setAddModalOpen(false);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await apiClient.post('/api/category', newCategoryData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      saveNewCategory(response.data);
+      resetForm();
+      setAddModalOpen(false);
+    } catch (error) {
+      console.error("Error creating category:", error);
+      alert(`Failed to create category: ${error.response?.data?.message || error.message}`);
+    }
   };
 
   if (!addModalOpen) return null;
