@@ -8,7 +8,7 @@ import PomoSetting from '../components/modals/PomoSetting'
 import PomoAdd from './modals/PomoAdd';
 import { apiClient } from '../util/apiClient';
 function PomoTask({ onTaskSelect, activeTaskId, tasks, setTasks, fetchTasks }) {
-  const [loading] = false;
+  const [loading, _setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedTask, setSelectedTask] = useState(null); 
   const [isAdding, setIsAdding] = useState(false);
