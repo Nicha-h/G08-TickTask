@@ -11,6 +11,7 @@ function Pomodoro() {
   const [activeTask, setActiveTask] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [showNoTaskPrompt, setShowNoTaskPrompt] = useState(false);
+  const [isAddingTask, setIsAddingTask] = useState(false);
   const [error, setError] = useState('');
   const [currentSessionId, setCurrentSessionId] = useState(null);
   const API_URL = `${apiClient.defaults.baseURL}/api/pomodoroSession`;
@@ -51,25 +52,25 @@ function Pomodoro() {
   }, [intervalId]);
 
   useEffect(() => {
-    const fetchCurrentSession = async () => {
-      try {
-        // The active-session endpoint expects a userId path parameter.
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-          return;
-        }
+    // const fetchCurrentSession = async () => {
+    //   try {
+    //     // The active-session endpoint expects a userId path parameter.
+    //     const userId = localStorage.getItem('userId');
+    //     if (!userId) {
+    //       return;
+    //     }
 
-        const res = await apiClient.get(`${API_URL}/active/${userId}`, getAuthHeader());
-        if (res.data && res.data.SessionId) {
-          // Need to map based on backend response which provides timer_type
-          // and duration_seconds etc. For now we will rely entirely on local state.
-        }
-      } catch (err) {
-        console.error('Error fetching current session:', err);
-        setError('Failed to fetch current session.');
-      }
-    };
-    fetchCurrentSession();
+    //     const res = await apiClient.get(`${API_URL}/active/${userId}`, getAuthHeader());
+    //     if (res.data && res.data.SessionId) {
+    //       // Need to map based on backend response which provides timer_type
+    //       // and duration_seconds etc. For now we will rely entirely on local state.
+    //     }
+    //   } catch (err) {
+    //     console.error('Error fetching current session:', err);
+    //     setError('Failed to fetch current session.');
+    //   }
+    // };
+    // fetchCurrentSession();
     fetchTasks();
   }, []);
 
@@ -366,6 +367,8 @@ function Pomodoro() {
             tasks={tasks}
             setTasks={setTasks}
             fetchTasks={fetchTasks}
+            isAdding={isAddingTask}
+            setIsAdding={setIsAddingTask}
           />
         </div>
       </div>
@@ -376,19 +379,23 @@ function Pomodoro() {
           <div className="bg-white p-6 rounded-lg shadow-xl max-w-md w-full m-4 font-poppins text-center">
             <h2 className="text-xl font-bold mb-4 font-poppins">No Task Selected</h2>
             <p className="mb-6 text-gray-600">
-              {tasks.length > 0 
+              {tasks.some(task => !task.Pomo_Task_Status) 
                 ? "You haven't selected a task. Would you like to choose one, add a new one, or skip and run the timer anyway?"
-                : "You don't have any tasks. Would you like to add one or skip and run the timer anyway?"}
+                : "You don't have any uncompleted tasks. Would you like to add one or skip and run the timer anyway?"}
             </p>
             <div className="flex flex-col gap-3">
               <button 
                 onClick={() => {
                   setShowNoTaskPrompt(false);
-                  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                  if (tasks.some(task => !task.Pomo_Task_Status)) {
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                  } else {
+                    setIsAddingTask(true);
+                  }
                 }}
                 className="bg-green hover:bg-[#c5cf80] text-black py-2 px-4 rounded border-2 transition-transform hover:scale-105 hover:cursor-pointer font-bold"
               >
-                {tasks.length > 0 ? "Choose / Add Task" : "Add Task Below"}
+                {tasks.some(task => !task.Pomo_Task_Status) ? "Choose Task Below" : "Add Task"}
               </button>
               <button 
                 onClick={() => {
