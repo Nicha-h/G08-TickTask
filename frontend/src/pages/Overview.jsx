@@ -19,13 +19,6 @@ const Overview = () => {
   const animationRefs = useRef({});
   const donutRef = useRef(null);
 
-  // Mock data สำหรับกรณีที่ API ไม่พร้อม
-  const getMockData = () => ({
-    today: { total: 12, completed: 8, incomplete: 4 },
-    month: { total: 145, completed: 89, incomplete: 56 },
-    year: { total: 1250, completed: 890, incomplete: 360 },
-  });
-
   // Fetch data from backend
   const fetchTaskData = async () => {
     try {
@@ -33,45 +26,13 @@ const Overview = () => {
       setError(null);
 
       const response = await apiClient.get(`/api/tasks/overview`, {
-        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          // Add authorization header if needed
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
 
-      // ตรวจสอบว่า response เป็น JSON หรือไม่
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        console.warn('API did not return JSON, using mock data');
-        const mockData = getMockData();
-        const transformedData = {
-          today: {
-            total: mockData.today.total,
-            completed: mockData.today.completed,
-            inComplete: mockData.today.incomplete,
-          },
-          month: {
-            total: mockData.month.total,
-            completed: mockData.month.completed,
-            inComplete: mockData.month.incomplete,
-          },
-          year: {
-            total: mockData.year.total,
-            completed: mockData.year.completed,
-            inComplete: mockData.year.incomplete,
-          },
-        };
-        setData(transformedData);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
+      const result = response.data;
 
       // Transform backend data to match component structure
       const transformedData = {
@@ -95,29 +56,7 @@ const Overview = () => {
       setData(transformedData);
     } catch (err) {
       console.error('Error fetching task data:', err);
-
-      // ใช้ mock data เมื่อเกิด error
-      console.log('Using mock data due to API error');
-      const mockData = getMockData();
-      const transformedData = {
-        today: {
-          total: mockData.today.total,
-          completed: mockData.today.completed,
-          inComplete: mockData.today.incomplete,
-        },
-        month: {
-          total: mockData.month.total,
-          completed: mockData.month.completed,
-          inComplete: mockData.month.incomplete,
-        },
-        year: {
-          total: mockData.year.total,
-          completed: mockData.year.completed,
-          inComplete: mockData.year.incomplete,
-        },
-      };
-      setData(transformedData);
-      setError(`API Error: ${err.message} (Using sample data)`);
+      setError(`API Error: ${err.message}`);
     } finally {
       setLoading(false);
     }
