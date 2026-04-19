@@ -3,8 +3,9 @@ import close from "../../assets/close.svg";
 import IconPickerModal from "../modals/IconPickerModal";
 import CustomColor from "../../assets/CustomColor.svg";
 import ColorPickerModal from "../modals/ColorPickerModal";
-import apiClient from "../../util/apiClient";
+import { apiClient } from "../../util/apiClient";
 import { iconComponents } from "./icon";
+import ErrorBox from "../../components/ErrorBox";
 const AddCategoryModal = ({
   addModalOpen,
   setAddModalOpen,
@@ -22,6 +23,7 @@ const AddCategoryModal = ({
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedIcon, setSelectedIcon] = useState("");
   const [showColorPickerModal, setShowColorPickerModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const resetForm = () => {
     setCategoryName("");
@@ -31,7 +33,7 @@ const AddCategoryModal = ({
 
   const handleSave = async () => {
     if (!categoryName) {
-      alert("Please enter a category name.");
+      setErrorMessage("Please enter a category name.");
       return;
     }
 
@@ -42,7 +44,7 @@ const AddCategoryModal = ({
       }
     );
     if (isDuplicate) {
-      alert("This category name already exists. Please choose another name.");
+      setErrorMessage("This category name already exists. Please choose another name.");
       return;
     }
 
@@ -67,7 +69,7 @@ const AddCategoryModal = ({
       setAddModalOpen(false);
     } catch (error) {
       console.error("Error creating category:", error);
-      alert(`Failed to create category: ${error.response?.data?.message || error.message}`);
+      setErrorMessage("Something went wrong while creating the category. Please try again later or contact support if the issue persists.");
     }
   };
 
@@ -203,6 +205,14 @@ const AddCategoryModal = ({
             setShowColorPickerModal(false);
           }}
           onClose={() => setShowColorPickerModal(false)}
+        />
+      )}
+
+      {/* Error Box Modal */}
+      {errorMessage && (
+        <ErrorBox
+          errorMessage={errorMessage}
+          onClose={() => setErrorMessage("")}
         />
       )}
     </>
