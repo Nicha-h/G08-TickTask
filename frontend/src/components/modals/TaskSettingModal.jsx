@@ -115,9 +115,6 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
 
     try {
 
-      console.log("Full task object:", task);
-      console.log("Available task properties:", Object.keys(task || {}));
-    
       const taskId = task?.TaskID ||  
                     task?.taskId || 
                     task?.Task_ID || 
@@ -126,7 +123,6 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
                     task?.TaskId ||
                     task?.task_id;
       
-      console.log("Extracted Task ID:", taskId);
       
       if (!taskId) {
         console.error("Task ID not found. Task object:", task);
@@ -144,7 +140,7 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
         Task_Icon: selectedIcon,
       };
 
-      const response = await apiClient.put(
+      await apiClient.put(
         `/api/tasks/${taskId}`,
         taskData,
         {
@@ -155,12 +151,12 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
         }
       );
 
-      console.log("Task updated successfully:", response.data);
+      
       if (selectedCategoryId) {
         try {
           await apiClient.put(
-            `/api/category/${taskId}/assign`,
-            { CategoryId: selectedCategoryId },
+            `/api/category/${selectedCategoryId}/assign`,
+            { taskId: taskId },
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -168,7 +164,6 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
               },
             }
           );
-          console.log("Category assigned successfully");
         } catch (categoryError) {
           console.error("Error assigning category:", categoryError);
         
@@ -247,8 +242,6 @@ const TaskSettingModal = ({ task, onSave, onClose }) => {
         Authorization: `Bearer ${token}`,
       },
     });
-
-    console.log("Task deleted successfully");
 
     if (onSave) {
       onSave(null);
