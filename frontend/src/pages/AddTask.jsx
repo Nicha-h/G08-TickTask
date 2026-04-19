@@ -85,8 +85,8 @@ const saveTask = async () => {
 
     // If category was selected, assign the task to category
     if (selectedCategoryId) {
-      await apiClient.put(`/api/category/${taskId}/assign`, {
-        CategoryId: selectedCategoryId
+      await apiClient.put(`/api/category/${selectedCategoryId}/assign`, {
+        taskId: taskId
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
