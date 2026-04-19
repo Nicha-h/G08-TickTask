@@ -3,7 +3,7 @@ import close from "../../assets/close.svg";
 import IconPickerModal from "../modals/IconPickerModal";
 import CustomColor from "../../assets/CustomColor.svg";
 import ColorPickerModal from "../modals/ColorPickerModal";
-import { apiClient } from "../../util/apiClient";
+import apiClient from "../../util/apiClient";
 import { iconComponents } from "./icon";
 const AddCategoryModal = ({
   addModalOpen,
@@ -37,7 +37,7 @@ const AddCategoryModal = ({
 
     const isDuplicate = existingCategories.some(
       (cat) => {
-        const catName = cat.Category_Name || '';
+        const catName = cat.name || cat.Category_Name || cat.category_name || '';
         return catName.trim().toLowerCase() === categoryName.trim().toLowerCase();
       }
     );

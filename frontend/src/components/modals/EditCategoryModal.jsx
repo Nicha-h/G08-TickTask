@@ -26,9 +26,9 @@ const EditCategoryModal = ({
 
   useEffect(() => { 
     if (editingCategory) {
-      setCategoryName(editingCategory.Category_Name || "");
-      setColor(editingCategory.Category_Color || null);
-      setSelectedIcon(editingCategory.Category_icon || "iconSmile");
+      setCategoryName(editingCategory.Category_Name || editingCategory.name || "");
+      setColor(editingCategory.Category_Color || editingCategory.color || null);
+      setSelectedIcon(editingCategory.Category_icon || editingCategory.Category_Icon || editingCategory.icon || "iconSmile");
     }
   }, [editingCategory]);
 
@@ -111,9 +111,9 @@ const EditCategoryModal = ({
                   type="text"
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
-                  disabled={editingCategory.Category_Name === "All"}
+                  disabled={editingCategory.Category_Name === "All" || editingCategory.name === "All"}
                   className={`w-full border border-black rounded py-2 px-3 ${
-                    editingCategory.Category_Name === "All" ? "bg-gray-100" : ""
+                    (editingCategory.Category_Name === "All" || editingCategory.name === "All") ? "bg-gray-100" : ""
                   }`}
                 />
               </div>
@@ -126,7 +126,7 @@ const EditCategoryModal = ({
             
           }}
                   onClick={() => {
-                    if (editingCategory.Category_Name !== "All") {
+                    if (editingCategory.Category_Name !== "All" && editingCategory.name !== "All") {
                       setIconPickerOpen(true);
                     }
                   }}
