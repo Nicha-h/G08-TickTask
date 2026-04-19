@@ -7,11 +7,10 @@ import add from '@iconify-icons/mdi/add-circle-outline';
 import PomoSetting from '../components/modals/PomoSetting'
 import PomoAdd from './modals/PomoAdd';
 import { apiClient } from '../util/apiClient';
-function PomoTask({ onTaskSelect, activeTaskId, tasks, setTasks, fetchTasks }) {
+function PomoTask({ onTaskSelect, activeTaskId, tasks, setTasks, fetchTasks, isAdding, setIsAdding }) {
   const [loading, _setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedTask, setSelectedTask] = useState(null); 
-  const [isAdding, setIsAdding] = useState(false);
 
   const handleTaskCompletion = async (pomo_TaskId, currentStatus) => {
     try {
@@ -65,11 +64,11 @@ function PomoTask({ onTaskSelect, activeTaskId, tasks, setTasks, fetchTasks }) {
   };
 
   const handleAddTask = () => {
-    setIsAdding(true); 
+    if (setIsAdding) setIsAdding(true); 
   };
 
   const handleCloseAdd = () => {
-    setIsAdding(false);
+    if (setIsAdding) setIsAdding(false);
   };
 
   const handleCloseSettings = () => {
