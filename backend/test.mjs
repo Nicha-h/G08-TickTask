@@ -1,8 +1,11 @@
 /**
  * API smoke + integration tests — native fetch (Node 18+), zero dependencies.
- * Run:  node test.mjs
+ * Run:  npm test   (loads ../.env.local for NEON_AUTH_BASE_URL / NEON_REALTIME_URL)
  * Env:  TEST_BASE=http://localhost:3000 (default)
  */
+
+const AUTH_BASE = process.env.NEON_AUTH_BASE_URL;
+const ORIGIN = 'http://localhost:5173';
 
 const BASE = process.env.TEST_BASE || 'http://localhost:3000';
 const TEST_EMAIL = `test_${Date.now()}@ticktask.test`;
@@ -63,54 +66,56 @@ async function req(method, path, body, auth = false) {
 
 // ─── 1. Users ────────────────────────────────────────────────────────────────
 
+// Neon Auth (Managed Better Auth) is called directly; the API only sees the JWT it issues
+async function authReq(path, { body, cookie } = {}) {
+  const headers = { origin: ORIGIN };
+  if (body) headers['content-type'] = 'application/json';
+  if (cookie) headers.cookie = cookie;
+  const res = await fetch(`${AUTH_BASE}${path}`, {
+    method: body ? 'POST' : 'GET',
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const json = await res.json().catch(() => null);
+  const setCookie = res.headers.getSetCookie().map((c) => c.split(';')[0]).join('; ');
+  return { status: res.status, json, cookie: setCookie };
+}
+
+async function fetchJwt(cookie) {
+  const res = await authReq('/token', { cookie });
+  return res.json?.token ?? '';
+}
+
 async function testUsers() {
-  console.log('\n── Users ──');
+  console.log('\n── Users (Neon Auth) ──');
 
-  // signup
-  const signup = await req('POST', '/api/users/signup', {
-    email: TEST_EMAIL,
-    password: TEST_PASS,
+  // sign up
+  const signup = await authReq('/sign-up/email', {
+    body: { email: TEST_EMAIL, password: TEST_PASS, name: 'Tester' },
   });
-  ok('POST /signup — 200', signup.status === 200);
-  ok('POST /signup — has token', !!signup.json?.token);
-  deepOk('POST /signup — response shape', signup.json?.user, {
-    email: TEST_EMAIL,
-  });
-  token = signup.json?.token ?? '';
-  userId = signup.json?.user?.id ?? 0;
+  ok('Neon Auth sign-up — 200', signup.status === 200, JSON.stringify(signup.json));
+  ok('Neon Auth sign-up — session cookie', !!signup.cookie);
 
-  // login
-  const login = await req('POST', '/api/users/login', {
-    email: TEST_EMAIL,
-    password: TEST_PASS,
+  // sign in again, then exchange the session for a JWT
+  const login = await authReq('/sign-in/email', {
+    body: { email: TEST_EMAIL, password: TEST_PASS },
   });
-  ok('POST /login — 200', login.status === 200);
-  ok('POST /login — has token', !!login.json?.token);
-  deepOk('POST /login — correct user returned', login.json?.user, {
-    email: TEST_EMAIL,
-  });
-  token = login.json?.token ?? token;
+  ok('Neon Auth sign-in — 200', login.status === 200);
+  token = await fetchJwt(login.cookie);
+  ok('Neon Auth /token — JWT', token.split('.').length === 3);
 
-  // check-email
-  const check = await req('POST', '/api/users/check-email', {
-    email: TEST_EMAIL,
-  });
-  ok('POST /check-email — 200', check.status === 200);
-  ok('POST /check-email — exists=true', check.json?.exists === true);
-
-  // reset-password (no mail infra — just verify it responds)
-  const reset = await req('POST', '/api/users/reset-password', {
-    email: TEST_EMAIL,
-  });
-  ok(
-    'POST /reset-password — responds',
-    reset.status !== 0,
-    `status=${reset.status}`,
-  );
-
-  // get profile
+  // first authorized request creates the app user, profile and default category
   const profile = await req('GET', '/api/users/profile', null, true);
-  ok('GET /profile — 200', profile.status === 200);
+  ok('GET /profile — 200', profile.status === 200, JSON.stringify(profile.json));
+  deepOk('GET /profile — email from Neon Auth', profile.json?.user, {
+    User_Email: TEST_EMAIL,
+  });
+  userId = profile.json?.UserID ?? 0;
+  ok('GET /profile — app UserID', userId > 0);
+
+  // the same Neon Auth user maps to the same app user
+  const again = await req('GET', '/api/users/profile', null, true);
+  ok('GET /profile again — same UserID', again.json?.UserID === userId);
 
   // update profile + round-trip verify
   const profilePayload = { name: 'Tester', iconType: 'custom', iconPath: '🎯' };
@@ -142,23 +147,18 @@ async function testUsersNegative() {
   );
   token = saved;
 
-  // signup missing fields
-  const noPass = await req('POST', '/api/users/signup', { email: 'x@y.com' });
-  ok('POST /signup no password — 400/500', noPass.status >= 400);
+  // Neon Auth rejects a wrong password
+  const wrongPw = await authReq('/sign-in/email', {
+    body: { email: TEST_EMAIL, password: 'wrongpassword' },
+  });
+  ok('Neon Auth sign-in wrong password — 401', wrongPw.status === 401);
 
-  // signup invalid email
-  const badEmail = await req('POST', '/api/users/signup', {
-    email: 'notanemail',
+  // legacy auth endpoints are gone
+  const legacy = await req('POST', '/api/users/login', {
+    email: TEST_EMAIL,
     password: TEST_PASS,
   });
-  ok('POST /signup invalid email — 400/500', badEmail.status >= 400);
-
-  // login wrong password
-  const wrongPw = await req('POST', '/api/users/login', {
-    email: TEST_EMAIL,
-    password: 'wrong',
-  });
-  ok('POST /login wrong password — 401', wrongPw.status === 401);
+  ok('POST /api/users/login removed — 404', legacy.status === 404);
 }
 
 // ─── 2. Tasks ────────────────────────────────────────────────────────────────
@@ -759,6 +759,76 @@ async function testPomoTasks() {
   await req('DELETE', `/api/pomodoroSession/${freshSessionId}`, null, true);
 }
 
+// ─── 5b. Realtime ────────────────────────────────────────────────────────────
+
+async function fetchSealed(feed) {
+  const res = await req('POST', `/api/live/${feed}`, null, true);
+  return res;
+}
+
+async function testRealtime() {
+  console.log('\n── Realtime ──');
+
+  const unauth = await fetch(`${BASE}/api/live/pomodoro`, { method: 'POST' });
+  ok('POST /api/live/pomodoro without token — 401', unauth.status === 401);
+
+  const unknown = await fetchSealed('nope');
+  ok('POST /api/live/nope — 404', unknown.status === 404);
+
+  const sealed = await fetchSealed('pomodoro');
+  ok('POST /api/live/pomodoro — sealed query', sealed.status === 200 && !!sealed.json?.capability);
+
+  const { createRealtimeClient } = await import('@neon/realtime/client');
+  const client = createRealtimeClient({ url: process.env.NEON_REALTIME_URL });
+  const sub = client.subscribe(sealed.json);
+
+  const waitFor = (pred, ms = 15000) =>
+    new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`timed out; state=${JSON.stringify(sub.getState())}`)), ms);
+      const check = (snap) => {
+        if (pred(snap)) {
+          clearTimeout(timer);
+          off();
+          resolve(snap);
+        }
+      };
+      const off = sub.onChange(check);
+      check(sub.getSnapshot());
+    });
+
+  try {
+    const initial = await waitFor((snap) => snap.status === 'live' && snap.data !== undefined, 45000);
+    ok('Subscription live with initial rows', Array.isArray(initial.data), `rows=${initial.data?.length}`);
+
+    const session = await req('POST', '/api/pomodoroSession', { duration_seconds: 1500, timer_type: 'work' }, true);
+    const liveSessionId = session.json?.data?.SessionId;
+    const title = `Live ${Date.now()}`;
+    const created = await req(
+      'POST',
+      '/api/pomodoroTask',
+      { Pomo_Task_Title: title, Pomo_Task_Short: 5, Pomo_Task_Long: 15, Pomo_Target_Count: 4, SessionId: liveSessionId },
+      true,
+    );
+    const started = Date.now();
+    const changed = await waitFor((snap) => snap.data?.some((row) => row.Pomo_Task_Title === title));
+    ok(`Pomo task insert pushed live (${Date.now() - started} ms)`, !!changed);
+
+    // POST /pomodoroTask attaches the task to a session of its own
+    const id = created.json?.data?.Pomo_TaskId ?? created.json?.Pomo_TaskId;
+    const taskSessionId = changed.data.find((row) => row.Pomo_TaskId === id)?.SessionId;
+    await req('DELETE', `/api/pomodoroSession/${liveSessionId}`, null, true);
+    const del = await req('DELETE', `/api/pomodoroSession/${taskSessionId}`, null, true);
+    ok('DELETE task session — 200', del.status === 200);
+    const removed = await waitFor((snap) => !snap.data?.some((row) => row.Pomo_TaskId === id));
+    ok('Session + task delete pushed live', !!removed);
+  } catch (err) {
+    ok('Realtime subscription', false, err.message);
+  } finally {
+    sub.unsubscribe();
+    client.close();
+  }
+}
+
 // ─── 6. Cleanup ──────────────────────────────────────────────────────────────
 
 async function testCleanup() {
@@ -851,6 +921,7 @@ const suites = [
   ['testPomodoro', testPomodoro],
   ['testPomodoroNegative', testPomodoroNegative],
   ['testPomoTasks', testPomoTasks],
+  ['testRealtime', testRealtime],
   ['testCleanup', testCleanup],
   ['testOpenAPI', testOpenAPI],
 ];
