@@ -16,7 +16,7 @@ export const TaskSchema = z.object({
 const taskUpdateSchema = TaskSchema.partial();
 
 export async function validateTaskId(c: Context, next: Next) {
-  const idParam = c.req.param('id');
+  const idParam = c.req.param('id') ?? '';
   
   if (!/^\d+$/.test(idParam)) {
     return c.json({

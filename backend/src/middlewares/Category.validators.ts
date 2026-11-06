@@ -9,7 +9,7 @@ export const Category = z.object({
 });
 
 export async function validateCategoryId(c: Context, next: Next) {
-  const idParam = c.req.param('id');
+  const idParam = c.req.param('id') ?? '';
   
   if (!/^\d+$/.test(idParam)) {
     return c.json({
