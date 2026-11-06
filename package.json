@@ -2,9 +2,14 @@
   "name": "g08-ticktask",
   "private": true,
   "scripts": {
-    "docker:build": "docker build -t ticktask .",
-    "docker:start": "docker run --rm -d --name ticktask -p 3000:3000 -e NODE_ENV=production -e DATABASE_URL=file:/app/data/ticktask.db -e JWT_SECRET=dev-secret -e BACKEND_URL=http://localhost:3000 -e FRONTEND_URL=http://localhost:3000 ticktask",
+    "build": "npm --prefix frontend run build && npm --prefix backend run build",
+    "docker:build": "neon-env run -- docker build -t ticktask --build-arg NEON_AUTH_BASE_URL --build-arg NEON_REALTIME_URL .",
+    "docker:start": "neon-env run -- docker run --rm -d --name ticktask -p 3000:3000 -e NODE_ENV=production -e BACKEND_URL=http://localhost:3000 -e FRONTEND_URL=http://localhost:3000 -e DATABASE_URL -e DATABASE_URL_UNPOOLED -e NEON_AUTH_BASE_URL -e NEON_AUTH_JWKS_URL -e NEON_REALTIME_URL -e NEON_REALTIME_SECRET ticktask",
     "docker:stop": "docker stop ticktask",
     "docker:remove": "docker rmi ticktask"
+  },
+  "dependencies": {
+    "@neon/config": "^1.11.3",
+    "@neon/env": "^1.6.15"
   }
 }
