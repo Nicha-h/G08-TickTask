@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import TaskSettingModal from "../components/modals/TaskSettingModal.jsx";
 // import iconSmile from "../assets/iconSmile.svg";
 import { apiClient } from "../util/apiClient.js";
+import { useLiveSync } from "../hooks/useLiveSync.js";
 
 
 
@@ -27,6 +28,9 @@ const Calendar = () => {
 const [error, setError] = useState(null);
 
 const token = localStorage.getItem("token");
+// Bumped when the user's tasks change in Postgres, so the month refetches live
+const [liveVersion, setLiveVersion] = useState(0);
+useLiveSync("tasks", () => setLiveVersion((v) => v + 1));
   
 useEffect(() => {
   const fetchTasks = async () => {
@@ -70,7 +74,7 @@ useEffect(() => {
   };
 
   fetchTasks();
-}, [currentDate, token]); // Refetch when month changes
+}, [currentDate, token, liveVersion]); // Refetch when month changes or tasks change live
   const daysOfWeek = [
     "Sunday",
     "Monday",

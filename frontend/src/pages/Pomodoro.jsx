@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import PomoTask from '../components/PomoTask';
 import { apiClient } from '../util/apiClient';
 import ErrorBox from '../components/ErrorBox';
+import { useLiveSync } from '../hooks/useLiveSync';
 function Pomodoro() {
   const [activeMode, setActiveMode] = useState('Pomodoro');
   const [timer, setTimer] = useState(25 * 60);
@@ -73,6 +74,9 @@ function Pomodoro() {
     // fetchCurrentSession();
     fetchTasks();
   }, []);
+
+  // Pomodoro tasks edited in another tab or device show up here live
+  useLiveSync('pomodoro', () => fetchTasks());
 
   const fetchTasks = async () => {
     try {

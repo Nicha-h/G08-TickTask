@@ -3,6 +3,7 @@ import { useLocation, NavLink } from "react-router-dom";
 import TaskSettingModal from "../components/modals/TaskSettingModal"; // make sure the path is correct
 import {iconComponents} from "../components/modals/icon"; // assuming this maps Task_Icon to actual image paths
 import { apiClient } from "../util/apiClient";
+import { useLiveSync } from "../hooks/useLiveSync";
 const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
   const [tasks, setTasks] = useState(initialTasks || []);
   const [loading, setLoading] = useState(false);
@@ -17,6 +18,11 @@ const TaskList = ({ tasks: initialTasks, selectedDate = null }) => {
       fetchTasks(selectedDate);
     }
   }, [initialTasks, selectedDate]);
+
+  // Refetch the day's tasks when any of the user's tasks change, here or elsewhere
+  useLiveSync("tasks", () => {
+    if (!initialTasks && selectedDate) fetchTasks(selectedDate);
+  });
 
   const fetchTasks = async (date) => {
     setLoading(true);
