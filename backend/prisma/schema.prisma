@@ -4,8 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")          // pooled (-pooler) for app traffic
+  directUrl = env("DATABASE_URL_UNPOOLED") // direct for Prisma Migrate
 }
 
 enum TaskStatus {
@@ -34,9 +35,8 @@ model User {
   UserID        Int    @id @default(autoincrement())
   profile profile?
   User_Email String @unique
-  User_Password  String
-  resetToken     String?     
-  resetTokenExpiry DateTime? 
+  // Neon Auth (Managed Better Auth) user id, the JWT `sub`
+  authUserId String? @unique
   tasks task[]
   category category[]
 
