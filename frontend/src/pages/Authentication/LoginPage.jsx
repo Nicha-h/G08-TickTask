@@ -6,8 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '../../assets/Logo.svg';
 import Hidden from '../../assets/hidden.svg';
 import Reveal from '../../assets/Eye.svg';
-import {jwtDecode} from 'jwt-decode';
 import { apiClient } from '../../util/apiClient';
+import { authClient, completeSignIn, authResult } from '../../util/auth';
 import ErrorBox from '../../components/ErrorBox';
 function LoginPage() {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ function LoginPage() {
 
   const userSchema = z.object({
     email: z.email('Please enter a valid email'),
-    password: z.string().min(7, 'Incorrect password!'),
+    password: z.string().min(1, 'Please enter your password'),
   });
 
   const {
@@ -31,21 +31,24 @@ function LoginPage() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await apiClient.post(`/api/users/login`, data);
-      const { token } = response.data;
-  
-      localStorage.setItem('token', token);
-      const decoded = jwtDecode(token);
-      const userId = decoded.id; 
-  
-      localStorage.setItem('userId', userId);
+      const { error } = await authResult(authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+      }));
+      if (error) {
+        setErrorMessage(
+          error.status === 401
+            ? 'Invalid email or password. Please try again.'
+            : error.message || 'Something went wrong. Please try again later.',
+        );
+        return;
+      }
+
+      await completeSignIn(apiClient);
       navigate('/home');
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setErrorMessage('Invalid email or password. Please try again.');
-      } else {
-        setErrorMessage('Something went wrong. Please try again later.');
-      }
+      console.error('Error during login:', error);
+      setErrorMessage('Something went wrong. Please try again later.');
     }
   };
 

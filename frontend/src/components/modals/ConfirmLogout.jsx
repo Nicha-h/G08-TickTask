@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import Close from '../../assets/close.svg';
-import { useNavigate } from 'react-router-dom';
+import { signOut } from '../../util/auth';
 
 function ConfirmLogout({onClose }) {
-    const navigate = useNavigate();
     const [isClosing, setIsClosing] = useState(false);
 
   const closeModal = () => {
@@ -14,9 +13,10 @@ function ConfirmLogout({onClose }) {
     }, 300);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("userToken");
-    navigate("/login");
+  const handleLogout = async () => {
+    await signOut();
+    // A full page load drops any live-query subscriptions held for this user
+    window.location.assign("/login");
   };
 
   return (

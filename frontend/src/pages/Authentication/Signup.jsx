@@ -6,8 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Logo from '../../assets/Logo.svg';
 import Hidden from '../../assets/hidden.svg';
 import Reveal from '../../assets/Eye.svg';
-import {jwtDecode} from 'jwt-decode';
 import { apiClient } from '../../util/apiClient';
+import { authClient, completeSignIn, authResult } from '../../util/auth';
 import ErrorBox from '../../components/ErrorBox';
 function Signup() {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ function Signup() {
   const [errorMessage, setErrorMessage] = useState('');
   const userSchema = z.object({
     email: z.email('Please enter a valid email'),
-    password: z.string().min(7, 'Your password needs to be at least 7 characters.'),
+    password: z.string().min(8, 'Your password needs to be at least 8 characters.'),
   });
 
   const {
@@ -26,43 +26,28 @@ function Signup() {
 
   const onSubmit = async (data) => {
     try {
-      // POST request
-      const signupResponse = await apiClient.post(`/api/users/signup`, { 
+      const { error } = await authResult(authClient.signUp.email({
         email: data.email,
-        password: data.password, 
-      });
-  
-      let token = signupResponse.data?.token;
-
-      if (!token) {
-        const loginResponse = await apiClient.post(`/api/users/login`, {
-          email: data.email,
-          password: data.password,
-        });
-        token = loginResponse.data?.token;
+        password: data.password,
+        name: data.email.split('@')[0],
+      }));
+      if (error) {
+        if (error.code === 'USER_ALREADY_EXISTS' || error.status === 422) {
+          setErrorMessage('A user with this email already exists.');
+        } else if (error.status === 400) {
+          setErrorMessage('Please check your email and password and try again.');
+        } else {
+          setErrorMessage(error.message || 'Something went wrong. Please try again later.');
+        }
+        return;
       }
 
-      if (!token || typeof token !== 'string') {
-        throw new Error('Authentication token is missing or invalid.');
-      }
-  
-      localStorage.setItem('token', token);
-      const decoded = jwtDecode(token);
-      const userId = decoded.id; 
-  
-      localStorage.setItem('userId', userId);
-
+      // The first API call creates the TickTask user, profile and default category
+      await completeSignIn(apiClient);
       navigate('/home');
     } catch (error) {
       console.error('Error during signup:', error);
-       if (error.response && error.response.status === 400) {
-        setErrorMessage('Please check your email and password and try again.');
-      } else if (error.response && error.response.status === 409) {
-        setErrorMessage('A user with this email already exists.');
-      } else {
-        setErrorMessage('Something went wrong. Please try again later.');
-      }
-
+      setErrorMessage('Something went wrong. Please try again later.');
     }
   };
 

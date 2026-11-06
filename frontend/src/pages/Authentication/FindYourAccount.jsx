@@ -4,9 +4,10 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Close from '../../assets/close.svg';
-import { Navigate, NavLink} from 'react-router-dom';
-import { apiClient } from '../../util/apiClient';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { authClient, authResult } from '../../util/auth';
 function FindYourAccount() {
+  const navigate = useNavigate();
   const userSchema = z.object({
     email: z.email('Please enter a valid email'),
   });
@@ -22,11 +23,14 @@ function FindYourAccount() {
   const [emailNotFound, setEmailNotFound] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [sentTo, setSentTo] = useState('');
   const onSubmit = async (data) => {
     const { email } = data;
-    const emailExists = await checkEmailInDatabase(email);
+    // Neon Auth emails a reset code; it answers the same for unknown emails so accounts can't be probed
+    const { error } = await authResult(authClient.emailOtp.requestPasswordReset({ email }));
 
-    if (emailExists) {
+    if (!error) {
+      setSentTo(email);
       setShowModal(true);
       setEmailNotFound(false);
       clearErrors('email');
@@ -34,22 +38,10 @@ function FindYourAccount() {
       setEmailNotFound(true);
       setError('email', {
         type: 'manual',
-        message: "Couldn't find your TickTask Account",
+        message: error.message || "Couldn't send a reset code",
       });
     }
   };
-
-const checkEmailInDatabase = async (email) => {
-  try {
-    const response = await apiClient.post('/api/users/check-email', { email });
-    return response.data.exists;
-  } catch (error) {
-    console.error('Error checking email:', error);
-    return false;
-  }
-};
-
-
 
   const closeModal = () => {
     setIsClosing(true);
@@ -88,12 +80,12 @@ const checkEmailInDatabase = async (email) => {
             />
             {(emailNotFound || errors.email) && (
               <p className="text-red-500 text-xs sm:text-xs md:text-xs lg:text-sm mt-1">
-                {emailNotFound ? "Couldn't find your TickTask Account" : errors.email.message}
+                {errors.email?.message}
               </p>
             )}
           </div>
           <div className="flex justify-center item-center text-[8px] sm:text-[10px] md:text-xs lg:text-xs font-normal py-2.5">
-            Enter your email to receive an email to reset your password
+            Enter your email to receive a code to reset your password
           </div>
           <div className="mt-[21px] w-full flex justify-center">
             <button
@@ -101,7 +93,7 @@ const checkEmailInDatabase = async (email) => {
               className="w-[140px] h-[35px] text-xs md:w-[150px] md:h-[40px] md:text-sm lg:w-[180px] lg:h-[40px] lg:text-base rounded-[4px] bg-bluegray font-poppins font-semibold text-white 
               transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg cursor-pointer"
             >
-              Send reset link
+              Send reset code
             </button>
           </div>
         </form>
@@ -129,7 +121,14 @@ const checkEmailInDatabase = async (email) => {
             </div>
 
             {/* Message */}
-            <p className="font-poppins text-base mt-3">Check your inbox!</p>
+            <p className="font-poppins text-base mt-3">Check your inbox for a reset code!</p>
+            <button
+              onClick={() => navigate(`/reset-Password?email=${encodeURIComponent(sentTo)}`)}
+              className="mt-4 w-[160px] h-[35px] text-sm rounded-[4px] bg-bluegray font-poppins font-semibold text-white
+                transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg cursor-pointer"
+            >
+              Enter code
+            </button>
             {/*
             <p className="font-poppins text-xs mt-2">Didn't receive any mail?</p>
             <div>

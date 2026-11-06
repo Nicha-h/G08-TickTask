@@ -1,13 +1,34 @@
 import { db } from '../index.js'
-import bcrypt from 'bcrypt';
 
-export async function createUserInDb(email: string, plainPassword: string) {
-  const hash = await bcrypt.hash(plainPassword, 10);
-  
+// Maps a Neon Auth user to the app's User row, creating it (with its default profile and category) on first sight
+export async function findOrCreateUserByAuth(authUserId: string, email: string): Promise<number> {
+  const linked = await db.user.findUnique({ where: { authUserId } });
+  if (linked) return linked.UserID;
+
+  // A row for this email from before Neon Auth is linked rather than duplicated
+  const byEmail = await db.user.findUnique({ where: { User_Email: email } });
+  if (byEmail) {
+    await db.user.update({ where: { UserID: byEmail.UserID }, data: { authUserId } });
+    return byEmail.UserID;
+  }
+
+  try {
+    return await createUserInDb(authUserId, email);
+  } catch (err: any) {
+    // Concurrent first requests for the same user: the other one created it
+    if (err?.code === 'P2002') {
+      const existing = await db.user.findUnique({ where: { authUserId } });
+      if (existing) return existing.UserID;
+    }
+    throw err;
+  }
+}
+
+async function createUserInDb(authUserId: string, email: string) {
   const user = await db.user.create({
     data: {
       User_Email: email,
-      User_Password: hash,
+      authUserId,
       profile: {
         create: {
           Username: email,

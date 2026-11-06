@@ -8,23 +8,7 @@ export function setupUserRoutes(app: OpenAPIHono) {
   app.use("/api/users/profile", authMiddleware);
   app.use("/api/users/profile/*", authMiddleware);
 
-  // Public routes
-  app.openapi(
-    UserSchemas.signupRoute,
-    UserController.createUserController as any,
-  );
-  app.openapi(
-    UserSchemas.loginRoute,
-    UserController.loginUserController as any,
-  );
-  app.openapi(
-    UserSchemas.checkEmailRoute,
-    UserController.checkEmailController as any,
-  );
-  app.openapi(
-    UserSchemas.resetPasswordRoute,
-    UserController.resetPasswordController as any,
-  );
+  // Sign-up, login and password reset are handled by Neon Auth
 
   // Protected routes
   app.openapi(

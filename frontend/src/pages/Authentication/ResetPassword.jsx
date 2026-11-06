@@ -7,16 +7,17 @@ import { NavLink } from 'react-router-dom';
 import Reveal from '../../assets/Eye.svg';
 import Hidden from '../../assets/hidden.svg';
 import FYI from '../../assets/vineboom.svg';
-import { apiClient } from '../../util/apiClient';
+import { authClient, authResult } from '../../util/auth';
 function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const userSchema = z
     .object({
+      otp: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
       password: z
         .string()
-        .min(7, 'Your password needs to be at least 7 characters.'),
+        .min(8, 'Your password needs to be at least 8 characters.'),
       confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
@@ -30,26 +31,26 @@ function ResetPassword() {
     formState: { errors },
   } = useForm({ resolver: zodResolver(userSchema) });
 
+  const email = new URLSearchParams(window.location.search).get('email') ?? '';
+  const [errorMessage, setErrorMessage] = useState('');
+
   const onSubmit = async (data) => {
-    try {
-      const token = new URLSearchParams(window.location.search).get('token');
+    const { error } = await authResult(authClient.emailOtp.resetPassword({
+      email,
+      otp: data.otp,
+      password: data.password,
+    }));
 
-      const response = await apiClient.post(`/api/users/reset-password`, {
-        token,
-        newPassword: data.password,
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setShowModal(true);
-      } else {
-        alert(result.error || 'Something went wrong');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Something went wrong while resetting password');
+    if (error) {
+      setErrorMessage(
+        error.code === 'INVALID_OTP' || error.code === 'OTP_EXPIRED'
+          ? 'That code is invalid or expired. Request a new one.'
+          : error.message || 'Something went wrong while resetting password',
+      );
+      return;
     }
+    setErrorMessage('');
+    setShowModal(true);
   };
 
   const [showModal, setShowModal] = useState(false);
@@ -88,13 +89,37 @@ function ResetPassword() {
         <div className="sm:text-3xl md:text-4xl lg:text-5xl font-bold">
           Reset your Password
           <div className="sm:text-lg md:text-xl lg:text-2xl font-normal py-3.5">
-            Enter your new password
+            Enter the code we emailed{email ? ` to ${email}` : ''} and your new password
           </div>
         </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="w-full max-w-[300px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[470px] flex flex-col items-center transition-all duration-200 ease-in-out transform"
         >
+          {/* Reset code */}
+          <div className="font-normal font-poppins mt-[29px] w-full relative">
+            <p className="font-normal text-[13px] sm:text-[13px] md:text-[14px] lg:text-[15px] ">
+              Code
+            </p>
+            <input
+              {...register('otp')}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="123456"
+              className="w-full h-[40px] border-2 rounded-[8px] text-[14px] pl-3 pr-10"
+            />
+            {errors.otp && (
+              <p className="text-red-500 text-xs sm:text-xs md:text-xs lg:text-sm mt-1">
+                {errors.otp.message}
+              </p>
+            )}
+            {errorMessage && (
+              <p className="text-red-500 text-xs sm:text-xs md:text-xs lg:text-sm mt-1">
+                {errorMessage}
+              </p>
+            )}
+          </div>
+
           {/* Password */}
           <div className="font-normal font-poppins mt-[29px] w-full relative">
             <p className="font-normal text-[13px] sm:text-[13px] md:text-[14px] lg:text-[15px] ">
@@ -173,7 +198,7 @@ function ResetPassword() {
 
           <div className="flex flex-row items-center justify-center text-xs w-full font-light py-2.5 text-darkgray">
             <img src={FYI} className="w-4 h-4 mr-1" alt="Info" />
-            Your password needs to be at least 7 characters.
+            Your password needs to be at least 8 characters.
           </div>
 
           <div className="mt-[21px] w-full flex justify-center">
