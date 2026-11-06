@@ -8,5 +8,8 @@
     "types": ["node"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
-  }
+  },
+  "include": ["src"],
+  // src/modules is an unused copy of the app (nothing imports it) that still targets the pre-Neon auth schema
+  "exclude": ["src/modules"]
 }
