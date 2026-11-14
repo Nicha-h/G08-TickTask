@@ -4,7 +4,16 @@ Hono + Prisma API for TickTask, backed by PostgreSQL on Neon. Sign-in is handled
 
 ## Setup
 
-Environment variables come from the repo root `.env.local` (run `neon env pull` in the repo root). See `.env.example` for the full list.
+Environment variables come from the repo root `.env.local`. To create it, run these in the repo root:
+
+```bash
+npm install -g neon
+neon login
+neon link --project-id <project-id>   # ask a teammate, or copy it from the Neon Console
+neon env pull
+```
+
+`.env.example` lists every variable, including the Cloudinary keys you add yourself.
 
 ```bash
 npm install

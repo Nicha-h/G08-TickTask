@@ -13,8 +13,11 @@ You need Node.js 22+ and access to the project's Neon project (Postgres, Neon Au
    cd G08-TickTask
    npm install
    ```
-2. Pull the Neon environment variables into the repo root `.env.local` (both apps load it):
+2. Install the Neon CLI, link the repo to the TickTask Neon project and pull its environment variables into the repo root `.env.local` (both apps load it):
    ```bash
+   npm install -g neon
+   neon login
+   neon link --project-id <project-id>   # ask a teammate, or copy it from the Neon Console
    neon env pull
    ```
    `backend/.env.example` lists every variable, including the Cloudinary keys you add yourself.

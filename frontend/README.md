@@ -45,7 +45,10 @@
 
 ```bash
 npm install
-neon env pull   # writes .env.local in the repo root; both apps load it
+npm install -g neon                    # Neon CLI
+neon login
+neon link --project-id <project-id>    # ask a teammate, or copy it from the Neon Console
+neon env pull                          # writes .env.local in the repo root; both apps load it
 ```
 
 ### 1️⃣ Run the Backend
