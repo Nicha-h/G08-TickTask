@@ -11,6 +11,9 @@
 # deps
 node_modules/
 src/generated/
+
+# build output
+dist/
 # env
 .env
 .env.production

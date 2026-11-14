@@ -15,9 +15,6 @@ FROM node:24-alpine AS backend-build
 
 WORKDIR /app/backend
 
-# Install build tools needed for native modules (bcrypt)
-RUN apk add --no-cache python3 make g++
-
 COPY backend/package.json backend/package-lock.json ./
 RUN npm ci
 
