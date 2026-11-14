@@ -32,19 +32,28 @@
 ## 💻 Tech Stack
 
 - ⚛️ React + TailwindCSS (Frontend)
-- 🔥 Hono + Prisma + MySQL (Backend)
+- 🔥 Hono + Prisma + PostgreSQL on Neon (Backend)
 - 🔐 Neon Auth (email + password, password reset by email code)
 - ☁️ Cloudinary for Profile Images
+- 🔄 Neon Realtime for live task and Pomodoro sync
 
 ---
 
 ## 🚀 Getting Started
+
+### 0️⃣ Get the environment variables
+
+```bash
+npm install
+neon env pull   # writes .env.local in the repo root; both apps load it
+```
 
 ### 1️⃣ Run the Backend
 
 ```bash
 cd backend
 npm install
+npm run db:migrate
 npm run dev
 ```
 

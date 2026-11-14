@@ -4,15 +4,47 @@
 
 
 ## :rocket: Getting Started
-1. Clone the repository: bash git clone https://github.com/CSC105-2024/G08-TickTask.git `cd G08-TickTask`
 
+You need Node.js 22+ and access to the project's Neon project (Postgres, Neon Auth and Neon Realtime).
 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/CSC105-2024/G08-TickTask.git
+   cd G08-TickTask
+   npm install
+   ```
+2. Pull the Neon environment variables into the repo root `.env.local` (both apps load it):
+   ```bash
+   neon env pull
+   ```
+   `backend/.env.example` lists every variable, including the Cloudinary keys you add yourself.
+3. Start the backend (runs database migrations first):
+   ```bash
+   cd backend
+   npm install
+   npm run db:migrate
+   npm run dev
+   ```
+   The API runs on `http://localhost:3000`, with Swagger UI at `/swagger` and the OpenAPI spec at `/doc`.
+4. Start the frontend in another terminal:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   The app runs on `http://localhost:5173/`.
+
+**Docker (single container):** `npm run docker:build` then `npm run docker:start` serves the built frontend and the API together on `http://localhost:3000`.
+
+---
 ## :hammer: Frontend - React
 ### :wrench: Tech Stack
 - React
-- Axios
 - React Router DOM
 - Tailwind CSS
+- Neon Auth (`@neon/auth`)
+- Neon Realtime (`@neon/realtime`) for live task and Pomodoro sync
+- Axios
 - React Hook Form
 - Zod
 - Day.js
@@ -23,30 +55,19 @@
 - react-responsive
 - react-swipeable
 - jwt-decode
-- Cloudinary
 - Vite
-
-## :rocket: Getting Started - React Client
-1. Navigate to the frontend directory: `bash cd frontend`
-2. Install dependencies: `bash npm install`
-3. Start the development server: `bash npm run dev`
-4. The client will be running on `http://localhost:5173/`
 
 ---
 ## :wrench: Backend - Node.js
 ### :hammer_and_wrench: Tech Stack
 
-- Node.js
-- Hono
-- MySQL
+- Node.js + tsx
+- Hono with `@hono/zod-openapi` and Swagger UI
 - Prisma
-- Axios
-- bcrypt
-- Cloudinary
-- dotenv
-- formidable
-- jsonwebtoken
-- nodemailer
+- PostgreSQL on Neon
+- Neon Auth (JWTs verified with `jose`)
+- Neon Realtime
+- Cloudinary (profile pictures)
 - Zod
 
 ---
@@ -66,21 +87,23 @@ You can resend the code once every 60 seconds. The page shows the same message w
 ---
 ## :electric_plug: API Endpoints
 
+Every `/api/*` route needs the Neon Auth JWT in an `Authorization: Bearer <token>` header.
 
 ### 📥 Create (POST / PUT)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/category` | Create a new category |
-| PUT  | `/category/:id/assign` | Assign tasks to a category |
-| POST | `/session` | Create a new session |
-| POST | `/session/start` | Start a new session |
-| POST | `/pomo-task` | Create a new Pomo task |
-| POST | `/pomo-task/:id/increment` | Increment Pomodoro counter |
-| POST | `/pomo-task/:id/reset` | Reset Pomodoro counter |
-| POST | `/pomo-task/:id/target` | Set Pomodoro target count |
-| POST | `/task` | Create a new task |
-| POST | `/user/profile/upload-profile-pic` | Upload user profile picture |
+| POST | `/api/category` | Create a category |
+| PUT  | `/api/category/:id/assign` | Assign a task to a category |
+| POST | `/api/pomodoroSession` | Create a Pomodoro session |
+| POST | `/api/pomodoroSession/start` | Start a session |
+| POST | `/api/pomodoroTask` | Create a Pomodoro task |
+| POST | `/api/pomodoroTask/:id/increment` | Increment the Pomodoro counter |
+| POST | `/api/pomodoroTask/:id/reset` | Reset the Pomodoro counter |
+| POST | `/api/pomodoroTask/:id/target` | Set the Pomodoro target count |
+| POST | `/api/tasks` | Create a task |
+| POST | `/api/users/profile/upload-profile-pic` | Upload a profile picture |
+| POST | `/api/live/:feed` | Get a live query for realtime sync |
 
 ---
 
@@ -88,21 +111,21 @@ You can resend the code once every 60 seconds. The page shows the same message w
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/category` | Get all categories |
-| GET | `/category/:id/progress` | Get progress of a category |
-| GET | `/category/:id/count` | Get task count in a category |
-| GET | `/category/:id/tasks` | Get tasks in a category |
-| GET | `/session/user/:userId` | Get all sessions for a user |
-| GET | `/session/:id` | Get session by ID |
-| GET | `/session/active/:userId` | Get active session for a user |
-| GET | `/pomo-task` | Get all Pomo tasks |
-| GET | `/pomo-task/session/:sessionId` | Get tasks by session ID |
-| GET | `/pomo-task/:id` | Get Pomo task by ID |
-| GET | `/pomo-task/:id/progress` | Get Pomo task progress |
-| GET | `/task` | Get all tasks (with status filter) |
-| GET | `/task/by-date` | Get tasks by date |
-| GET | `/task/overview` | Get overview of tasks |
-| GET | `/user/profile` | Get user profile |
+| GET | `/api/category` | Get all categories |
+| GET | `/api/category/:id/progress` | Get category progress |
+| GET | `/api/category/:id/count` | Get the task count in a category |
+| GET | `/api/category/:id/tasks` | Get the tasks in a category |
+| GET | `/api/pomodoroSession/user/:userId` | Get all sessions for a user |
+| GET | `/api/pomodoroSession/:id` | Get a session by ID |
+| GET | `/api/pomodoroSession/active/:userId` | Get the active session for a user |
+| GET | `/api/pomodoroTask` | Get all Pomodoro tasks |
+| GET | `/api/pomodoroTask/session/:sessionId` | Get tasks by session |
+| GET | `/api/pomodoroTask/:id` | Get a Pomodoro task by ID |
+| GET | `/api/pomodoroTask/:id/progress` | Get Pomodoro task progress |
+| GET | `/api/tasks` | Get all tasks |
+| GET | `/api/tasks/by-date` | Get tasks by date |
+| GET | `/api/tasks/overview` | Get the task overview |
+| GET | `/api/users/profile` | Get the user profile |
 
 ---
 
@@ -110,19 +133,19 @@ You can resend the code once every 60 seconds. The page shows the same message w
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| PUT | `/category/:id` | Update a category |
-| PATCH | `/category/:id` | Partially update a category |
-| PUT | `/session/:id` | Update a session |
-| PUT | `/session/:id/pause` | Pause a session |
-| PUT | `/session/:id/resume` | Resume a session |
-| PUT | `/session/:id/complete` | Complete a session |
-| PUT | `/session/:id/time` | Update remaining time in session |
-| PUT | `/pomo-task/:id` | Update a Pomo task |
-| PUT | `/pomo-task/:id/assign` | Assign task to session |
-| PUT | `/pomo-task/:id/complete` | Complete a Pomo task |
-| PUT | `/task/:id` | Update a task |
-| PATCH | `/task/:id` | Partially update a task |
-| PUT | `/user/profile` | Update user profile |
+| PUT | `/api/category/:id` | Update a category |
+| PATCH | `/api/category/:id` | Partially update a category |
+| PUT | `/api/pomodoroSession/:id` | Update a session |
+| PUT | `/api/pomodoroSession/:id/pause` | Pause a session |
+| PUT | `/api/pomodoroSession/:id/resume` | Resume a session |
+| PUT | `/api/pomodoroSession/:id/complete` | Complete a session |
+| PUT | `/api/pomodoroSession/:id/time` | Update the remaining time |
+| PUT | `/api/pomodoroTask/:id` | Update a Pomodoro task |
+| PUT | `/api/pomodoroTask/:id/assign` | Assign a task to a session |
+| PUT | `/api/pomodoroTask/:id/complete` | Complete a Pomodoro task |
+| PUT | `/api/tasks/:id` | Update a task |
+| PATCH | `/api/tasks/:id` | Partially update a task |
+| PUT | `/api/users/profile` | Update the user profile |
 
 ---
 
@@ -130,16 +153,7 @@ You can resend the code once every 60 seconds. The page shows the same message w
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| DELETE | `/category/:id` | Delete a category |
-| DELETE | `/session/:id` | Delete a session |
-| DELETE | `/pomo-task/:id` | Delete a Pomo task |
-| DELETE | `/task/:id` | Delete a task |
----
-
-
-
-```
-4. Start the development server: `bash npm run dev`
-5. The server will be running on `http://localhost:3000`
-
-
+| DELETE | `/api/category/:id` | Delete a category |
+| DELETE | `/api/pomodoroSession/:id` | Delete a session |
+| DELETE | `/api/pomodoroTask/:id` | Delete a Pomodoro task |
+| DELETE | `/api/tasks/:id` | Delete a task |
