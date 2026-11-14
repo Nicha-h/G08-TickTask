@@ -1,5 +1,4 @@
 import type { Context } from "hono";
-import { db } from "../database/db.js";
 import { categorySchema } from "../schemas/Schemas.js";
 import { z } from "zod";
 import * as categoryModel from "../models/Category.model.js";
