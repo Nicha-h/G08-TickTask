@@ -50,6 +50,20 @@
 - Zod
 
 ---
+## :closed_lock_with_key: Authentication
+
+Sign-up, login and password reset go straight from the browser to [Neon Auth](https://neon.com/docs/auth/overview). The API never sees passwords; it only checks the JWT that Neon Auth issues.
+
+**Password reset**
+1. On the login page, choose **Forgot password? Click here** and enter your email.
+2. A 6-digit code is emailed to you. It expires after 5 minutes and stops working after 3 wrong tries.
+3. Enter the code and your new password (at least 8 characters), then sign in again.
+
+You can resend the code once every 60 seconds. The page shows the same message whether or not the email has an account, so it can't be used to find out who is registered.
+
+**Email verification:** once email verification is turned on in Neon, sign-up and login ask for a 6-digit code sent to your email before you can continue.
+
+---
 ## :electric_plug: API Endpoints
 
 
@@ -66,10 +80,6 @@
 | POST | `/pomo-task/:id/reset` | Reset Pomodoro counter |
 | POST | `/pomo-task/:id/target` | Set Pomodoro target count |
 | POST | `/task` | Create a new task |
-| POST | `/user/signup` | Create new user |
-| POST | `/user/login` | User login |
-| POST | `/user/check-email` | Check if email is registered |
-| POST | `/user/reset-password` | Request password reset |
 | POST | `/user/profile/upload-profile-pic` | Upload user profile picture |
 
 ---

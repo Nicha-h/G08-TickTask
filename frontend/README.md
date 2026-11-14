@@ -19,6 +19,10 @@
 ### 🔄 Update
 - Edit and customize **tasks**, **categories**, and **user profile** (picture & username).
 
+### 🔐 Account
+- Sign up and log in with email and password.
+- Forgot your password? Get a **6-digit code by email** and set a new one.
+
 ### 🗑️ Delete
 - Delete tasks, categories, and profile.
 - *Note:* Deleting a category won't delete the tasks within it.
@@ -29,7 +33,7 @@
 
 - ⚛️ React + TailwindCSS (Frontend)
 - 🔥 Hono + Prisma + MySQL (Backend)
-- 🔐 JWT for Authentication
+- 🔐 Neon Auth (email + password, password reset by email code)
 - ☁️ Cloudinary for Profile Images
 
 ---
