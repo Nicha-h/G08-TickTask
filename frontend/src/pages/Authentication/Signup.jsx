@@ -7,15 +7,21 @@ import Logo from '../../assets/Logo.svg';
 import Hidden from '../../assets/hidden.svg';
 import Reveal from '../../assets/Eye.svg';
 import { apiClient } from '../../util/apiClient';
-import { authClient, completeSignIn, authResult } from '../../util/auth';
+import { authClient, completeSignIn, authResult, getAuthToken } from '../../util/auth';
 import ErrorBox from '../../components/ErrorBox';
+import VerifyEmailStep from '../../components/VerifyEmailStep';
+import { emailSchema, isAuthError, otpErrorMessage, passwordSchema } from '../../util/otp';
+import { useCooldown } from '../../hooks/useCooldown';
 function Signup() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  // Credentials held only in memory while the user enters an email verification code
+  const [pendingSignIn, setPendingSignIn] = useState(null);
+  const verifyCooldown = useCooldown('verify');
   const userSchema = z.object({
-    email: z.email('Please enter a valid email'),
-    password: z.string().min(8, 'Your password needs to be at least 8 characters.'),
+    email: emailSchema,
+    password: passwordSchema,
   });
 
   const {
@@ -32,13 +38,23 @@ function Signup() {
         name: data.email.split('@')[0],
       }));
       if (error) {
-        if (error.code === 'USER_ALREADY_EXISTS' || error.status === 422) {
+        if (isAuthError(error, 'USER_ALREADY_EXISTS') || error.status === 422) {
           setErrorMessage('A user with this email already exists.');
+        } else if (error.code === 'weak_password') {
+          setErrorMessage(otpErrorMessage(error).message);
         } else if (error.status === 400) {
           setErrorMessage('Please check your email and password and try again.');
         } else {
           setErrorMessage(error.message || 'Something went wrong. Please try again later.');
         }
+        return;
+      }
+
+      // No session means Neon wants the email verified first (only once verification is turned on); it has sent a code
+      localStorage.removeItem('token');
+      if (!(await getAuthToken())) {
+        verifyCooldown.start();
+        setPendingSignIn({ email: data.email, password: data.password });
         return;
       }
 
@@ -55,10 +71,31 @@ function Signup() {
     setShowPassword((prev) => !prev);
   };
 
+  if (pendingSignIn) {
+    return (
+      <>
+        {errorMessage && <ErrorBox errorMessage={errorMessage} onClose={() => setErrorMessage('')} />}
+        <VerifyEmailStep
+          email={pendingSignIn.email}
+          onBack={() => setPendingSignIn(null)}
+          onVerified={async () => {
+            const { error } = await authResult(authClient.signIn.email(pendingSignIn));
+            if (error) {
+              navigate('/login', { replace: true });
+              return;
+            }
+            await completeSignIn(apiClient);
+            navigate('/home');
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       {errorMessage && <ErrorBox errorMessage={errorMessage} onClose={() => setErrorMessage('')} />}
-      <div className="flex flex-col justify-center items-center h-screen">
+      <div className="flex flex-col justify-center items-center h-screen px-4">
         {/* Logo */}
         <div>
           <img className="w-[120px] h-[120px] sm:w-[120px] sm:h-[120px] md:w-[135px] md:h-[135px] lg:w-[150px] lg:h-[150px] 
@@ -78,13 +115,15 @@ function Signup() {
         transition-all duration-200 ease-in-out transform">Sign Up</div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-[300px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[427px] flex flex-col items-center 
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="w-full max-w-[300px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[427px] flex flex-col items-center 
         transition-all duration-200 ease-in-out transform">
         
           <div className="font-poppins w-full">
             <p className="text-[13px] sm:text-[13px] md:text-[14px] lg:text-[15px] mb-[3px]">Email</p>
             <input
               {...register('email')}
+              type="email"
+              autoComplete="username"
               placeholder="example@mail.com"
               className="w-full h-[35px] sm:h-[35px] md:h-[37px] lg:h-[40px] border-2 rounded-[8px] text-[12px] sm:text-[12px] md:text-[12px] lg:text-[14px] pl-3"
             />
@@ -95,6 +134,7 @@ function Signup() {
             <input
               {...register('password')}
               type={showPassword ? 'text' : 'password'} 
+              autoComplete="new-password"
               placeholder="Password"
               className="w-full h-[35px] sm:h-[35px] md:h-[37px] lg:h-[40px] border-2 rounded-[8px] text-[12px] sm:text-[12px] md:text-[12px] lg:text-[14px] pl-3" 
             />

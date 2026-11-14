@@ -3,81 +3,106 @@ import Back from '../../assets/Singlearrow.svg';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { NavLink } from 'react-router-dom';
-import Reveal from '../../assets/Eye.svg';
-import Hidden from '../../assets/hidden.svg';
-import FYI from '../../assets/vineboom.svg';
-import { authClient, authResult } from '../../util/auth';
-function ResetPassword() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+import { Navigate, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { authClient, authResult, signOut } from '../../util/auth';
+import { codeSchema, otpErrorMessage, passwordSchema, pendingEmail, PASSWORD_MIN } from '../../util/otp';
+import { useCooldown } from '../../hooks/useCooldown';
+import PasswordField from '../../components/PasswordField';
+import CodeField from '../../components/CodeField';
+import ErrorBox from '../../components/ErrorBox';
 
-  const userSchema = z
-    .object({
-      otp: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email'),
-      password: z
-        .string()
-        .min(8, 'Your password needs to be at least 8 characters.'),
-      confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      error: 'Your passwords does not match',
-      path: ['confirmPassword'],
-    });
+const userSchema = z
+  .object({
+    otp: codeSchema,
+    password: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    error: 'Your passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+function ResetPassword() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  // The email comes from the forgot page through router state (or this tab's sessionStorage after a refresh), never the URL.
+  // Read once so clearing the stored copy after a successful reset doesn't trigger the redirect below.
+  const [email] = useState(() => location.state?.email ?? pendingEmail.get('reset'));
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    resetField,
+    formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(userSchema) });
 
-  const email = new URLSearchParams(window.location.search).get('email') ?? '';
+  const cooldown = useCooldown('reset');
+  const [codeError, setCodeError] = useState(null);
+  const [notice, setNotice] = useState('');
+  const [resending, setResending] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const onSubmit = async (data) => {
-    const { error } = await authResult(authClient.emailOtp.resetPassword({
-      email,
-      otp: data.otp,
-      password: data.password,
-    }));
+  if (!email) {
+    return <Navigate to="/findYourAccount" replace />;
+  }
 
-    if (error) {
-      setErrorMessage(
-        error.code === 'INVALID_OTP' || error.code === 'OTP_EXPIRED'
-          ? 'That code is invalid or expired. Request a new one.'
-          : error.message || 'Something went wrong while resetting password',
-      );
+  const resendCode = async () => {
+    if (resending || cooldown.secondsLeft > 0) return;
+    setResending(true);
+    try {
+      const { error } = await authResult(authClient.emailOtp.requestPasswordReset({ email }));
+      cooldown.start();
+      if (error?.status === 429) {
+        setCodeError({ message: 'Too many requests. Please wait a minute and try again.', needsNewCode: codeError?.needsNewCode ?? false });
+        return;
+      }
+      // A new code replaces the old one, so the old error no longer applies
+      setCodeError(null);
+      resetField('otp');
+      setNotice('New code sent. Check your email.');
+    } catch {
+      setErrorMessage("Couldn't reach the server. Check your connection and try again.");
+    } finally {
+      setResending(false);
+    }
+  };
+
+  const onSubmit = async (data) => {
+    setNotice('');
+    let error;
+    try {
+      ({ error } = await authResult(authClient.emailOtp.resetPassword({
+        email,
+        otp: data.otp,
+        password: data.password,
+      })));
+    } catch {
+      setErrorMessage("Couldn't reach the server. Check your connection and try again.");
       return;
     }
-    setErrorMessage('');
-    setShowModal(true);
+
+    if (error) {
+      setCodeError(otpErrorMessage(error));
+      return;
+    }
+
+    // Drop any session this browser still has, otherwise /login would bounce straight to /home
+    await signOut().catch(() => {});
+    pendingEmail.clear('reset');
+    cooldown.clear();
+    navigate('/login', { replace: true, state: { passwordChanged: true } });
   };
 
-  const [showModal, setShowModal] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
-
-  const closeModal = () => {
-    setIsClosing(true);
-    setTimeout(() => {
-      setShowModal(false);
-      setIsClosing(false);
-    }, 300);
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword((prev) => !prev);
-  };
+  const codeIsDead = codeError?.needsNewCode ?? false;
 
   return (
     <div>
+      {errorMessage && <ErrorBox errorMessage={errorMessage} onClose={() => setErrorMessage('')} />}
       {/* Back */}
       <div className="m-12">
         <NavLink
-          to="/login"
+          to="/findYourAccount"
+          aria-label="Back"
           className="inline-block hover:animate-bounce-left transition-transform duration-200 cursor-pointer"
         >
           <img src={Back} alt="Back" className="h-7 w-7" />
@@ -85,169 +110,64 @@ function ResetPassword() {
       </div>
 
       {/* Form */}
-      <div className="flex flex-col justify-center items-center h-screen font-poppins -mt-28">
-        <div className="sm:text-3xl md:text-4xl lg:text-5xl font-bold">
+      <div className="flex flex-col justify-center items-center min-h-screen font-poppins -mt-28 pb-12 px-4">
+        <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold">
           Reset your Password
-          <div className="sm:text-lg md:text-xl lg:text-2xl font-normal py-3.5">
-            Enter the code we emailed{email ? ` to ${email}` : ''} and your new password
+          <div className="text-sm sm:text-base md:text-lg lg:text-xl font-normal py-3.5 break-words max-w-[300px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[470px]">
+            Enter the code we emailed to <span className="font-semibold">{email}</span> and your new password.{' '}
+            <NavLink to="/findYourAccount" className="text-royalblue hover:underline whitespace-nowrap">
+              Use a different email
+            </NavLink>
           </div>
         </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
+          noValidate
           className="w-full max-w-[300px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[470px] flex flex-col items-center transition-all duration-200 ease-in-out transform"
         >
+          {/* Lets password managers save the new password against the right account */}
+          <input type="email" name="username" autoComplete="username" value={email} readOnly hidden />
+
           {/* Reset code */}
-          <div className="font-normal font-poppins mt-[29px] w-full relative">
-            <p className="font-normal text-[13px] sm:text-[13px] md:text-[14px] lg:text-[15px] ">
-              Code
-            </p>
-            <input
-              {...register('otp')}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="123456"
-              className="w-full h-[40px] border-2 rounded-[8px] text-[14px] pl-3 pr-10"
-            />
-            {errors.otp && (
-              <p className="text-red-500 text-xs sm:text-xs md:text-xs lg:text-sm mt-1">
-                {errors.otp.message}
-              </p>
-            )}
-            {errorMessage && (
-              <p className="text-red-500 text-xs sm:text-xs md:text-xs lg:text-sm mt-1">
-                {errorMessage}
-              </p>
-            )}
-          </div>
+          <CodeField
+            registration={register('otp', { onChange: () => setCodeError(null) })}
+            error={errors.otp?.message ?? codeError?.message}
+            needsNewCode={codeIsDead}
+            notice={notice}
+            secondsLeft={cooldown.secondsLeft}
+            resending={resending}
+            onResend={resendCode}
+          />
 
-          {/* Password */}
-          <div className="font-normal font-poppins mt-[29px] w-full relative">
-            <p className="font-normal text-[13px] sm:text-[13px] md:text-[14px] lg:text-[15px] ">
-              Password
-            </p>
-            <input
-              {...register('password')}
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
-              className="w-full h-[40px] border-2 rounded-[8px] text-[14px] pl-3 pr-10"
-            />
-            {/* Toggle Visibility */}
-            <button
-              type="button"
-              onClick={togglePasswordVisibility}
-              className="absolute right-3 top-[41px] md:top-[43px] lg:top-[42px] transform -translate-y-1/2 hover:scale-105"
-            >
-              {showPassword ? (
-                <img
-                  src={Reveal}
-                  alt="Hide Password"
-                  className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-all duration-200 ease-in-out transform"
-                />
-              ) : (
-                <img
-                  src={Hidden}
-                  alt="Show Password"
-                  className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-all duration-200 ease-in-out transform"
-                />
-              )}
-            </button>
-            {errors.password && (
-              <p className="text-red-500 text-xs sm:text-xs md:text-xs lg:text-sm mt-1">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
+          <PasswordField
+            id="password"
+            label="New Password"
+            registration={register('password')}
+            error={errors.password?.message}
+            hint={`At least ${PASSWORD_MIN} characters`}
+            placeholder="Password"
+          />
 
-          {/* Confirm Password */}
-          <div className="font-normal font-poppins mt-[29px] w-full relative">
-            <p className="font-normal text-[13px] sm:text-[13px] md:text-[14px] lg:text-[15px] ">
-              Confirm Password
-            </p>
-            <input
-              {...register('confirmPassword')}
-              type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="Confirm Password"
-              className="w-full h-[40px] border-2 rounded-[8px] text-[14px] pl-3 pr-10"
-            />
-            {/* Toggle Confirm Password Visibility */}
-            <button
-              type="button"
-              onClick={toggleConfirmPasswordVisibility}
-              className="absolute right-3 top-[41px] md:top-[43px] lg:top-[42px] transform -translate-y-1/2 hover:scale-105"
-            >
-              {showConfirmPassword ? (
-                <img
-                  src={Reveal}
-                  alt="Hide Password"
-                  className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-all duration-200 ease-in-out transform"
-                />
-              ) : (
-                <img
-                  src={Hidden}
-                  alt="Show Password"
-                  className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-all duration-200 ease-in-out transform"
-                />
-              )}
-            </button>
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-xs sm:text-xs md:text-xs lg:text-sm mt-1">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
+          <PasswordField
+            id="confirmPassword"
+            label="Confirm Password"
+            registration={register('confirmPassword')}
+            error={errors.confirmPassword?.message}
+            placeholder="Confirm Password"
+          />
 
-          <div className="flex flex-row items-center justify-center text-xs w-full font-light py-2.5 text-darkgray">
-            <img src={FYI} className="w-4 h-4 mr-1" alt="Info" />
-            Your password needs to be at least 8 characters.
-          </div>
-
-          <div className="mt-[21px] w-full flex justify-center">
+          <div className="mt-[29px] w-full flex justify-center">
             <button
               type="submit"
-              className="w-[140px] h-[35px] text-xs md:w-[150px] md:h-[40px] md:text-sm lg:w-[180px] lg:h-[40px] lg:text-base rounded-[4px] bg-bluegray font-poppins font-semibold text-white transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg"
+              disabled={isSubmitting || codeIsDead}
+              className="w-[140px] h-[35px] text-xs md:w-[150px] md:h-[40px] md:text-sm lg:w-[180px] lg:h-[40px] lg:text-base rounded-[4px] bg-bluegray font-poppins font-semibold text-white transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg cursor-pointer
+              disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none"
             >
-              Done
+              {isSubmitting ? 'Saving…' : 'Done'}
             </button>
           </div>
         </form>
       </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-          <div
-            className={`bg-white p-7 rounded-lg shadow-lg text-center w-full max-w-md relative ${
-              isClosing ? 'animate-scale-out' : 'animate-scale-in'
-            }`}
-          >
-            {/* Title */}
-            <h2 className="text-2xl font-poppins font-bold mb-4">
-              Password Changed!
-            </h2>
-
-            {/* Divider */}
-            <div className="flex justify-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-
-            {/* Message */}
-            <p className="font-poppins text-base mt-3">
-              Your Password has been changed successfully
-            </p>
-            <div className="mt-6">
-              <NavLink to="/login">
-                <button
-                  className="w-[140px] h-[35px] text-xs md:w-[150px] md:h-[40px] md:text-sm lg:w-[150px] lg:h-[40px] lg:text-base rounded-[4px] bg-bluegray font-poppins font-semibold text-white 
-                transition-all duration-200 ease-in-out transform hover:scale-105 hover:shadow-lg"
-                  onClick={closeModal}
-                >
-                  Back to login
-                </button>
-              </NavLink>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

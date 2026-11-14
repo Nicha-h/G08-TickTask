@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { NavLink, useNavigate, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavLink, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,13 +9,28 @@ import Reveal from '../../assets/Eye.svg';
 import { apiClient } from '../../util/apiClient';
 import { authClient, completeSignIn, authResult } from '../../util/auth';
 import ErrorBox from '../../components/ErrorBox';
+import VerifyEmailStep from '../../components/VerifyEmailStep';
+import { emailSchema, isAuthError } from '../../util/otp';
+import { useCooldown } from '../../hooks/useCooldown';
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  // Set by the reset page; read once, then cleared so a refresh doesn't show it again
+  const [passwordChanged, setPasswordChanged] = useState(() => location.state?.passwordChanged === true);
+  // Credentials held only in memory while the user enters an email verification code
+  const [pendingSignIn, setPendingSignIn] = useState(null);
+  const verifyCooldown = useCooldown('verify');
+
+  useEffect(() => {
+    if (location.state?.passwordChanged) {
+      navigate('.', { replace: true, state: null });
+    }
+  }, [location.state, navigate]);
 
   const userSchema = z.object({
-    email: z.email('Please enter a valid email'),
+    email: emailSchema,
     password: z.string().min(1, 'Please enter your password'),
   });
 
@@ -29,12 +44,27 @@ function LoginPage() {
     return <Navigate to="/home" replace />;
   }
 
+  const signIn = async ({ email, password }) => {
+    const { error } = await authResult(authClient.signIn.email({ email, password }));
+    if (error) return error;
+    await completeSignIn(apiClient);
+    navigate('/home');
+    return null;
+  };
+
   const onSubmit = async (data) => {
+    setPasswordChanged(false);
     try {
-      const { error } = await authResult(authClient.signIn.email({
-        email: data.email,
-        password: data.password,
-      }));
+      const error = await signIn(data);
+      if (isAuthError(error, 'EMAIL_NOT_VERIFIED')) {
+        // Only happens once email verification is turned on in Neon
+        if (verifyCooldown.secondsLeft === 0) {
+          await authResult(authClient.emailOtp.sendVerificationOtp({ email: data.email, type: 'email-verification' }));
+          verifyCooldown.start();
+        }
+        setPendingSignIn(data);
+        return;
+      }
       if (error) {
         setErrorMessage(
           error.status === 401
@@ -43,9 +73,6 @@ function LoginPage() {
         );
         return;
       }
-
-      await completeSignIn(apiClient);
-      navigate('/home');
     } catch (error) {
       console.error('Error during login:', error);
       setErrorMessage('Something went wrong. Please try again later.');
@@ -56,10 +83,29 @@ function LoginPage() {
     setShowPassword((prev) => !prev);
   };
 
+  if (pendingSignIn) {
+    return (
+      <>
+        {errorMessage && <ErrorBox errorMessage={errorMessage} onClose={() => setErrorMessage('')} />}
+        <VerifyEmailStep
+          email={pendingSignIn.email}
+          onBack={() => setPendingSignIn(null)}
+          onVerified={async () => {
+            const error = await signIn(pendingSignIn);
+            if (error) {
+              setPendingSignIn(null);
+              setErrorMessage('Your email is verified. Please sign in.');
+            }
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       {errorMessage && <ErrorBox errorMessage={errorMessage} onClose={() => setErrorMessage('')} />}
-      <div className="flex flex-col justify-center items-center h-screen">
+      <div className="flex flex-col justify-center items-center h-screen px-4">
         {/* Logo */}
         <div>
           <img className="w-[120px] h-[120px] sm:w-[120px] sm:h-[120px] md:w-[135px] md:h-[135px] lg:w-[150px] lg:h-[150px] 
@@ -77,13 +123,30 @@ function LoginPage() {
         <div className="font-poppins font-bold sm:text-base md:text-xl lg:text-[24px] my-6 sm:my-6 md:my-5 lg:my-5 
         transition-all duration-200 ease-in-out transform">Login</div>
 
+        {passwordChanged && (
+          <div role="status" className="w-full max-w-[300px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[427px] -mt-2 mb-5 flex items-center justify-between gap-3
+          rounded-[8px] border-2 border-greensubmit bg-honeydew px-4 py-2.5 font-poppins text-[13px] lg:text-[15px] text-darkgray">
+            <span>Password changed, please sign in.</span>
+            <button
+              type="button"
+              onClick={() => setPasswordChanged(false)}
+              aria-label="Dismiss"
+              className="cursor-pointer text-lg leading-none text-gray hover:text-darkgray"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-[300px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[427px] flex flex-col items-center 
+        <form onSubmit={handleSubmit(onSubmit)} noValidate className="w-full max-w-[300px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[427px] flex flex-col items-center 
         transition-all duration-200 ease-in-out transform">
           <div className="font-poppins w-full">
             <p className="text-[13px] sm:text-[13px] md:text-[14px] lg:text-[15px] mb-[3px]">Email</p>
             <input
               {...register('email')}
+              type="email"
+              autoComplete="username"
               placeholder="example@mail.com"
               className="w-full h-[35px] sm:h-[35px] md:h-[37px] lg:h-[40px] border-2 rounded-[8px] text-[12px] sm:text-[12px] md:text-[12px] lg:text-[14px] pl-3"
             />
@@ -94,6 +157,7 @@ function LoginPage() {
             <input
               {...register('password')}
               type={showPassword ? 'text' : 'password'} 
+              autoComplete="current-password"
               placeholder="Password"
               className="w-full h-[35px] sm:h-[35px] md:h-[37px] lg:h-[40px] border-2 rounded-[8px] text-[12px] sm:text-[12px] md:text-[12px] lg:text-[14px] pl-3" 
             />
